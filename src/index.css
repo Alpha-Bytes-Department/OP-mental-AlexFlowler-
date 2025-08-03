@@ -1,0 +1,54 @@
+
+@import url('https://fonts.googleapis.com/css2?family=League+Gothic&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+@import "tailwindcss";
+@plugin "daisyui";
+
+/* CSS Custom Properties for Fonts */
+:root {
+  --font-league-gothic: 'League Gothic', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+  
+  /* Custom Colors for Tailwind v4 */
+  --cCard: #DBD0A6;
+  --hCard: #8E7D3F;
+}
+
+/* Base font styles */
+body {
+  font-family: var(--font-inter);
+}
+
+/* Utility classes for easy font usage */
+.font-league-gothic {
+  font-family: var(--font-league-gothic);
+}
+
+.font-inter {
+  font-family: var(--font-inter);
+}
+
+/* Custom color utility classes */
+.text-cCard {
+  color: var(--cCard);
+}
+
+.text-hCard {
+  color: var(--hCard);
+}
+
+.bg-cCard {
+  background-color: var(--cCard);
+}
+
+.bg-hCard {
+  background-color: var(--hCard);
+}
+
+.border-cCard {
+  border-color: var(--cCard);
+}
+.border-hCard {
+  border-color: var(--hCard);
+}

@@ -1,3 +1,4 @@
+import Faq from "./Faq"
 import Feature from "./Feature"
 import Header from "./Header"
 import Pricing from "./Pricing"
@@ -10,6 +11,7 @@ const Home = () => {
         <Feature />
         <Pricing />
         <Testimonial />
+        <Faq/>
     </div>
   )
 }

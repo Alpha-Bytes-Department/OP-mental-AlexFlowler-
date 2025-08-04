@@ -62,7 +62,7 @@ const Pricing = () => {
       </div>
     
 
-      <div className="text-white flex items-center justify-center">
+      <div className="text-white sm:flex-row flex-col gap-6 sm:gap-4 flex items-center justify-center">
 
 
         {[
@@ -116,7 +116,11 @@ const Pricing = () => {
               <div className="text-start mb-8">
                 <span className="text-6xl font-bold text-white">
                   {planDuration === "monthly" ? plan.monthlyPrice : plan.annualPrice}
+
                 </span>
+               {plan.annualPrice!== "Free" &&<span className=" px-3">
+                  {planDuration === "monthly" ? "/per month" : "/per year"}
+                </span>}
               </div>
 
               <div className="flex justify-center mb-8">

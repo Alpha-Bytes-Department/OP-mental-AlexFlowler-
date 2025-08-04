@@ -18,8 +18,8 @@ const Header = () => {
         />
         <div className="flex sm:gap-9 gap-8 items-center">
           <Link to="https://optimalperformancesystem.com/">Home</Link>
-          <Link to="/chat">About</Link>
-          <button className="btn bg-cCard">Start Subscription</button>
+          <Link to="/chat">Coach</Link>
+          <button className="btn bg-cCard text-black">Start Subscription</button>
         </div>
       </nav>
 
@@ -35,7 +35,7 @@ const Header = () => {
           at your fingertips.
         </p>
         <div className=" flex items-center gap-4">
-          <button className="btn bg-cCard font-bold py-3 px-5">
+          <button className="btn text-black bg-cCard font-bold py-3 px-5">
             Start Subscription
           </button>
           <Link

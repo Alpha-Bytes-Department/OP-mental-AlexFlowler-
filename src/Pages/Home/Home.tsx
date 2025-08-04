@@ -1,7 +1,16 @@
+import Feature from "./Feature"
+import Header from "./Header"
+import Pricing from "./Pricing"
+import Testimonial from "./Testimonial"
 
 const Home = () => {
   return (
-    <div>Home</div>
+    <div className="bg-black">      
+        <Header />
+        <Feature />
+        <Pricing />
+        <Testimonial />
+    </div>
   )
 }
 

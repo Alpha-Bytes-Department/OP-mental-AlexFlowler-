@@ -9,6 +9,7 @@ export default {
       fontFamily: {
         'league-gothic': ['League Gothic', 'sans-serif'],
         'inter': ['Inter', 'sans-serif'],
+        'montserrat': ['Montserrat', 'sans-serif'],
       },
     },
   },

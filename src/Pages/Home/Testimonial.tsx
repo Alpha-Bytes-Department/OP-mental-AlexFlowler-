@@ -2,8 +2,6 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
 import { useState } from 'react';
 import type { Swiper as SwiperType } from 'swiper';
-// import Swiper and modules styles
-import 'swiper/css';
 import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi2";
 
 
@@ -92,8 +90,8 @@ const Testimonial = () => {
                         className="w-12 h-12 rounded-full mr-4"
                       />
                       <div>
-                        <h3 className="text-hCard text-lg font-monserrat font-semibold">{testimonial.name}</h3>
-                        <p className="font-monserrat font-semibold text-hCard text-sm">{testimonial.role}</p>
+                        <h3 className="text-hCard text-lg font-montserrat font-semibold">{testimonial.name}</h3>
+                        <p className="font-montserrat font-semibold text-hCard text-sm">{testimonial.role}</p>
                       </div>
                     </div>
                     

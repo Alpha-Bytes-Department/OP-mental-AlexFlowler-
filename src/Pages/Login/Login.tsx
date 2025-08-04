@@ -30,7 +30,7 @@ const Login = () => {
     return (
         <div className=" bg-[url('/background.png')] min-h-screen font-inter">
             <div className="flex items-center justify-center px-5  py-24  text-white">
-                <div className="border px-5 md:px-10 border-hCard rounded-[10px] bg-[##00000080] w-full max-w-lg">
+                <div className="border px-5 md:px-10 border-hCard rounded-[10px] bg-[#00000080] w-full max-w-lg">
                     <h1 className=" text-center text-4xl font-inter font-semibold pt-14">
                        Login
                     </h1>
@@ -89,7 +89,7 @@ const Login = () => {
                         </button>
                     </form>
 
-                    <Link to="/privacy" className="text-[#FAFAFD99] ">
+                    <Link to="https://optimalperformancesystem.com/privacy-policy/" className="text-[#FAFAFD99] ">
                         <p className=" text-cCard text-center pb-5">
                             Privacy Policy and <span className="text-[#FAFAFD99]">terms of service</span>
                         </p>

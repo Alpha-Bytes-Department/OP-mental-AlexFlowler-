@@ -1,6 +1,8 @@
 
 @import url('https://fonts.googleapis.com/css2?family=League+Gothic&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
 @import "tailwindcss";
 @plugin "daisyui";
@@ -9,6 +11,7 @@
 :root {
   --font-league-gothic: 'League Gothic', sans-serif;
   --font-inter: 'Inter', sans-serif;
+  --font-montserrat: 'Montserrat', sans-serif;
   
   /* Custom Colors for Tailwind v4 */
   --cCard: #DBD0A6;
@@ -27,6 +30,10 @@ body {
 
 .font-inter {
   font-family: var(--font-inter);
+}
+
+.font-montserrat {
+  font-family: var(--font-montserrat);
 }
 
 /* Custom color utility classes */

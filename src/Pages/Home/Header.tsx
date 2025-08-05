@@ -10,7 +10,7 @@ const Header = () => {
     >
       {/* Overlay for background opacity */}
       <div className="absolute inset-0 bg-black opacity-70 pointer-events-none"></div>
-      <nav className="flex sm:justify-between gap-8 relative z-10">
+      <nav className="flex sm:justify-between gap-5 sm:gap-8 relative z-10">
         <img
           className="sm:h-14 h-10 w-10 sm:w-14"
           src="/image.png"
@@ -34,7 +34,7 @@ const Header = () => {
           Experience the one-of-a-kind AI mental performance and wellness coach
           at your fingertips.
         </p>
-        <div className=" flex items-center gap-4">
+        <div className=" flex items-center flex-col sm:flex-row gap-4">
           <button className="btn text-black bg-cCard font-bold py-3 px-5">
             Start Subscription
           </button>

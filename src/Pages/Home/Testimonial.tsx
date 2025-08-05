@@ -4,7 +4,6 @@ import { useState } from 'react';
 import type { Swiper as SwiperType } from 'swiper';
 import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi2";
 
-
 const Testimonial = () => {
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
 

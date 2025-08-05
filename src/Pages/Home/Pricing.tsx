@@ -28,7 +28,7 @@ const Pricing = () => {
         Bring your business to the best scale
       </h2>
 
-      <h1 className="text-[86px] font-normal font-league-gothic text-center text-white bg-gradient-to-t from-black to-white bg-clip-text">
+      <h1 className="sm:text-[86px] text-6xl font-normal font-league-gothic text-center text-white bg-gradient-to-t from-black to-white bg-clip-text">
         Discover Products With <br /> the Best Pricing
       </h1>
       <p className="text-center pb-16 text-xl text-white font-montserrat">

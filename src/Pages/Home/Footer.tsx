@@ -177,7 +177,7 @@ const Footer = () => {
       <div className=" mt-2 max-w-4xl mx-auto">
         <div className="">
           
-          <div className="flex flex-wrap  justify-between  space-x-6 text-sm text-gray-400"><div className="text-gray-400 text-sm">
+          <div className="flex flex-wrap flex-col px-5 sm:flex-row justify-between  space-x-6 text-sm text-gray-400"><div className="text-gray-400 text-sm">
             Copyright 2025 fenyx femme
           </div>
             <Link to="/terms" className="hover:text-white transition-colors">

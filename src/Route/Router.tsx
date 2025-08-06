@@ -4,6 +4,10 @@ import Login from "../Pages/Login/Login";
 import Home from "../Pages/Home/Home";
 import Error from "../Pages/Error/Error";
 import Signup from "../Pages/SignUp/Signup";
+import ChatHome from "../Pages/Chat/ChatHome/ChatHome";
+import ChatLayout from "../Pages/Chat/ChatLayout/ChatLayout";
+import ChatSession from "../Pages/Chat/ChatSession/ChatSession";
+import Settings from "../Pages/Chat/Settings/Settings";
 
 const Router = createBrowserRouter(
   [
@@ -25,6 +29,25 @@ const Router = createBrowserRouter(
     {
       path: "/register",
       element: <Signup />,
+    },
+    {
+      path: "/chat",
+      element: <ChatLayout />,
+      errorElement: <Error />,
+      children:[
+        {
+          path: "/chat",
+          element: <ChatHome />,
+        },
+        {
+          path: "/chat/:id",
+          element: <ChatSession  />,
+        },
+        {
+          path: "/chat/settings",
+          element: <Settings />,
+        }
+      ]
     }
 
   ],

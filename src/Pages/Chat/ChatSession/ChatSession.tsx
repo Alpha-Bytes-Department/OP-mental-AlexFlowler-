@@ -124,7 +124,7 @@ const ChatSession = () => {
       }
     };
 
-    // loadInitialData();
+    loadInitialData();
   }, [sessionId]);
 
   const handleSubmit = async (e: React.FormEvent) => {

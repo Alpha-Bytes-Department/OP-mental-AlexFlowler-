@@ -1,5 +1,5 @@
 const Faq = () => {
-  return <div className=" sm:py-48 py-20 bg-[url('/background.png')]">
+  return <div className=" sm:py-48 py-20 bg-[url('/background.png')] bg-cover">
     <h1 className=" font-montserrat text-white text-3xl font-semibold sm:text-5xl text-center">Frequently asked <span className="text-yellow-500">questions</span></h1>
 
     <div className="max-w-4xl px-5 mx-auto mt-10 flex flex-col gap-5 py-10">

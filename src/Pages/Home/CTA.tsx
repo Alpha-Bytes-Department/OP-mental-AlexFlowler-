@@ -1,4 +1,14 @@
 const CTA = () => {
+  const scrollToPricing = () => {
+    const pricingElement = document.getElementById('pricing');
+    if (pricingElement) {
+      pricingElement.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
   return (
     <div  className=" bg-no-repeat bg-center bg-cover sm:px-16 px-5 py-5 sm:py-13 font-inter text-white relative"
       style={{
@@ -21,7 +31,10 @@ const CTA = () => {
             Ready to improve your mental <br /> performance?
           </h1>
           <div className="flex justify-center ">
-              <button className="mt-10  px-20 py-2 bg-cCard text-black rounded-lg">
+              <button 
+                className="mt-10  px-20 py-2 bg-cCard text-black rounded-lg"
+                onClick={scrollToPricing}
+              >
                 Start Subscription
               </button>
           </div>

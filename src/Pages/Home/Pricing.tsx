@@ -5,7 +5,7 @@ const Pricing = () => {
   const [planDuration, setPlanDuration] = useState<("monthly" | "yearly")>("monthly");
 
   return (
-    <div className="bg-[url('/background.png')] py-28">
+    <div  className="bg-[url('/background.png')] py-28 bg-cover">
       <style>
         {`@keyframes gradient-light {
           0% { opacity: 0.7; transform: translateY(20px);}
@@ -36,7 +36,7 @@ const Pricing = () => {
         less? Customize your subscription for a seamless fit!
       </p>
 
-      <div className="flex justify-center">
+      <div id="pricing" className="flex justify-center">
         <div className="flex rounded-xl p-1 backdrop:blur-2xl border gap-2 justify-center mb-12">
               <button
                 className={`px-8 py-3 bg-gradient-to-t  rounded-xl text-sm transition-colors duration-300 ${

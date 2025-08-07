@@ -13,7 +13,7 @@ const featureList=[
     {id:5,title:"OP Mental Performance Tools",icon:<AiOutlineSafety size={24} />,description:"Rest assured with our HIPAA-compliant architecture, ensuring your data's privacy and security."},
 ]
 
-  return <div className="bg-[url('/background.png')]">
+  return <div className="bg-[url('/background.png')] bg-no-repeat bg-cover">
     <div className="flex flex-col items-center justify-center pb-20 pt-10">
       <div className=" flex items-center gap-3.5 px-4 py-3 my-13 rounded-lg border border-hCard bg-[#00000080]"> 
         <div className="h-2 w-2 rounded-full bg-hCard"></div>  <h2 className="text-xl font-bold text-white">Feature Section</h2>

@@ -1,6 +1,16 @@
 import { Link } from "react-router-dom";
 
 const Header = () => {
+  const scrollToPricing = () => {
+    const pricingElement = document.getElementById('pricing');
+    if (pricingElement) {
+      pricingElement.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
   return (
     <div
       className="min-h-[100vh] bg-no-repeat bg-center bg-cover sm:px-16 px-5 py-5 sm:py-13 font-inter text-white relative"
@@ -19,7 +29,12 @@ const Header = () => {
         <div className="flex sm:gap-9 gap-8 items-center">
           <Link to="https://optimalperformancesystem.com/">Home</Link>
           <Link to="/chat">Coach</Link>
-          <button className="btn bg-cCard text-black">Start Subscription</button>
+          <button 
+            className="btn bg-cCard text-black"
+            onClick={scrollToPricing}
+          >
+            Start Subscription
+          </button>
         </div>
       </nav>
 
@@ -35,7 +50,10 @@ const Header = () => {
           at your fingertips.
         </p>
         <div className=" flex items-center flex-col sm:flex-row gap-4">
-          <button className="btn text-black bg-cCard font-bold py-3 px-5">
+          <button 
+            className="btn text-black bg-cCard font-bold py-3 px-5"
+            onClick={scrollToPricing}
+          >
             Start Subscription
           </button>
           <Link

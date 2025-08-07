@@ -68,7 +68,7 @@ const Navigation = ({
       title: "Chat history",
     },
   ];
-const [isLogOutActive,setLogOutActive] = useState(false);
+  const [isLogOutActive, setLogOutActive] = useState(false);
   return (
     <>
       {/* Mobile Hamburger Menu */}
@@ -159,7 +159,7 @@ const [isLogOutActive,setLogOutActive] = useState(false);
 
         {/* Chat History */}
         <div className="flex-1 overflow-hidden">
-          <div className="px-4 space-y-1  overflow-y-auto max-h-96">
+          <div className="px-4 space-y-1  overflow-y-auto max-h-72 lg:max-h-96">
             {chatHistory.map((chat) => (
               <NavLink
                 key={chat.id}
@@ -237,71 +237,140 @@ const [isLogOutActive,setLogOutActive] = useState(false);
               </span>
             )}
           </NavLink>
+          <NavLink
+            to="/chat/settings"
+            className={({ isActive }) => ` lg:hidden
+                w-full flex items-center gap-3 p-3 rounded-lg
+                hover:bg-[#2D2A2B] transition-colors
+              ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
+              ${isDesktopCollapsed ? "justify-center" : "justify-start"}
+            `}
+          >
+            <HiOutlineCog6Tooth size={24} className=" " />
+            {!isDesktopCollapsed && (
+              <span className="text-xl font-montserrat ">Settings</span>
+            )}
+          </NavLink>
         </div>
         <div className="w-10/12 h-[1.5px] bg-cCard mx-auto" />
-        <div className="mb-18">
+        <div className={`${!isDesktopCollapsed ? "lg:mb-18" : "mb-0"}`}>
+          {/* User Profile Section */}
           <div
             className={`
               flex items-center mx-2 rounded-lg cursor-pointer
               transition-colors
-              ${isDesktopCollapsed ? "justify-center mb-5 mt-2" : "justify-start mb-4 mt-2"}
+              ${
+                isDesktopCollapsed
+                  ? "justify-center mb-5 mt-2"
+                  : "justify-start mb-4 mt-2"
+              }
               hover:bg-[#2d2a2b]
               px-2 py-2
               sm:px-3 sm:py-2
             `}
-            style={{ marginTop: '12px' }}
+            style={{ marginTop: "12px" }}
             onClick={() => setLogOutActive((prev) => !prev)}
           >
             <div className="flex items-center gap-2 w-full">
               <div className="border rounded-full p-1 flex-shrink-0">
-          <HiOutlineUser size={24} />
+                <HiOutlineUser size={24} />
               </div>
               {!isDesktopCollapsed && (
-          <div className="text-base sm:text-lg md:text-xl font-bold text-white truncate">
-            alex_fowler
-          </div>
+                <div className="text-base sm:text-lg md:text-xl font-bold text-white truncate">
+                  alex_fowler
+                </div>
               )}
               <span className="ml-auto">
-          <FaAngleDown size={20} className="text-white" />
+                <FaAngleDown size={20} className="text-white" />
               </span>
             </div>
           </div>
           <div
             className={`
               flex items-center justify-center
-              w-10/12 mx-auto
+              w-11/12 mx-auto
               rounded-lg
               bg-[#2d2a2b]
               text-white text-base sm:text-lg md:text-xl font-bold
               py-2
-              ${isDesktopCollapsed ? "mb-5" : "mb-4"}
+              ${isDesktopCollapsed ? "mb-2" : "mb-4"}
               cursor-pointer
               hover:bg-[#232021]
               transition-all duration-700 ease-in-out
-              ${isLogOutActive ? "opacity-100 max-h-20 mt-1 pointer-events-auto" : "opacity-0 max-h-0 mt-0 pointer-events-none"}
+              ${
+                isLogOutActive
+                  ? "opacity-100 max-h-20 mt-1 pointer-events-auto"
+                  : "opacity-0 max-h-0 mt-0 pointer-events-none"
+              }
               overflow-hidden
             `}
             tabIndex={0}
             role="button"
+            onClick={() => {
+              const modal = document.getElementById(
+                "Profile_Modal"
+              ) as HTMLDialogElement | null;
+              if (modal) modal.showModal();
+            }}
             aria-hidden={!isLogOutActive}
           >
             Log Out
           </div>
         </div>
 
-        
-
         {isDesktopCollapsed && (
           <div className="w-10/12 h-[1.5px] bg-cCard mx-auto" />
         )}
         {isDesktopCollapsed && (
-          <div className=" px-2 pb-28">
-            <button className="w-full flex justify-center p-2 rounded-lg hover:bg-white/10 transition-colors">
+          <div className={`px-2 ${!isDesktopCollapsed ? "lg:mb-18" : "mb-2"}`}>
+            <NavLink
+              to="/chat/settings"
+              className={({ isActive }) => `
+                w-full flex justify-center mt-2 p-2 rounded-lg transition-colors
+                ${
+                  isActive
+                    ? "bg-[#2a2f2d] text-white"
+                    : "hover:bg-[#2a2f2d] text-white"
+                }
+              `}
+            >
               <HiOutlineCog6Tooth size={28} />
-            </button>
+            </NavLink>
           </div>
         )}
       </div>
+
+      <dialog id="Profile_Modal" className="modal">
+        <div className="modal-box max-w-lg text-center lg:px-20 pt-10 lg:pt-40 bg-[#111111]">
+          <h1 className="font-semibold font-montserrat  text-3xl">
+            Logout Confirmation
+          </h1>
+          <p className="py-9 font-montserrat text-xl">
+            Press ESC key or click the button below to close
+          </p>
+          <div className="modal-action">
+            <div className="flex justify-center w-full gap-6 pb-10 lg:pb-40  ">
+              <button
+                onClick={() => {
+                  const modal = document.getElementById(
+                    "Profile_Modal"
+                  ) as HTMLDialogElement | null;
+                  if (modal) modal.close();
+                }}
+                className="btn bg-[#2a2f2d] px-8 text-2xl font-semibold font-inter py-1 border-none text-white"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {}}
+                className="btn bg-cCard px-8 text-2xl font-semibold font-inter py-1 border-none "
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      </dialog>
     </>
   );
 };

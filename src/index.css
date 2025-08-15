@@ -1,24 +1,23 @@
-
-@import url('https://fonts.googleapis.com/css2?family=League+Gothic&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=League+Gothic&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 
 /* Import Swiper CSS */
-@import url('https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css');
+@import url("https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css");
 
 @import "tailwindcss";
 @plugin "daisyui";
 
 /* CSS Custom Properties for Fonts */
 :root {
-  --font-league-gothic: 'League Gothic', sans-serif;
-  --font-inter: 'Inter', sans-serif;
-  --font-montserrat: 'Montserrat', sans-serif;
-  
+  --font-league-gothic: "League Gothic", sans-serif;
+  --font-inter: "Inter", sans-serif;
+  --font-montserrat: "Montserrat", sans-serif;
+
   /* Custom Colors for Tailwind v4 */
-  --cCard: #DBD0A6;
-  --hCard: #8E7D3F;
+  --cCard: #dbd0a6;
+  --hCard: #8e7d3f;
 }
 
 /* Base font styles */
@@ -91,4 +90,55 @@ body {
 
 .swiper-pagination-bullet-active {
   opacity: 1;
+}
+
+/* Glassmorphic SweetAlert Styles */
+.glassmorphic-popup,
+.glassmorphic-popup-error {
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+.glassmorphic-title,
+.glassmorphic-title-error {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+.glassmorphic-text,
+.glassmorphic-text-error {
+  color: #e5e7eb !important;
+}
+
+.glassmorphic-button {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 8px !important;
+  color: #ffffff !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  transition: all 0.3s ease !important;
+}
+
+.glassmorphic-button:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+  transform: translateY(-2px) !important;
+}
+
+.glassmorphic-button-error {
+  background: rgba(239, 68, 68, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 8px !important;
+  color: #ffffff !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  transition: all 0.3s ease !important;
+}
+
+.glassmorphic-button-error:hover {
+  background: rgba(239, 68, 68, 0.4) !important;
+  transform: translateY(-2px) !important;
 }

@@ -1,10 +1,12 @@
 import { FcGoogle } from "react-icons/fc";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CiMail } from "react-icons/ci";
 import { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { IoLockClosedOutline } from "react-icons/io5";
-import { useForm } from "react-hook-form";
+import {  useForm } from "react-hook-form";
+import { useAxios } from "../../Providers/AxiosProvider";
+import Swal from "sweetalert2";
 
 type Inputs = {
   email: string;
@@ -13,41 +15,112 @@ type Inputs = {
 };
 
 const Signup = () => {
+  const axios = useAxios();
+  const navigate= useNavigate()
+  const [isLoading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] =
     useState<boolean>(false);
   const {
     register,
-    handleSubmit,watch,
+    handleSubmit,
+    watch,
+    reset,
     formState: { errors },
   } = useForm<Inputs>();
-const password = watch("password");
-const passwordValidation = {
+  const password = watch("password");
+  const passwordValidation = {
     required: "Password is required",
     minLength: {
-        value: 6,
-        message: "Password must be at least 6 characters long",
+      value: 6,
+      message: "Password must be at least 6 characters long",
     },
     pattern: {
-        value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,}$/,
-        message:
-            "Password must contain at least one letter, one number, and one special character",
+      value:
+        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,}$/,
+      message:
+        "Password must contain at least one letter, one number, and one special character",
     },
-};
+  };
 
-const confirmPasswordValidation = {
+  const confirmPasswordValidation = {
     required: "Confirm password is required",
-    validate: (value: string) =>
-        value === password || "Passwords do not match",
-};
+    validate: (value: string) => value === password || "Passwords do not match",
+  };
 
-  const onSubmit = (data: Inputs) => {
-    // Safe console log
+  const onSubmit = async (data: Inputs) => {
+    event?.preventDefault();
+    setLoading(true);
     console.log("Login Data:", {
       email: data.email,
       password: data.password,
-      confirmPassword:data.confirm_password
+      confirmPassword: data.confirm_password,
     });
+    try {
+      const response = await axios.post("/api/users/register/", {
+        email: data.email,
+        password: data.password,
+        password_confirm: data.confirm_password,
+      });
+      if (response.status === 201 || response.status === 200) {
+        Swal.fire({
+          title: "Success!",
+          text: "Registration successful.",
+          icon: "success",
+          confirmButtonText: "OK",
+          background: "rgba(255, 255, 255, 0.1)",
+          backdrop: "rgba(0, 0, 0, 0.4)",
+          customClass: {
+            popup: "glassmorphic-popup",
+            title: "glassmorphic-title",
+            htmlContainer: "glassmorphic-text",
+            confirmButton: "glassmorphic-button",
+          },
+        });
+        console.log("Registration successful:", response.data);
+        const emailDomain = data.email.split("@")[1]?.toLowerCase();
+        let emailProviderUrl = "";
+        switch (emailDomain) {
+        case "gmail.com":
+          emailProviderUrl = "https://mail.google.com/mail/u/0/#inbox";
+          window.open(emailProviderUrl, "_blank");
+          break;
+        case "outlook.com":
+        case "hotmail.com":
+          emailProviderUrl = "https://outlook.live.com/mail/inbox";
+          window.open(emailProviderUrl, "_blank");
+          break;
+        case "yahoo.com":
+          emailProviderUrl = "https://mail.yahoo.com/d/folders/1";
+          window.open(emailProviderUrl, "_blank");
+          break;
+        default:
+          window.open("mailto:" + data.email, "_blank");
+        }
+
+        setLoading(false);
+        
+        reset();
+        navigate("/verify");
+      }
+    } catch (error) {
+      console.error("Registration Error:", error);
+      Swal.fire({
+        title: "Error!",
+        text: error.message,
+        icon: "error",
+        confirmButtonText: "Try Again",
+        background: "rgba(255, 255, 255, 0.1)",
+        backdrop: "rgba(0, 0, 0, 0.4)",
+        customClass: {
+          popup: "glassmorphic-popup-error",
+          title: "glassmorphic-title-error",
+          htmlContainer: "glassmorphic-text-error",
+          confirmButton: "glassmorphic-button-error",
+        },
+      });
+      setLoading(false);
+    }
   };
 
   return (
@@ -85,7 +158,7 @@ const confirmPasswordValidation = {
                 {...register("email", { required: true })}
               />
             </div>
-           
+
             <div className="flex items-center text-cCard gap-1 border border-cCard rounded-[6px] px-3 py-2">
               <IoLockClosedOutline size={24} />
               <div className="h-4 ml-2 w-0 border-cCard border-1"></div>
@@ -108,7 +181,7 @@ const confirmPasswordValidation = {
                 )}
               </button>
             </div>
-            {errors.password&&<p>{errors.password.message}!</p>}
+            {errors.password && <p>{errors.password.message}!</p>}
 
             <div className="flex items-center text-cCard gap-1 border border-cCard rounded-[6px] px-3 py-2">
               <IoLockClosedOutline size={24} />
@@ -117,7 +190,9 @@ const confirmPasswordValidation = {
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Confirm Password"
                 className="input w-full bg bg-transparent focus:outline-none border-none shadow-none text-lg font-medium "
-                {...register("confirm_password", { ...confirmPasswordValidation })}
+                {...register("confirm_password", {
+                  ...confirmPasswordValidation,
+                })}
               />
               <button
                 type="button"
@@ -132,16 +207,22 @@ const confirmPasswordValidation = {
                 )}
               </button>
             </div>
-            {errors.confirm_password && <p>{errors.confirm_password.message}!</p>}
+            {errors.confirm_password && (
+              <p>{errors.confirm_password.message}!</p>
+            )}
             <button
               type="submit"
-              className=" text-black text-sm my-8 font-medium justify-center gap-2 bg-cCard rounded-[6px] py-5"
+              disabled={isLoading}
+              className=" text-black text-sm my-8 font-medium justify-center gap-2 bg-cCard rounded-[6px] disabled:opacity-50 py-5"
             >
               Sign up
             </button>
           </form>
 
-          <Link to="https://optimalperformancesystem.com/privacy-policy/" className="text-[#FAFAFD99] ">
+          <Link
+            to="https://optimalperformancesystem.com/privacy-policy/"
+            className="text-[#FAFAFD99] "
+          >
             <p className=" text-cCard text-center pb-5">
               Privacy Policy and{" "}
               <span className="text-[#FAFAFD99]">terms of service</span>

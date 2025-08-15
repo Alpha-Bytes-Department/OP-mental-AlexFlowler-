@@ -8,6 +8,7 @@ import ChatHome from "../Pages/Chat/ChatHome/ChatHome";
 import ChatLayout from "../Pages/Chat/ChatLayout/ChatLayout";
 import ChatSession from "../Pages/Chat/ChatSession/ChatSession";
 import Settings from "../Pages/Chat/Settings/Settings";
+import Verify from "../Pages/MailVerifiy/Verify";
 
 const Router = createBrowserRouter(
   [
@@ -19,6 +20,10 @@ const Router = createBrowserRouter(
         {
           path: "/",
           element: <Home/>,
+        },
+        {
+          path: "/verify",
+          element: <Verify />,
         },
       ],
     },

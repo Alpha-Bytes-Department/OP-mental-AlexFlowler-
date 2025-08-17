@@ -2,7 +2,6 @@ import { FiPlusCircle } from "react-icons/fi";
 import {
   HiOutlineBars3,
   HiOutlineXMark,
-  HiOutlineChatBubbleLeft,
   HiOutlineCog6Tooth,
   HiOutlineChevronLeft,
   HiOutlineUser,

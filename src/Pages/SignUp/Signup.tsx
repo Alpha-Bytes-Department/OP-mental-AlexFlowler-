@@ -107,7 +107,9 @@ const Signup = () => {
       console.error("Registration Error:", error);
       Swal.fire({
         title: "Error!",
-        text: error.message,
+        text: typeof error === "object" && error !== null && "message" in error
+          ? (error as { message: string }).message
+          : "An unknown error occurred.",
         icon: "error",
         confirmButtonText: "Try Again",
         background: "rgba(255, 255, 255, 0.1)",

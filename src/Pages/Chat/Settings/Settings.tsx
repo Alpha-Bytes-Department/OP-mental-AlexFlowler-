@@ -1,6 +1,9 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { IoCamera } from "react-icons/io5";
+import { useState, useEffect } from "react";
+import { set, useForm } from "react-hook-form";
+import { IoCamera, IoPencil, IoSave, IoClose } from "react-icons/io5";
+import { FaUserCircle } from "react-icons/fa";
+import { useAxios } from "../../../Providers/AxiosProvider";
+import Swal from "sweetalert2";
 
 interface SettingsFormData {
   logo: FileList;
@@ -12,47 +15,149 @@ interface SettingsFormData {
 }
 
 const Settings = () => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [userData, setUserData] = useState(() => {
+    return JSON.parse(localStorage.getItem("user") || "{}");
+  });
+  const axios = useAxios();
+  const baseUrl = "http://10.10.12.53:8000";
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
+    reset,
   } = useForm<SettingsFormData>({
     defaultValues: {
-      name: "",
-      address: "",
-      username: "",
-      description: "",
-      gender: "",
+      name: userData.name || "",
+      address: userData.address || "",
+      username: userData.username || "",
+      description: userData.description || "",
+      gender: userData.gender || "",
     },
   });
 
-  const onSubmit = (data: SettingsFormData) => {
+  const onSubmit = async (data: SettingsFormData) => {
     console.log("Settings Form Data:", data);
+    setLoading(true);
+    try {
+      // Create FormData for proper file upload handling
+      const formData = new FormData();
+
+      // Append text fields
+      formData.append("name", data.name);
+      formData.append("username", data.username);
+      formData.append("description", data.description || "");
+      formData.append("gender", data.gender);
+
+      // Only append profile_image if a file was selected
+      if (data.logo && data.logo.length > 0) {
+        formData.append("profile_image", data.logo[0]);
+      }
+
+      // Log FormData contents for debugging
+      console.log("FormData contents:");
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
+
+      const response = await axios.patch("/api/users/profile/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log("Settings updated successfully:", response.data);
+      if (response.status === 200 || response.status === 201) {
+        setTimeout(async () => {
+          const userDetail = await axios.get("/api/users/profile/");
+          console.log("User details fetched successfully:", userDetail.data);
+
+          // Update local state and localStorage
+          const updatedUser = userDetail.data;
+          setUserData(updatedUser);
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+
+          // Update form values with new data
+          reset({
+            name: updatedUser.name || "",
+            address: updatedUser.address || "",
+            username: updatedUser.username || "",
+            description: updatedUser.description || "",
+            gender: updatedUser.gender || "",
+          });
+
+          // Update gender dropdown
+          setSelectedGender(updatedUser.gender || "Select Gender");
+
+          // Update profile image preview
+          setPreviewImage(
+            updatedUser.profile_image
+              ? `${baseUrl}${updatedUser.profile_image}`
+              : null
+          );
+
+          // Turn off edit mode
+          setIsEditing(false);
+
+          Swal.fire({
+            title: "Success!",
+            text: "Profile Update successful.",
+            icon: "success",
+            confirmButtonText: "OK",
+            background: "rgba(255, 255, 255, 0.1)",
+            backdrop: "rgba(0, 0, 0, 0.4)",
+            customClass: {
+              popup: "glassmorphic-popup",
+              title: "glassmorphic-title",
+              htmlContainer: "glassmorphic-text",
+              confirmButton: "glassmorphic-button",
+            },
+          });
+          setLoading(false);
+        }, 1000);
+      }
+    } catch (error) {
+      console.error("Error updating settings:", error);
+      setLoading(false);
+    }
   };
 
   // State for custom gender dropdown
   const [isOpen, setIsOpen] = useState(false);
   const [selectedGender, setSelectedGender] = useState("Select Gender");
-  const genderOptions = [
-    "Select Gender",
-    "Male",
-    "Female",
-    "Other",
-    "Prefer not to say",
-  ];
+  const genderOptions = ["Select Gender", "Men", "Women", "Other"];
 
   // State for image preview
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(
+    userData.profile_image ? `${baseUrl}${userData.profile_image}` : null
+  );
+
+  // Update form when userData changes
+  useEffect(() => {
+    reset({
+      name: userData.name || "",
+      address: userData.address || "",
+      username: userData.username || "",
+      description: userData.description || "",
+      gender: userData.gender || "",
+    });
+    setSelectedGender(userData.gender || "Select Gender");
+    setPreviewImage(
+      userData.profile_image ? `${baseUrl}${userData.profile_image}` : null
+    );
+  }, [userData, reset]);
 
   const handleGenderSelect = (value: string) => {
+    if (!isEditing) return;
     setSelectedGender(value);
     setValue("gender", value === "Select Gender" ? "" : value);
     setIsOpen(false);
   };
 
-  // Handle file upload and preview
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isEditing) return;
     const file = event.target.files?.[0];
     if (file) {
       // Create preview URL
@@ -64,43 +169,98 @@ const Settings = () => {
     }
   };
 
+  const toggleEdit = () => {
+    if (isEditing) {
+      // Cancel edit - reset form to original values
+      reset({
+        name: userData.name || "",
+        address: userData.address || "",
+        username: userData.username || "",
+        description: userData.description || "",
+        gender: userData.gender || "",
+      });
+      setSelectedGender(userData.gender || "Select Gender");
+      setPreviewImage(
+        userData.profile_image ? `${baseUrl}${userData.profile_image}` : null
+      );
+    }
+    setIsEditing(!isEditing);
+  };
+
+  const getProfileImage = () => {
+    if (previewImage) {
+      return (
+        <img
+          src={previewImage}
+          alt="Profile"
+          className="w-full h-full object-cover rounded-full"
+        />
+      );
+    }
+    return <FaUserCircle size={48} className="text-white/70" />;
+  };
+
   return (
     <div className="min-h-screen text-white py-4 sm:py-8 lg:py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8 sm:mb-12">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl text-center font-bold">
+        <div className="mb-8 sm:mb-12 flex justify-between items-center">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
             General Settings
           </h1>
+          <button
+            onClick={toggleEdit}
+            className="flex items-center gap-2 px-4 py-2 bg-transparent border border-white/30 rounded-lg hover:bg-white/10 transition-colors"
+          >
+            {isEditing ? (
+              <>
+                <IoClose size={20} />
+                <span className="hidden sm:inline">Cancel</span>
+              </>
+            ) : (
+              <>
+                <IoPencil size={20} />
+                <span className="hidden sm:inline">Edit Profile</span>
+              </>
+            )}
+          </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 sm:space-y-8">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-6 sm:space-y-8"
+        >
           {/* Upload Logo Section */}
           <div className="flex flex-col items-center mb-6 sm:mb-8">
             <label
-              htmlFor="logo-upload"
-              className="cursor-pointer hover:scale-105 duration-300"
+              htmlFor={isEditing ? "logo-upload" : undefined}
+              className={`${
+                isEditing ? "cursor-pointer hover:scale-105" : "cursor-default"
+              } duration-300 relative`}
             >
-              <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mb-3 border border-white p-2 sm:p-3 rounded-full flex items-center justify-center transition overflow-hidden">
-                {previewImage ? (
-                  <img
-                    src={previewImage}
-                    alt="Logo preview"
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                ) : (
-                  <IoCamera size={24} className="sm:w-8 sm:h-8" />
+              <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mb-3 border border-white/30 p-1 rounded-full flex items-center justify-center transition overflow-hidden bg-gray-800/50">
+                {getProfileImage()}
+                {isEditing && (
+                  <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                    <IoCamera size={24} className="text-white" />
+                  </div>
                 )}
               </div>
-              <input
-                id="logo-upload"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileUpload}
-              />
+              {isEditing && (
+                <input
+                  id="logo-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileUpload}
+                />
+              )}
             </label>
-            <p className="text-base sm:text-lg font-medium">Upload Logo</p>
+            <p className="text-base sm:text-lg font-medium text-center">
+              {isEditing
+                ? "Click to Upload Profile Picture"
+                : "Profile Picture"}
+            </p>
           </div>
 
           {/* Form Fields Container */}
@@ -109,7 +269,10 @@ const Settings = () => {
             <div className="w-full lg:w-1/2 max-w-md mx-auto lg:mx-0 space-y-6 sm:space-y-8">
               {/* Name Field */}
               <div className="space-y-2">
-                <label htmlFor="name" className="block text-base sm:text-lg font-medium">
+                <label
+                  htmlFor="name"
+                  className="block text-base sm:text-lg font-medium"
+                >
                   Name
                 </label>
                 <input
@@ -117,16 +280,24 @@ const Settings = () => {
                   type="text"
                   id="name"
                   placeholder="your name"
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-transparent border border-cCard rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/60 transition-colors text-sm sm:text-base"
+                  disabled={!isEditing}
+                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-transparent border border-cCard rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/60 transition-colors text-sm sm:text-base ${
+                    !isEditing ? "opacity-70 cursor-not-allowed" : ""
+                  }`}
                 />
-                {errors.name && (
-                  <p className="text-red-400 text-xs sm:text-sm">{errors.name.message}</p>
+                {errors.name && isEditing && (
+                  <p className="text-red-400 text-xs sm:text-sm">
+                    {errors.name.message}
+                  </p>
                 )}
               </div>
 
               {/* Username Field */}
               <div className="space-y-2">
-                <label htmlFor="username" className="block text-base sm:text-lg font-medium">
+                <label
+                  htmlFor="username"
+                  className="block text-base sm:text-lg font-medium"
+                >
                   Username
                 </label>
                 <input
@@ -136,9 +307,12 @@ const Settings = () => {
                   type="text"
                   id="username"
                   placeholder="your username"
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-transparent border border-cCard rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/60 transition-colors text-sm sm:text-base"
+                  disabled={!isEditing}
+                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-transparent border border-cCard rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/60 transition-colors text-sm sm:text-base ${
+                    !isEditing ? "opacity-70 cursor-not-allowed" : ""
+                  }`}
                 />
-                {errors.username && (
+                {errors.username && isEditing && (
                   <p className="text-red-400 text-xs sm:text-sm">
                     {errors.username.message}
                   </p>
@@ -147,16 +321,25 @@ const Settings = () => {
 
               {/* Gender Field (Custom Dropdown) */}
               <div className="space-y-2">
-                <label htmlFor="gender" className="block text-base sm:text-lg font-medium">
+                <label
+                  htmlFor="gender"
+                  className="block text-base sm:text-lg font-medium"
+                >
                   Gender
                 </label>
                 <div className="relative">
                   <div
-                    {...register("gender", { required: "Gender is required" })}
-                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-cCard rounded-lg text-white focus:outline-none focus:border-white/60 transition-colors cursor-pointer bg-transparent flex items-center justify-between text-sm sm:text-base"
-                    onClick={() => setIsOpen(!isOpen)}
+                    {...register("gender")}
+                    className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-cCard rounded-lg text-white focus:outline-none focus:border-white/60 transition-colors bg-transparent flex items-center justify-between text-sm sm:text-base ${
+                      isEditing
+                        ? "cursor-pointer"
+                        : "cursor-not-allowed opacity-70"
+                    }`}
+                    onClick={() => isEditing && setIsOpen(!isOpen)}
                     style={{
-                      backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
+                      backgroundImage: isEditing
+                        ? `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`
+                        : "none",
                       backgroundPosition: "right 0.75rem center",
                       backgroundRepeat: "no-repeat",
                       backgroundSize: "1.5em 1.5em",
@@ -164,7 +347,7 @@ const Settings = () => {
                   >
                     {selectedGender}
                   </div>
-                  {isOpen && (
+                  {isOpen && isEditing && (
                     <div className="absolute w-full mt-1 border border-cCard rounded-lg z-10 max-h-48 overflow-y-auto">
                       {genderOptions.map((option) => (
                         <div
@@ -178,7 +361,7 @@ const Settings = () => {
                     </div>
                   )}
                 </div>
-                {errors.gender && (
+                {errors.gender && isEditing && (
                   <p className="text-red-400 text-xs sm:text-sm">
                     {errors.gender.message}
                   </p>
@@ -190,21 +373,22 @@ const Settings = () => {
             <div className="w-full lg:w-1/2 max-w-md mx-auto lg:mx-0 space-y-6 sm:space-y-8">
               {/* Address Field */}
               <div className="space-y-2">
-                <label htmlFor="address" className="block text-base sm:text-lg font-medium">
+                <label
+                  htmlFor="address"
+                  className="block text-base sm:text-lg font-medium"
+                >
                   Address
                 </label>
                 <input
-                  {...register("address", { required: "Address is required" })}
+                  {...register("address")}
                   type="text"
                   id="address"
-                  placeholder="yourname584@gmail.com"
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-transparent border border-cCard rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/60 transition-colors text-sm sm:text-base"
+                  placeholder="your address"
+                  disabled={!isEditing}
+                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-transparent border border-cCard rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/60 transition-colors text-sm sm:text-base ${
+                    !isEditing ? "opacity-70 cursor-not-allowed" : ""
+                  }`}
                 />
-                {errors.address && (
-                  <p className="text-red-400 text-xs sm:text-sm">
-                    {errors.address.message}
-                  </p>
-                )}
               </div>
 
               {/* Description Field */}
@@ -220,21 +404,28 @@ const Settings = () => {
                   id="description"
                   rows={4}
                   placeholder="your information here!"
-                  className="w-full min-h-[120px] sm:min-h-[140px] lg:min-h-[160px] px-3 sm:px-4 py-2.5 sm:py-3 bg-transparent border border-cCard rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/60 transition-colors resize-none text-sm sm:text-base"
+                  disabled={!isEditing}
+                  className={`w-full min-h-[120px] sm:min-h-[140px] lg:min-h-[160px] px-3 sm:px-4 py-2.5 sm:py-3 bg-transparent border border-cCard rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/60 transition-colors resize-none text-sm sm:text-base ${
+                    !isEditing ? "opacity-70 cursor-not-allowed" : ""
+                  }`}
                 />
               </div>
             </div>
           </div>
 
-          {/* Save Button */}
-          <div className="flex justify-center pt-6 sm:pt-8">
-            <button
-              type="submit"
-              className="w-full sm:w-auto px-8 sm:px-12 lg:px-16 py-3 sm:py-4 bg-cCard text-black font-bold text-base sm:text-lg rounded-lg transition-all duration-200 transform hover:scale-105 max-w-xs"
-            >
-              Save
-            </button>
-          </div>
+          {/* Save Button - Only show when editing */}
+          {isEditing && (
+            <div className="flex justify-center pt-6 sm:pt-8">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full disabled:opacity-50 sm:w-auto px-8 sm:px-12 lg:px-16 py-3 sm:py-4 bg-cCard text-black font-bold text-base sm:text-lg rounded-lg transition-all duration-200 transform hover:scale-105 max-w-xs flex items-center justify-center gap-2"
+              >
+                <IoSave size={20} />
+                {loading ? "Saving..." : "Save Settings"}
+              </button>
+            </div>
+          )}
         </form>
       </div>
     </div>

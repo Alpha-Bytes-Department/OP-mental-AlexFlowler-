@@ -25,6 +25,7 @@ const Verify = () => {
                     setMessage("Your email has been successfully verified!");
                     localStorage.setItem("access", response.data.access);
                     localStorage.setItem("refresh", response.data.refresh);
+                    localStorage.setItem("user", JSON.stringify(response.data.user));
                     setTimeout(() => {
                         navigate("/chat");
                     }, 1000);

@@ -9,8 +9,10 @@ import {
 } from "react-icons/hi2";
 import { SiGoogletasks } from "react-icons/si";
 import { FaAngleDown, FaBookJournalWhills, FaBrain } from "react-icons/fa6";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAxios } from "../Providers/AxiosProvider";
+import Swal from "sweetalert2";
 
 interface NavigationProps {
   isMobileMenuOpen: boolean;
@@ -25,50 +27,45 @@ const Navigation = ({
   toggleMobileMenu,
   toggleDesktopCollapse,
 }: NavigationProps) => {
-  const chatHistory = [
-    {
-      id: 1,
-      title: "Chat history",
-    },
-    { id: 2, title: "Chat history" },
-    {
-      id: 3,
-      title: "Chat history",
-    },
-    {
-      id: 4,
-      title: "Chat history",
-    },
-    {
-      id: 5,
-      title: "Chat history",
-    },
-    {
-      id: 6,
-      title: "Chat history",
-    },
-    {
-      id: 7,
-      title: "Chat history",
-    },
-    {
-      id: 8,
-      title: "Chat history",
-    },
-    {
-      id: 9,
-      title: "Chat history",
-    },
-    {
-      id: 10,
-      title: "Chat history",
-    },
-    {
-      id: 11,
-      title: "Chat history",
-    },
-  ];
   const [isLogOutActive, setLogOutActive] = useState(false);
+  const navigate = useNavigate();
+  const axios=useAxios()
+  const handleLogOut=async()=>{
+    console.log("Logging out...");
+    try {
+      const response = await axios.post("/api/users/logout/");
+      console.log("Logout successful:", response.data);
+      if (response.status === 200 || response.status === 201) {
+        localStorage.removeItem("user");
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
+        const modal = document.getElementById(
+          "Profile_Modal"
+        ) as HTMLDialogElement | null;
+        if (modal) modal.close();
+      }
+       Swal.fire({
+                  title: "Success!",
+                  text: "Logout successful.",
+                  icon: "success",
+                  confirmButtonText: "OK",
+                  background: "rgba(255, 255, 255, 0.1)",
+                  backdrop: "rgba(0, 0, 0, 0.4)",
+                  customClass: {
+                    popup: "glassmorphic-popup",
+                    title: "glassmorphic-title",
+                    htmlContainer: "glassmorphic-text",
+                    confirmButton: "glassmorphic-button",
+                  },
+                });
+                navigate("/");
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+
+    
+  }
+
   return (
     <>
       {/* Mobile Hamburger Menu */}
@@ -138,183 +135,156 @@ const Navigation = ({
           <div className="md:h-11/12 h-full hidden lg:block w-[2px] absolute left-64 lg:left-72 lg:my-7 bg-cCard" />
         )}
 
-        {/* Main Actions */}
-        <div className="p-4 space-y-2">
-          <NavLink
-            to="/chat"
-            end
-            className={({ isActive }) => `
-              w-full flex items-center gap-3 p-3 rounded-lg
-              hover:bg-[#2D2A2B] transition-colors 
-              ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
-              ${isDesktopCollapsed ? "justify-center" : "justify-start"}
-            `}
-          >
-            <FiPlusCircle size={24} className=" " />
-            {!isDesktopCollapsed && (
-              <span className="text-xl font-montserrat ">Start new chat</span>
-            )}
-          </NavLink>
-        </div>
+        {/* Main Actions - Flex container to separate top and bottom sections */}
+        <div className="flex flex-col flex-1 justify-between">
+          {/* Top Section - Start New Chat */}
+          <div className="p-4 space-y-2">
+            <NavLink
+              to="/chat"
+              end
+              className={({ isActive }) => `
+                w-full flex items-center gap-3 p-3 rounded-lg
+                hover:bg-[#2D2A2B] transition-colors
+                ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
+                ${isDesktopCollapsed ? "justify-center" : "justify-start"}
+              `}
+            >
+              <FiPlusCircle size={24} className=" " />
+              {!isDesktopCollapsed && (
+                <span className="text-xl font-montserrat ">Start new chat</span>
+              )}
+            </NavLink>
+          </div>
 
-        {/* Chat History */}
-        <div className="flex-1 overflow-hidden">
-          <div className="px-4 space-y-1  overflow-y-auto max-h-72 lg:max-h-96">
-            {chatHistory.map((chat) => (
+          {/* Bottom Section - Other Navigation Items and User Profile */}
+          <div>
+            <div className="p-4 space-y-2">
               <NavLink
-                key={chat.id}
-                to={`/chat/${chat.id}`}
+                to="/mindset"
                 className={({ isActive }) => `
-                        flex items-center gap-3 p-3 rounded-lg
-                        hover:bg-[#2D2A2B] transition-colors
-                        ${isActive ? "bg-[#2D2A2B]" : ""}
-                        ${
-                          isDesktopCollapsed
-                            ? "justify-center"
-                            : "justify-start"
-                        }
-                    `}
+                    w-full flex items-center gap-3 p-3 rounded-lg
+                    hover:bg-[#2D2A2B] transition-colors
+                  ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
+                  ${isDesktopCollapsed ? "justify-center" : "justify-start"}
+                `}
               >
-                <div className=" flex items-center justify-center">
-                  <HiOutlineChatBubbleLeft size={24} className="" />
-                </div>
+                <FaBrain size={24} className=" " />
                 {!isDesktopCollapsed && (
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xl font-medium text-white">
-                      {chat.title}
-                    </div>
-                  </div>
+                  <span className="text-xl font-montserrat ">
+                    Mindset Mantra
+                  </span>
                 )}
               </NavLink>
-            ))}
-          </div>
-        </div>
-
-        {/* User Profile */}
-
-        <div className="p-4 space-y-2">
-          <NavLink
-            to="/mindset"
-            className={({ isActive }) => `
-                w-full flex items-center gap-3 p-3 rounded-lg
-                hover:bg-[#2D2A2B] transition-colors
-              ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
-              ${isDesktopCollapsed ? "justify-center" : "justify-start"}
-            `}
-          >
-            <FaBrain size={24} className=" " />
-            {!isDesktopCollapsed && (
-              <span className="text-xl font-montserrat ">Mindset Mantra</span>
-            )}
-          </NavLink>
-          <NavLink
-            to="/journal"
-            className={({ isActive }) => `
-                w-full flex items-center gap-3 p-3 rounded-lg
-                hover:bg-[#2D2A2B] transition-colors
-              ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
-              ${isDesktopCollapsed ? "justify-center" : "justify-start"}
-            `}
-          >
-            <FaBookJournalWhills size={24} className=" " />
-            {!isDesktopCollapsed && (
-              <span className="text-xl font-montserrat ">Journal</span>
-            )}
-          </NavLink>
-          <NavLink
-            to="/internal-challenge"
-            className={({ isActive }) => `
-                w-full flex items-center gap-3 p-3 rounded-lg
-                hover:bg-[#2D2A2B] transition-colors
-              ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
-              ${isDesktopCollapsed ? "justify-center" : "justify-start"}
-            `}
-          >
-            <SiGoogletasks size={24} className=" " />
-            {!isDesktopCollapsed && (
-              <span className="text-xl font-montserrat ">
-                Internal Challenge
-              </span>
-            )}
-          </NavLink>
-          <NavLink
-            to="/chat/settings"
-            className={({ isActive }) => ` lg:hidden
-                w-full flex items-center gap-3 p-3 rounded-lg
-                hover:bg-[#2D2A2B] transition-colors
-              ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
-              ${isDesktopCollapsed ? "justify-center" : "justify-start"}
-            `}
-          >
-            <HiOutlineCog6Tooth size={24} className=" " />
-            {!isDesktopCollapsed && (
-              <span className="text-xl font-montserrat ">Settings</span>
-            )}
-          </NavLink>
-        </div>
-        <div className="w-10/12 h-[1.5px] bg-cCard mx-auto" />
-        <div className={`${!isDesktopCollapsed ? "lg:mb-18" : "mb-0"}`}>
-          {/* User Profile Section */}
-          <div
-            className={`
-              flex items-center mx-2 rounded-lg cursor-pointer
-              transition-colors
-              ${
-                isDesktopCollapsed
-                  ? "justify-center mb-5 mt-2"
-                  : "justify-start mb-4 mt-2"
-              }
-              hover:bg-[#2d2a2b]
-              px-2 py-2
-              sm:px-3 sm:py-2
-            `}
-            style={{ marginTop: "12px" }}
-            onClick={() => setLogOutActive((prev) => !prev)}
-          >
-            <div className="flex items-center gap-2 w-full">
-              <div className="border rounded-full p-1 flex-shrink-0">
-                <HiOutlineUser size={24} />
-              </div>
-              {!isDesktopCollapsed && (
-                <div className="text-base sm:text-lg md:text-xl font-bold text-white truncate">
-                  alex_fowler
-                </div>
-              )}
-              <span className="ml-auto">
-                <FaAngleDown size={20} className="text-white" />
-              </span>
+              <NavLink
+                to="/journal"
+                className={({ isActive }) => `
+                    w-full flex items-center gap-3 p-3 rounded-lg
+                    hover:bg-[#2D2A2B] transition-colors
+                  ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
+                  ${isDesktopCollapsed ? "justify-center" : "justify-start"}
+                `}
+              >
+                <FaBookJournalWhills size={24} className=" " />
+                {!isDesktopCollapsed && (
+                  <span className="text-xl font-montserrat ">Journal</span>
+                )}
+              </NavLink>
+              <NavLink
+                to="/internal-challenge"
+                className={({ isActive }) => `
+                    w-full flex items-center gap-3 p-3 rounded-lg
+                    hover:bg-[#2D2A2B] transition-colors
+                  ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
+                  ${isDesktopCollapsed ? "justify-center" : "justify-start"}
+                `}
+              >
+                <SiGoogletasks size={24} className=" " />
+                {!isDesktopCollapsed && (
+                  <span className="text-xl font-montserrat ">
+                    Internal Challenge
+                  </span>
+                )}
+              </NavLink>
+              <NavLink
+                to="/chat/settings"
+                className={({ isActive }) => ` lg:hidden
+                    w-full flex items-center gap-3 p-3 rounded-lg
+                    hover:bg-[#2D2A2B] transition-colors
+                  ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
+                  ${isDesktopCollapsed ? "justify-center" : "justify-start"}
+                `}
+              >
+                <HiOutlineCog6Tooth size={24} className=" " />
+                {!isDesktopCollapsed && (
+                  <span className="text-xl font-montserrat ">Settings</span>
+                )}
+              </NavLink>
             </div>
-          </div>
-          <div
-            className={`
-              flex items-center justify-center
-              w-11/12 mx-auto
-              rounded-lg
-              bg-[#2d2a2b]
-              text-white text-base sm:text-lg md:text-xl font-bold
-              py-2
-              ${isDesktopCollapsed ? "mb-2" : "mb-4"}
-              cursor-pointer
-              hover:bg-[#232021]
-              transition-all duration-700 ease-in-out
-              ${
-                isLogOutActive
-                  ? "opacity-100 max-h-20 mt-1 pointer-events-auto"
-                  : "opacity-0 max-h-0 mt-0 pointer-events-none"
-              }
-              overflow-hidden
-            `}
-            tabIndex={0}
-            role="button"
-            onClick={() => {
-              const modal = document.getElementById(
-                "Profile_Modal"
-              ) as HTMLDialogElement | null;
-              if (modal) modal.showModal();
-            }}
-            aria-hidden={!isLogOutActive}
-          >
-            Log Out
+            <div className="w-10/12 h-[1.5px] bg-cCard mx-auto" />
+            <div className={`${!isDesktopCollapsed ? "lg:mb-18" : "mb-0"}`}>
+              {/* User Profile Section */}
+              <div
+                className={`
+                  flex items-center mx-2 rounded-lg cursor-pointer
+                  transition-colors
+                  ${
+                    isDesktopCollapsed
+                      ? "justify-center mb-5 mt-2"
+                      : "justify-start mb-4 mt-2"
+                  }
+                  hover:bg-[#2d2a2b]
+                  px-2 py-2
+                  sm:px-3 sm:py-2
+                `}
+                style={{ marginTop: "12px" }}
+                onClick={() => setLogOutActive((prev) => !prev)}
+              >
+                <div className="flex items-center gap-2 w-full">
+                  <div className="border rounded-full p-1 flex-shrink-0">
+                    <HiOutlineUser size={24} />
+                  </div>
+                  {!isDesktopCollapsed && (
+                    <div className="text-base sm:text-lg md:text-xl font-bold text-white truncate">
+                      alex_fowler
+                    </div>
+                  )}
+                  <span className="ml-auto">
+                    <FaAngleDown size={20} className="text-white" />
+                  </span>
+                </div>
+              </div>
+              <div
+                className={`
+                  flex items-center justify-center
+                  w-11/12 mx-auto
+                  rounded-lg
+                  bg-[#2d2a2b]
+                  text-white text-base sm:text-lg md:text-xl font-bold
+                  py-2
+                  ${isDesktopCollapsed ? "mb-2" : "mb-4"}
+                  cursor-pointer
+                  hover:bg-[#232021]
+                  transition-all duration-700 ease-in-out
+                  ${
+                    isLogOutActive
+                      ? "opacity-100 max-h-20 mt-1 pointer-events-auto"
+                      : "opacity-0 max-h-0 mt-0 pointer-events-none"
+                  }
+                  overflow-hidden
+                `}
+                tabIndex={0}
+                role="button"
+                onClick={() => {
+                  const modal = document.getElementById(
+                    "Profile_Modal"
+                  ) as HTMLDialogElement | null;
+                  if (modal) modal.showModal();
+                }}
+                aria-hidden={!isLogOutActive}
+              >
+                Log Out
+              </div>
+            </div>
           </div>
         </div>
 
@@ -362,7 +332,7 @@ const Navigation = ({
                 Cancel
               </button>
               <button
-                onClick={() => {}}
+                onClick={() => {handleLogOut()}}
                 className="btn bg-cCard px-8 text-2xl font-semibold font-inter py-1 border-none "
               >
                 Confirm

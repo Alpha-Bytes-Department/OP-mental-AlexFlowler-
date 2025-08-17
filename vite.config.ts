@@ -8,4 +8,5 @@ export default defineConfig({
     port: 3000,
     host: true, // or use '0.0.0.0'
   },
+  
 })

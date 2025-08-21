@@ -17,7 +17,7 @@ const ChatLayout = () => {
 
   return (
     <div
-      className="flex  bg-black text-white relative"
+      className="flex h-screen bg-black text-white relative"
       style={{
         backgroundImage: "url('/background.png')",
         backgroundSize: "cover",
@@ -52,7 +52,7 @@ const ChatLayout = () => {
         )}
 
         {/* Page Content */}
-        <div className="flex-1 pt-16 lg:pt-0">
+        <div className="flex-1 pt-16 lg:pt-0  overflow-y-scroll">
           <Outlet />
         </div>
       </div>

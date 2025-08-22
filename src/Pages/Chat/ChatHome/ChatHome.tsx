@@ -163,91 +163,38 @@ const ChatHome = () => {
         `}
       </style>
 
-      <div className="flex flex-col h-screen text-white relative">
-        {/* Chat Messages Area - Fixed height with scrolling */}
-        <div className="flex-1 flex flex-col">
-          {/* Welcome Section */}
-          <div
-            className={`flex flex-col items-center justify-center text-center space-y-8 transition-all duration-1000 ease-in-out p-4 ${
-              hasMessages
-                ? "opacity-0 pointer-events-none transform -translate-y-5"
-                : "opacity-100 pointer-events-auto transform translate-y-0"
-            } ${hideWelcome ? "hidden" : ""}`}
-          >
-            <div className="flex flex-1 items-center justify-center min-h-[60vh]">
-              <div className="space-y-4">
-                <h1 className="text-5xl md:text-6xl font-bold text-white">
-                  Start a New Chat
-                </h1>
-                <h2 className="text-2xl md:text-3xl font-medium text-white/80">
-                  What can I help with?
-                </h2>
+      <div className="flex flex-col text-white">
+        {/* Chat Messages Area */}
+        <div className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 ">
+          <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto">
+            {messageData.map((item) => (
+              <div
+                key={item.id}
+                className={`flex animate-fadeInUp ${
+                  item.sender === "user" ? "justify-end" : "justify-start"
+                }`}
+              >
+                <div
+                  className={`text-start max-w-[85%] sm:max-w-xs md:max-w-sm lg:max-w-lg xl:max-w-2xl 2xl:max-w-3xl p-3 sm:p-4 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl text-sm sm:text-base md:text-lg leading-relaxed ${
+                    item.sender === "user"
+                      ? "bg-cCard text-black ml-auto"
+                      : "bg-transparent border border-cCard text-white mr-auto"
+                  }`}
+                >
+                  {item.status === "loading" ? (
+                    <span>Thinking...</span>
+                  ) : (
+                    <p>{item.message}</p>
+                  )}
+                </div>
               </div>
-            </div>
-          </div>
-
-          {/* Messages Container - Fixed Height with Scrolling */}
-          <div
-            className={`transition-all duration-1000 ease-in-out ${
-              hasMessages && messageData.length > 0
-                ? "opacity-100 flex-1"
-                : "opacity-0 h-0"
-            }`}
-            style={{
-              height:
-                hasMessages && messageData.length > 0
-                  ? "calc(100vh - 140px)"
-                  : "0px",
-              maxHeight: "calc(100vh - 140px)",
-            }}
-          >
-            <div className="h-full overflow-y-auto scroll-smooth px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16">
-              <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto">
-                {messageData.map((item) => (
-                  <div
-                    key={item.id}
-                    className={`flex animate-fadeInUp ${
-                      item.sender === "user" ? "justify-end" : "justify-start"
-                    }`}
-                  >
-                    <div
-                      className={`text-start max-w-[85%] sm:max-w-xs md:max-w-sm lg:max-w-lg xl:max-w-2xl 2xl:max-w-3xl p-3 sm:p-4 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl text-sm sm:text-base md:text-lg leading-relaxed ${
-                        item.sender === "user"
-                          ? "bg-cCard text-black ml-auto"
-                          : "bg-transparent border border-cCard text-white mr-auto"
-                      }`}
-                    >
-                      {item.status === "loading" ? (
-                        <div className="flex items-center gap-2">
-                          <div className="flex space-x-1">
-                            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-bounce"></div>
-                            <div
-                              className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-bounce"
-                              style={{ animationDelay: "0.1s" }}
-                            ></div>
-                            <div
-                              className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-bounce"
-                              style={{ animationDelay: "0.2s" }}
-                            ></div>
-                          </div>
-                          <span className="text-xs sm:text-sm text-gray-300">
-                            Thinking...
-                          </span>
-                        </div>
-                      ) : (
-                        <p>{item.message}</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-                <div ref={messagesEndRef} />
-              </div>
-            </div>
+            ))}
+            <div ref={messagesEndRef} />
           </div>
         </div>
 
-        {/* Chat Input - Fixed at bottom */}
-        <div className="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-sm border-t border-white/10 z-50">
+        {/* Chat Input - Stays Fixed at Bottom */}
+        <div className="sticky bottom-0 left-0 right-0 bg-black/80 backdrop-blur-sm border-t border-white/10 z-50">
           <div className="p-4 sm:p-6">
             <div className="max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl mx-auto">
               <form className="w-full" onSubmit={handleSubmit(onSubmit)}>

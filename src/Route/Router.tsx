@@ -9,6 +9,8 @@ import ChatLayout from "../Pages/Chat/ChatLayout/ChatLayout";
 import ChatSession from "../Pages/Chat/ChatSession/ChatSession";
 import Settings from "../Pages/Chat/Settings/Settings";
 import Verify from "../Pages/MailVerifiy/Verify";
+import MindsetMantra from "../Pages/MindsetMantra/MindsetMantra";
+import Journal from "../Pages/Journal/Journal";
 
 const Router = createBrowserRouter(
   [
@@ -51,6 +53,14 @@ const Router = createBrowserRouter(
         {
           path: "/chat/settings",
           element: <Settings />,
+        },
+        {
+          path: "/chat/mindset",
+          element: <MindsetMantra/>
+        },
+        {
+          path: "/chat/journal",
+          element: <Journal/>
         }
       ]
     }

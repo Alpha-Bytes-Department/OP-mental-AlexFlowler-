@@ -159,7 +159,7 @@ const Navigation = ({
           <div>
             <div className="p-4 space-y-2">
               <NavLink
-                to="/mindset"
+                to="/chat/mindset"
                 className={({ isActive }) => `
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
@@ -175,7 +175,7 @@ const Navigation = ({
                 )}
               </NavLink>
               <NavLink
-                to="/journal"
+                to="/chat/journal"
                 className={({ isActive }) => `
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
@@ -189,7 +189,7 @@ const Navigation = ({
                 )}
               </NavLink>
               <NavLink
-                to="/internal-challenge"
+                to="/chat/internal-challenge"
                 className={({ isActive }) => `
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors

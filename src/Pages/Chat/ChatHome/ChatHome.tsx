@@ -166,29 +166,38 @@ const ChatHome = () => {
       <div className="h-screen flex flex-col text-white">
         {/* Chat Messages Area */}
         <div className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 pb-24">
-          <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto">
-            {messageData.map((item) => (
-              <div
-                key={item.id}
-                className={`flex animate-fadeInUp ${
-                  item.sender === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
+          <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto h-full">
+            {messageData.length > 0 ? (
+              messageData.map((item) => (
                 <div
-                  className={`text-start max-w-[85%] sm:max-w-xs md:max-w-sm lg:max-w-lg xl:max-w-2xl 2xl:max-w-3xl p-3 sm:p-4 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl text-sm sm:text-base md:text-lg leading-relaxed ${
-                    item.sender === "user"
-                      ? "bg-cCard text-black ml-auto"
-                      : "bg-transparent border border-cCard text-white mr-auto"
+                  key={item.id}
+                  className={`flex animate-fadeInUp ${
+                    item.sender === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
-                  {item.status === "loading" ? (
-                    <span>Thinking...</span>
-                  ) : (
-                    <p>{item.message}</p>
-                  )}
+                  <div
+                    className={`text-start max-w-[85%] sm:max-w-xs md:max-w-sm lg:max-w-lg xl:max-w-2xl 2xl:max-w-3xl p-3 sm:p-4 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl text-sm sm:text-base md:text-lg leading-relaxed ${
+                      item.sender === "user"
+                        ? "bg-cCard text-black ml-auto"
+                        : "bg-transparent border border-cCard text-white mr-auto"
+                    }`}
+                  >
+                    {item.status === "loading" ? (
+                      <span>Thinking...</span>
+                    ) : (
+                      <p>{item.message}</p>
+                    )}
+                  </div>
                 </div>
+              ))
+            ) : (
+              <div className="flex flex-col justify-around gap-96 mt-24 h-full items-center">
+                <h1 className="text-4xl lg:text-7xl font-semibold mx-auto ">
+                  Start a New Chat
+                </h1>
+                <p className="text-xl lg:text-4xl">What I can help with ?</p>
               </div>
-            ))}
+            )}
             <div ref={messagesEndRef} />
           </div>
         </div>

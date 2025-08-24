@@ -43,11 +43,11 @@ const Router = createBrowserRouter(
       errorElement: <Error />,
       children:[
         {
-          path: "/chat",
+          path: "/chat/general",
           element: <ChatHome />,
         },
         {
-          path: "/chat/:id",
+          path: "/chat/general/:id",
           element: <ChatSession  />,
         },
         {

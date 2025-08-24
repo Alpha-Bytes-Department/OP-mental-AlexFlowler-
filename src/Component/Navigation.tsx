@@ -26,9 +26,11 @@ const Navigation = ({
   toggleMobileMenu,
   toggleDesktopCollapse,
 }: NavigationProps) => {
+
   const [isLogOutActive, setLogOutActive] = useState(false);
   const navigate = useNavigate();
   const axios = useAxios();
+  
   const handleLogOut = async () => {
     console.log("Logging out...");
     try {
@@ -137,7 +139,7 @@ const Navigation = ({
           {/* Top Section - Start New Chat */}
           <div className="p-4 space-y-2">
             <NavLink
-              to="/chat"
+              to="/chat/general"
               end
               className={({ isActive }) => `
                 w-full flex items-center gap-3 p-3 rounded-lg
@@ -215,7 +217,7 @@ const Navigation = ({
           <div>
             <div className="p-4 space-y-2">
               <NavLink
-                to="/chat"
+                to="/chat/general"
                 end
                 className={({ isActive }) => `
                 w-full flex items-center gap-3 p-3 rounded-lg

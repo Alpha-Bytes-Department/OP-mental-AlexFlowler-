@@ -126,7 +126,7 @@ const Signup = () => {
   };
 
   return (
-    <div className=" bg-[url('/background.png')] min-h-screen font-inter  max-w-lg">
+    <div className=" bg-[url('/background.png')] min-h-screen font-inter ">
       <div className="flex items-center justify-center px-5 py-24  text-white">
         <div className="border px-5 md:px-10 border-hCard rounded-[10px] bg-[#00000080] w-full max-w-lg">
           <h1 className=" text-center text-4xl font-inter font-semibold pt-14">

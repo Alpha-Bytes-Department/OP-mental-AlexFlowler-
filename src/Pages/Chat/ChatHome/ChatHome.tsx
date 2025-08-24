@@ -113,10 +113,6 @@ const ChatHome = () => {
         )
       );
 
-      setTimeout(() => {
-        const sessionId = `session_${Date.now()}`;
-        navigate(`/chat/${sessionId}`);
-      }, 3000);
     } catch (error) {
       setMessageData((prev) =>
         prev.map((msg) =>

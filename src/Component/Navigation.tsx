@@ -28,8 +28,8 @@ const Navigation = ({
 }: NavigationProps) => {
   const [isLogOutActive, setLogOutActive] = useState(false);
   const navigate = useNavigate();
-  const axios=useAxios()
-  const handleLogOut=async()=>{
+  const axios = useAxios();
+  const handleLogOut = async () => {
     console.log("Logging out...");
     try {
       const response = await axios.post("/api/users/logout/");
@@ -43,27 +43,25 @@ const Navigation = ({
         ) as HTMLDialogElement | null;
         if (modal) modal.close();
       }
-       Swal.fire({
-                  title: "Success!",
-                  text: "Logout successful.",
-                  icon: "success",
-                  confirmButtonText: "OK",
-                  background: "rgba(255, 255, 255, 0.1)",
-                  backdrop: "rgba(0, 0, 0, 0.4)",
-                  customClass: {
-                    popup: "glassmorphic-popup",
-                    title: "glassmorphic-title",
-                    htmlContainer: "glassmorphic-text",
-                    confirmButton: "glassmorphic-button",
-                  },
-                });
-                navigate("/");
+      Swal.fire({
+        title: "Success!",
+        text: "Logout successful.",
+        icon: "success",
+        confirmButtonText: "OK",
+        background: "rgba(255, 255, 255, 0.1)",
+        backdrop: "rgba(0, 0, 0, 0.4)",
+        customClass: {
+          popup: "glassmorphic-popup",
+          title: "glassmorphic-title",
+          htmlContainer: "glassmorphic-text",
+          confirmButton: "glassmorphic-button",
+        },
+      });
+      navigate("/");
     } catch (error) {
       console.error("Error logging out:", error);
     }
-
-    
-  }
+  };
 
   return (
     <>
@@ -144,7 +142,7 @@ const Navigation = ({
               className={({ isActive }) => `
                 w-full flex items-center gap-3 p-3 rounded-lg
                 hover:bg-[#2D2A2B] transition-colors
-                ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
+                ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
                 ${isDesktopCollapsed ? "justify-center" : "justify-start"}
               `}
             >
@@ -153,17 +151,92 @@ const Navigation = ({
                 <span className="text-xl font-montserrat ">Start new chat</span>
               )}
             </NavLink>
+            <NavLink
+              to="/chat/mindset"
+              className={({ isActive }) => `
+                    w-full flex items-center gap-3 p-3 rounded-lg
+                    hover:bg-[#2D2A2B] transition-colors
+                  ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
+                  ${isDesktopCollapsed ? "justify-center" : "justify-start"}
+                `}
+            >
+              <FaBrain size={24} className=" " />
+              {!isDesktopCollapsed && (
+                <span className="text-xl font-montserrat ">Mindset Mantra</span>
+              )}
+            </NavLink>
+            <NavLink
+              to="/chat/journal"
+              className={({ isActive }) => `
+                    w-full flex items-center gap-3 p-3 rounded-lg
+                    hover:bg-[#2D2A2B] transition-colors
+                  ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
+                  ${isDesktopCollapsed ? "justify-center" : "justify-start"}
+                `}
+            >
+              <FaBookJournalWhills size={24} className=" " />
+              {!isDesktopCollapsed && (
+                <span className="text-xl font-montserrat ">Journal</span>
+              )}
+            </NavLink>
+            <NavLink
+              to="/chat/internal-challenge"
+              className={({ isActive }) => `
+                    w-full flex items-center gap-3 p-3 rounded-lg
+                    hover:bg-[#2D2A2B] transition-colors
+                  ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
+                  ${isDesktopCollapsed ? "justify-center" : "justify-start"}
+                `}
+            >
+              <SiGoogletasks size={24} className=" " />
+              {!isDesktopCollapsed && (
+                <span className="text-xl font-montserrat ">
+                  Internal Challenge
+                </span>
+              )}
+            </NavLink>
+            <NavLink
+              to="/chat/settings"
+              className={({ isActive }) => ` lg:hidden
+                    w-full flex items-center gap-3 p-3 rounded-lg
+                    hover:bg-[#2D2A2B] transition-colors
+                  ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
+                  ${isDesktopCollapsed ? "justify-center" : "justify-start"}
+                `}
+            >
+              <HiOutlineCog6Tooth size={24} className=" " />
+              {!isDesktopCollapsed && (
+                <span className="text-xl font-montserrat ">Settings</span>
+              )}
+            </NavLink>
           </div>
 
           {/* Bottom Section - Other Navigation Items and User Profile */}
           <div>
             <div className="p-4 space-y-2">
               <NavLink
+                to="/chat"
+                end
+                className={({ isActive }) => `
+                w-full flex items-center gap-3 p-3 rounded-lg
+                hover:bg-[#2D2A2B] transition-colors
+                ${isActive ? "hidden" : "font-medium"}
+                ${isDesktopCollapsed ? "justify-center" : "justify-start"}
+              `}
+              >
+                <FiPlusCircle size={24} className=" " />
+                {!isDesktopCollapsed && (
+                  <span className="text-xl font-montserrat ">
+                    Start new chat
+                  </span>
+                )}
+              </NavLink>
+              <NavLink
                 to="/chat/mindset"
                 className={({ isActive }) => `
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
-                  ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
+                  ${isActive ? "hidden" : "font-medium"}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
                 `}
               >
@@ -179,7 +252,7 @@ const Navigation = ({
                 className={({ isActive }) => `
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
-                  ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
+                  ${isActive ? "hidden" : "font-medium"}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
                 `}
               >
@@ -193,7 +266,7 @@ const Navigation = ({
                 className={({ isActive }) => `
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
-                  ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
+                  ${isActive ? "hidden" : "font-medium"}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
                 `}
               >
@@ -209,7 +282,7 @@ const Navigation = ({
                 className={({ isActive }) => ` lg:hidden
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
-                  ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
+                  ${isActive ? "hidden" : "font-medium"}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
                 `}
               >
@@ -331,7 +404,9 @@ const Navigation = ({
                 Cancel
               </button>
               <button
-                onClick={() => {handleLogOut()}}
+                onClick={() => {
+                  handleLogOut();
+                }}
                 className="btn bg-cCard px-8 text-2xl font-semibold font-inter py-1 border-none "
               >
                 Confirm

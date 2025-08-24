@@ -7,7 +7,12 @@ import {
   HiOutlineUser,
 } from "react-icons/hi2";
 import { SiGoogletasks } from "react-icons/si";
-import { FaAngleDown, FaBookJournalWhills, FaBrain, FaAngleRight } from "react-icons/fa6";
+import {
+  FaAngleDown,
+  FaBookJournalWhills,
+  FaBrain,
+  FaAngleRight,
+} from "react-icons/fa6";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAxios } from "../Providers/AxiosProvider";
@@ -26,11 +31,10 @@ const Navigation = ({
   toggleMobileMenu,
   toggleDesktopCollapse,
 }: NavigationProps) => {
-
   const [isLogOutActive, setLogOutActive] = useState(false);
   const navigate = useNavigate();
   const axios = useAxios();
-  
+
   const handleLogOut = async () => {
     console.log("Logging out...");
     try {
@@ -178,7 +182,7 @@ const Navigation = ({
             >
               <FaBookJournalWhills size={24} className=" " />
               {!isDesktopCollapsed && (
-                <div className="flex justify-between items-center w-full"><span className="text-xl font-montserrat ">Journal</span><FaAngleDown size={20} className="text-white" /></div>
+                <span className="text-xl font-montserrat ">Add a Journal</span>
               )}
             </NavLink>
             <NavLink
@@ -260,7 +264,7 @@ const Navigation = ({
               >
                 <FaBookJournalWhills size={24} className=" " />
                 {!isDesktopCollapsed && (
-                  <div className="flex justify-between items-center w-full"><span className="text-xl font-montserrat ">Journal </span><FaAngleRight size={20} className="text-white"/></div>
+                  <span className="text-xl font-montserrat ">Add a Journal</span>
                 )}
               </NavLink>
               <NavLink

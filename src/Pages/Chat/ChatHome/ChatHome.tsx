@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { FaArrowUp } from "react-icons/fa6";
+import { useAxios } from "../../../Providers/AxiosProvider";
 
 interface Message {
   id: number;
@@ -17,10 +17,9 @@ interface FormData {
 const ChatHome = () => {
   const [messageData, setMessageData] = useState<Message[]>([]);
   const [hasMessages, setHasMessages] = useState(false);
-  const [hideWelcome, setHideWelcome] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const axios = useAxios();
 
   const { register, handleSubmit, reset, watch } = useForm<FormData>({
     defaultValues: { message: "" },
@@ -37,97 +36,19 @@ const ChatHome = () => {
     scrollToBottom();
   }, [messageData]);
 
-  // Hide welcome text after fade animation completes
-  useEffect(() => {
-    if (hasMessages) {
-      const timer = setTimeout(() => {
-        setHideWelcome(true);
-      }, 1600);
-
-      return () => clearTimeout(timer);
-    }
-  }, [hasMessages]);
-
-  // Dummy bot responses for mocking
-  const dummyResponses = [
-    "Hello! I'm here to help you. What's on your mind today?",
-    "That's an interesting question. Let me think about that for a moment.",
-    "I understand what you're saying. Can you tell me more about how that makes you feel?",
-    "Thank you for sharing that with me. It sounds like you've been through a lot.",
-    "I'm here to listen and support you. What would you like to explore next?",
-    "That's a great insight. How do you think we can work on that together?",
-    "I appreciate your openness. What steps do you think might help in this situation?",
-  ];
-
-  const getRandomResponse = () => {
-    return dummyResponses[Math.floor(Math.random() * dummyResponses.length)];
-  };
-
   const onSubmit = async (data: FormData) => {
-    if (!data.message.trim()) return;
-
     setHasMessages(true);
-
     // Add user message instantly
-    const userMessageId = Date.now();
-    setMessageData((prev) => [
-      ...prev,
-      {
-        id: userMessageId,
-        message: data.message,
-        sender: "user",
-        status: "success",
-      },
-    ]);
-
-    // Add loading bot message
-    const botMessageId = userMessageId + 1;
-    setMessageData((prev) => [
-      ...prev,
-      {
-        id: botMessageId,
-        message: "",
-        sender: "bot",
-        status: "loading",
-      },
-    ]);
-
-    reset();
-
     try {
-      setIsLoading(true);
-
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      const botResponse = getRandomResponse();
-
-      setMessageData((prev) =>
-        prev.map((msg) =>
-          msg.id === botMessageId
-            ? {
-                ...msg,
-                message: botResponse,
-                status: "success" as const,
-              }
-            : msg
-        )
-      );
-
+      const response = await axios.post("/api/chatbot/",
+        {
+          message: data
+        }
+      )
+      console.log(response);
+      reset();
     } catch (error) {
-      setMessageData((prev) =>
-        prev.map((msg) =>
-          msg.id === botMessageId
-            ? {
-                ...msg,
-                message: "Failed to get response. Please try again.",
-                status: "error" as const,
-              }
-            : msg
-        )
-      );
-      console.error("Error:", error);
-    } finally {
-      setIsLoading(false);
+      console.log("Failed to send requiest", error);
     }
   };
 
@@ -191,7 +112,9 @@ const ChatHome = () => {
                 <h1 className="text-4xl lg:text-7xl mx-auto font-league-gothic">
                   Start a New Chat
                 </h1>
-                <p className="text-xl lg:text-4xl font-league-gothic">What I can help with ?</p>
+                <p className="text-xl lg:text-4xl font-league-gothic">
+                  What I can help with ?
+                </p>
               </div>
             )}
             <div ref={messagesEndRef} />

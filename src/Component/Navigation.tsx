@@ -13,7 +13,8 @@ import {
   FaBrain,
   FaAngleRight,
 } from "react-icons/fa6";
-import { NavLink, useNavigate } from "react-router-dom";
+import { FaHome } from "react-icons/fa";
+import { Link, NavLink, useMatch, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAxios } from "../Providers/AxiosProvider";
 import Swal from "sweetalert2";
@@ -35,6 +36,10 @@ const Navigation = ({
   const navigate = useNavigate();
   const axios = useAxios();
 
+  //matching active navigation for handle navigation style
+  const chatgeneral = useMatch("/chat/general/*");
+
+  // logout handler
   const handleLogOut = async () => {
     console.log("Logging out...");
     try {
@@ -140,21 +145,21 @@ const Navigation = ({
 
         {/* Main Actions - Flex container to separate top and bottom sections */}
         <div className="flex flex-col flex-1 justify-between">
-          {/* Top Section - Start New Chat */}
+          {/* -----------------Top Section ------------------------ Start New Chat */}
           <div className="p-4 space-y-2">
             <NavLink
               to="/chat/general"
               end
-              className={({ isActive }) => `
+              className={`
                 w-full flex items-center gap-3 p-3 rounded-lg
                 hover:bg-[#2D2A2B] transition-colors
-                ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
+                ${chatgeneral ? "bg-[#2D2A2B] font-bold" : "hidden"}
                 ${isDesktopCollapsed ? "justify-center" : "justify-start"}
               `}
             >
               <FiPlusCircle size={24} className=" " />
               {!isDesktopCollapsed && (
-                <span className="text-xl font-montserrat ">Start new chat</span>
+                <span className="text-xl font-montserrat ">Start chat</span>
               )}
             </NavLink>
             <NavLink
@@ -217,15 +222,15 @@ const Navigation = ({
             </NavLink>
           </div>
 
-          {/* Bottom Section - Other Navigation Items and User Profile */}
+          {/* ----------------------------Bottom Section--------------- - Other Navigation Items and User Profile */}
           <div>
             <div className="p-4 space-y-2">
               <NavLink
                 to="/chat/general"
-                className={({ isActive }) => `
+                className={`
                 w-full flex items-center gap-3 p-3 rounded-lg
                 hover:bg-[#2D2A2B] transition-colors
-                ${isActive ? "hidden" : "font-medium"}
+                ${chatgeneral ? "hidden" : "font-medium"}
                 ${isDesktopCollapsed ? "justify-center" : "justify-start"}
               `}
               >
@@ -263,7 +268,9 @@ const Navigation = ({
               >
                 <FaBookJournalWhills size={24} className=" " />
                 {!isDesktopCollapsed && (
-                  <span className="text-xl font-montserrat ">Add a Journal</span>
+                  <span className="text-xl font-montserrat ">
+                    Add a Journal
+                  </span>
                 )}
               </NavLink>
               <NavLink
@@ -299,6 +306,23 @@ const Navigation = ({
             </div>
             <div className="w-10/12 h-[1.5px] bg-cCard mx-auto" />
             <div className={`${!isDesktopCollapsed ? "lg:mb-18" : "mb-0"}`}>
+              <NavLink
+                to="/"
+                end
+                className={`
+                w-full flex items-center gap-3 p-3 rounded-lg mx-3
+                    hover:bg-[#2D2A2B] transition-colors
+                  ${isDesktopCollapsed ? "mb-2" : "mb-0"}
+                  cursor-pointer
+                  hover:bg-[#232021]
+                  transition-all duration-700 ease-in-out"}
+              `}
+              >
+                <FaHome  size={24} className=" " />
+                {!isDesktopCollapsed && (
+                  <span className="text-xl font-montserrat font-semibold">Back to Home</span>
+                )}
+              </NavLink>
               {/* User Profile Section */}
               <div
                 className={`
@@ -306,8 +330,8 @@ const Navigation = ({
                   transition-colors
                   ${
                     isDesktopCollapsed
-                      ? "justify-center mb-5 mt-2"
-                      : "justify-start mb-4 mt-2"
+                      ? "justify-center mb-5 "
+                      : "justify-start mb-4 "
                   }
                   hover:bg-[#2d2a2b]
                   px-2 py-2

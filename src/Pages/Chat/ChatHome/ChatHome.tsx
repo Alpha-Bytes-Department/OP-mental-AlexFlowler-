@@ -4,10 +4,11 @@ import { FaArrowUp } from "react-icons/fa6";
 import { useAxios } from "../../../Providers/AxiosProvider";
 
 interface Message {
-  id: number;
+  id: number | string;
   message: string;
   sender: "user" | "bot";
   status: "success" | "loading" | "error";
+  timestamp?: string;
 }
 
 interface FormData {
@@ -16,8 +17,9 @@ interface FormData {
 
 const ChatHome = () => {
   const [messageData, setMessageData] = useState<Message[]>([]);
-  const [hasMessages, setHasMessages] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const axios = useAxios();
 
@@ -36,19 +38,125 @@ const ChatHome = () => {
     scrollToBottom();
   }, [messageData]);
 
-  const onSubmit = async (data: FormData) => {
-    setHasMessages(true);
-    // Add user message instantly
+  // Load existing chat data from API
+  const LoadData = async () => {
     try {
-      const response = await axios.post("/api/chatbot/",
-        {
-          message: data
+      setIsInitialLoading(true);
+      const response = await axios.get('/api/chatbot/history/all/');
+      console.log("Loaded data:", response);
+      
+      if (response.status === 200) {
+        const transformedMessages: Message[] = [];
+
+        if (Array.isArray(response.data)) {
+          response.data.forEach((item: any, idx: number) => {
+            // Add user message if present
+            if (item.role === "user") {
+              transformedMessages.push({
+          id: `user-${item.id ?? idx}`,
+          message: item.message,
+          sender: "user",
+          status: "success",
+          timestamp: item.timestamp,
+              });
+            }
+            // Add assistant (bot) message if present
+            if (item.role === "assistant") {
+              transformedMessages.push({
+          id: `bot-${item.id ?? idx}`,
+          message: item.message,
+          sender: "bot",
+          status: "success",
+          timestamp: item.timestamp,
+              });
+            }
+          });
         }
-      )
-      console.log(response);
-      reset();
+
+        setMessageData(transformedMessages);
+      }
     } catch (error) {
-      console.log("Failed to send requiest", error);
+      console.error("Error loading chat data:", error);
+    } finally {
+      setIsInitialLoading(false);
+    }
+    
+  };
+
+  useEffect(() => {
+    LoadData();
+  }, []);
+
+  // Send message to AI and handle response
+  const onSubmit = async (data: FormData) => {
+    if (!data.message.trim()) return;
+
+    // Add user message instantly
+    const userMessageId = Date.now();
+    const newUserMessage: Message = {
+      id: userMessageId,
+      message: data.message,
+      sender: "user",
+      status: "success",
+    };
+
+    setMessageData((prev) => [...prev, newUserMessage]);
+
+    // Add loading bot message
+    const botMessageId = userMessageId + 1;
+    const loadingBotMessage: Message = {
+      id: botMessageId,
+      message: "",
+      sender: "bot",
+      status: "loading",
+    };
+
+    setMessageData((prev) => [...prev, loadingBotMessage]);
+
+    // Clear input
+    reset();
+
+    try {
+      setIsLoading(true);
+
+      // Send message to API
+      const response = await axios.post("/api/chatbot/", {
+        message: data.message
+      });
+
+      console.log("AI Response:", response);
+
+      // Remove loading message and add actual response
+      setMessageData((prev) => {
+        const filteredMessages = prev.filter(msg => msg.id !== botMessageId);
+        return [
+          ...filteredMessages,
+          {
+            id: response?.data?.session_id || Date.now(),
+            message: response?.data?.reply || response?.data?.relpy || "I received your message!",
+            sender: "bot",
+            status: "success",
+          }
+        ];
+      });
+
+    } catch (error) {
+      console.error("Error sending message:", error);
+      
+      // Update loading message to show error
+      setMessageData((prev) =>
+        prev.map((msg) =>
+          msg.id === botMessageId
+            ? {
+                ...msg,
+                message: "Failed to get response. Please try again.",
+                status: "error" as const,
+              }
+            : msg
+        )
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -59,6 +167,21 @@ const ChatHome = () => {
     }
   };
 
+  if (isInitialLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center text-white">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="flex space-x-2">
+            <div className="w-3 h-3 bg-white rounded-full animate-bounce"></div>
+            <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
+            <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+          </div>
+          <p className="text-lg">Loading chat history...</p>
+        </div>
+      </div>
+    );
+  }
+  console.log(messageData)
   return (
     <>
       <style>
@@ -67,7 +190,6 @@ const ChatHome = () => {
             from {
               opacity: 0;
               transform: translateY(20px);
-              display: block;
             }
             to {
               opacity: 1;
@@ -83,46 +205,67 @@ const ChatHome = () => {
       <div className="h-screen flex flex-col text-white">
         {/* Chat Messages Area */}
         <div className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 pb-24">
-          <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto h-full">
+          <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto min-h-full">
             {messageData.length > 0 ? (
-              messageData.map((item) => (
-                <div
-                  key={item.id}
-                  className={`flex animate-fadeInUp ${
-                    item.sender === "user" ? "justify-end" : "justify-start"
-                  }`}
-                >
+              <>
+                {messageData.map((item) => (
                   <div
-                    className={`text-start max-w-[85%] sm:max-w-xs md:max-w-sm lg:max-w-lg xl:max-w-2xl 2xl:max-w-3xl p-3 sm:p-4 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl text-sm sm:text-base md:text-lg leading-relaxed ${
-                      item.sender === "user"
-                        ? "bg-cCard text-black ml-auto"
-                        : "bg-transparent border border-cCard text-white mr-auto"
+                    key={item.id}
+                    className={`flex animate-fadeInUp ${
+                      item.sender === "user" ? "justify-end" : "justify-start"
                     }`}
                   >
-                    {item.status === "loading" ? (
-                      <span>Thinking...</span>
-                    ) : (
-                      <p>{item.message}</p>
-                    )}
+                    <div
+                      className={`text-start max-w-[85%] sm:max-w-xs md:max-w-sm lg:max-w-lg xl:max-w-2xl 2xl:max-w-3xl p-3 sm:p-4 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl text-sm sm:text-base md:text-lg leading-relaxed ${
+                        item.sender === "user"
+                          ? "bg-cCard text-black ml-auto"
+                          : item.status === "error"
+                          ? "bg-red-900/30 border border-red-500 text-red-200 mr-auto"
+                          : "bg-transparent border border-cCard text-white mr-auto"
+                      }`}
+                    >
+                      {item.status === "loading" ? (
+                        <div className="flex items-center gap-2">
+                          <div className="flex space-x-1">
+                            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-bounce"></div>
+                            <div
+                              className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-bounce"
+                              style={{ animationDelay: "0.1s" }}
+                            ></div>
+                            <div
+                              className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-bounce"
+                              style={{ animationDelay: "0.2s" }}
+                            ></div>
+                          </div>
+                          <span className="text-xs sm:text-sm text-gray-300">
+                            Thinking...
+                          </span>
+                        </div>
+                      ) : (
+                        <p>{item.message}</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))
+                ))}
+                <div ref={messagesEndRef} />
+              </>
             ) : (
-              <div className="flex flex-col justify-around gap-96 mt-24 h-full items-center">
-                <h1 className="text-4xl lg:text-7xl mx-auto font-league-gothic">
-                  Start a New Chat
-                </h1>
-                <p className="text-xl lg:text-4xl font-league-gothic">
-                  What I can help with ?
-                </p>
+              <div className="flex flex-col justify-center items-center h-full text-center space-y-8">
+                <div className="space-y-4">
+                  <h1 className="text-5xl md:text-6xl font-bold text-white font-league-gothic">
+                    Start a New Chat
+                  </h1>
+                  <h2 className="text-2xl md:text-3xl font-medium text-white/80 font-league-gothic">
+                    What can I help with?
+                  </h2>
+                </div>
               </div>
             )}
-            <div ref={messagesEndRef} />
           </div>
         </div>
 
-        {/* Chat Input - Stays Fixed at Bottom */}
-        <div className="fixed bottom-0 left-0 right-0 px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-4 lg:ml-[280px] z-10">
+        {/* Chat Input - Fixed at Bottom */}
+        <div className="fixed bottom-0 left-0 right-0 px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-4 lg:ml-[280px] z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm">
           <div className="max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto">
             <form
               className="w-full max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl mx-auto"
@@ -134,7 +277,7 @@ const ChatHome = () => {
                   type="text"
                   placeholder="Message ....."
                   onKeyPress={handleKeyPress}
-                  className="w-full py-3 sm:py-4 md:py-5 lg:py-6 xl:py-7 2xl:py-8 pl-3 sm:pl-4 md:pl-5 lg:pl-6 xl:pl-7 2xl:pl-8 pr-12 sm:pr-14 md:pr-16 lg:pr-18 xl:pr-20 2xl:pr-24 text-sm sm:text-base md:text-lg lg:text-xl text-white bg-white/20 backdrop-blur-md rounded-xl sm:rounded-2xl outline-none focus:border-none transition-colors placeholder-gray-300"
+                  className="w-full py-3 sm:py-4 md:py-5 lg:py-6 xl:py-7 2xl:py-8 pl-3 sm:pl-4 md:pl-5 lg:pl-6 xl:pl-7 2xl:pl-8 pr-12 sm:pr-14 md:pr-16 lg:pr-18 xl:pr-20 2xl:pr-24 text-sm sm:text-base md:text-lg lg:text-xl text-white bg-white/20 backdrop-blur-md rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300"
                   disabled={isLoading}
                   autoComplete="off"
                 />

@@ -4,7 +4,7 @@ import { CiMail } from "react-icons/ci";
 import { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { IoLockClosedOutline } from "react-icons/io5";
-import {  useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useAxios } from "../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
 
@@ -16,7 +16,7 @@ type Inputs = {
 
 const Signup = () => {
   const axios = useAxios();
-  const navigate= useNavigate()
+  const navigate = useNavigate();
   const [isLoading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] =
@@ -64,9 +64,9 @@ const Signup = () => {
       });
       if (response.status === 201 || response.status === 200) {
         Swal.fire({
-          title: "Success!",
-          text: "Registration successful.",
-          icon: "success",
+          title: "Verification Email Sent!",
+          text: "Please check your inbox to verify your account.",
+          icon: "info",
           confirmButtonText: "OK",
           background: "rgba(255, 255, 255, 0.1)",
           backdrop: "rgba(0, 0, 0, 0.4)",
@@ -76,40 +76,59 @@ const Signup = () => {
             htmlContainer: "glassmorphic-text",
             confirmButton: "glassmorphic-button",
           },
+        }).then((result) => {
+          if (result.isConfirmed) {
+            console.log("Registration successful:", response.data);
+            const emailDomain = data.email.split("@")[1]?.toLowerCase();
+            let emailProviderUrl = "";
+            switch (emailDomain) {
+              case "gmail.com":
+                emailProviderUrl = "https://mail.google.com/mail/u/0/#inbox";
+                window.open(emailProviderUrl, "_blank");
+                break;
+              case "outlook.com":
+              case "hotmail.com":
+                emailProviderUrl = "https://outlook.live.com/mail/inbox";
+                window.open(emailProviderUrl, "_blank");
+                break;
+              case "yahoo.com":
+                emailProviderUrl = "https://mail.yahoo.com/d/folders/1";
+                window.open(emailProviderUrl, "_blank");
+                break;
+              default:
+                window.open("mailto:" + data.email, "_blank");
+            }
+          }
         });
-        console.log("Registration successful:", response.data);
-        const emailDomain = data.email.split("@")[1]?.toLowerCase();
-        let emailProviderUrl = "";
-        switch (emailDomain) {
-        case "gmail.com":
-          emailProviderUrl = "https://mail.google.com/mail/u/0/#inbox";
-          window.open(emailProviderUrl, "_blank");
-          break;
-        case "outlook.com":
-        case "hotmail.com":
-          emailProviderUrl = "https://outlook.live.com/mail/inbox";
-          window.open(emailProviderUrl, "_blank");
-          break;
-        case "yahoo.com":
-          emailProviderUrl = "https://mail.yahoo.com/d/folders/1";
-          window.open(emailProviderUrl, "_blank");
-          break;
-        default:
-          window.open("mailto:" + data.email, "_blank");
-        }
+
+        // Swal.fire({
+        //     title: "Verification Email Sent!",
+        //     text: "Please check your inbox to verify your account.",
+        //     icon: "info",
+        //     background: "rgba(255, 255, 255, 0.1)",
+        //     backdrop: "rgba(0, 0, 0, 0.4)",
+        //     timer: 4000, // auto close after 4 seconds
+        //     showConfirmButton: false,
+        //     customClass: {
+        //       popup: "glassmorphic-popup",
+        //       title: "glassmorphic-title",
+        //       htmlContainer: "glassmorphic-text",
+        //     },
+        //   });
 
         setLoading(false);
-        
+
         reset();
-        navigate("/verify");
+        // navigate("/verify");
       }
     } catch (error) {
       console.error("Registration Error:", error);
       Swal.fire({
         title: "Error!",
-        text: typeof error === "object" && error !== null && "message" in error
-          ? (error as { message: string }).message
-          : "An unknown error occurred.",
+        text:
+          typeof error === "object" && error !== null && "message" in error
+            ? (error as { message: string }).message
+            : "An unknown error occurred.",
         icon: "error",
         confirmButtonText: "Try Again",
         background: "rgba(255, 255, 255, 0.1)",

@@ -11,6 +11,7 @@ import Settings from "../Pages/Chat/Settings/Settings";
 import Verify from "../Pages/MailVerifiy/Verify";
 import MindsetMantra from "../Pages/MindsetMantra/MindsetMantra";
 import Journal from "../Pages/Journal/Journal";
+import InternalChallenges from "../Pages/InternalChallenges/InternalChallenges";
 
 const Router = createBrowserRouter(
   [
@@ -61,6 +62,10 @@ const Router = createBrowserRouter(
         {
           path: "/chat/journal",
           element: <Journal/>
+        },
+        {
+          path: "/chat/internal-challenge",
+          element: <InternalChallenges/>
         }
       ]
     }

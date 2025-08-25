@@ -222,7 +222,6 @@ const Navigation = ({
             <div className="p-4 space-y-2">
               <NavLink
                 to="/chat/general"
-                end
                 className={({ isActive }) => `
                 w-full flex items-center gap-3 p-3 rounded-lg
                 hover:bg-[#2D2A2B] transition-colors

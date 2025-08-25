@@ -47,7 +47,7 @@ const Router = createBrowserRouter(
           element: <ChatHome />,
         },
         {
-          path: "/chat/general/:id",
+          path: "/chat/general/test",
           element: <ChatSession  />,
         },
         {

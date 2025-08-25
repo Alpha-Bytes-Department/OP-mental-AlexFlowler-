@@ -188,10 +188,10 @@ const ChatHome = () => {
               ))
             ) : (
               <div className="flex flex-col justify-around gap-96 mt-24 h-full items-center">
-                <h1 className="text-4xl lg:text-7xl font-semibold mx-auto ">
+                <h1 className="text-4xl lg:text-7xl mx-auto font-league-gothic">
                   Start a New Chat
                 </h1>
-                <p className="text-xl lg:text-4xl">What I can help with ?</p>
+                <p className="text-xl lg:text-4xl font-league-gothic">What I can help with ?</p>
               </div>
             )}
             <div ref={messagesEndRef} />

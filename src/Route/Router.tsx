@@ -9,53 +9,59 @@ import ChatLayout from "../Pages/Chat/ChatLayout/ChatLayout";
 import ChatSession from "../Pages/Chat/ChatSession/ChatSession";
 import Settings from "../Pages/Chat/Settings/Settings";
 import Verify from "../Pages/MailVerifiy/Verify";
+import PrivateRoute from "../Pages/Chat/PrivateRoute";
+import UserVerify from "../Pages/MailVerifiy/UserVerify";
 
-const Router = createBrowserRouter(
-  [
-    {
-      path: "/",
-      element: <Layout />,
-      errorElement: <Error />,
-      children: [
-        {
-          path: "/",
-          element: <Home/>,
-        },
-        {
-          path: "/verify",
-          element: <Verify />,
-        },
-      ],
-    },
-    {
-      path: "/login",
-      element: <Login />,
-    },
-    {
-      path: "/register",
-      element: <Signup />,
-    },
-    {
-      path: "/chat",
-      element: <ChatLayout />,
-      errorElement: <Error />,
-      children:[
-        {
-          path: "/chat",
-          element: <ChatHome />,
-        },
-        {
-          path: "/chat/:id",
-          element: <ChatSession  />,
-        },
-        {
-          path: "/chat/settings",
-          element: <Settings />,
-        }
-      ]
-    }
-
-  ],
-  
-);
+const Router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Layout />,
+    errorElement: <Error />,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+      {
+        path: "/verify",
+        element: <Verify />,
+      },
+      {
+        path: "/users/verify",
+        element: <UserVerify />,
+      },
+    ],
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Signup />,
+  },
+  {
+    path: "/chat",
+    element: (
+      <PrivateRoute>
+        <ChatLayout />
+      </PrivateRoute>
+    ),
+    errorElement: <Error />,
+    children: [
+      {
+        path: "/chat",
+        element: <ChatHome />,
+      },
+      {
+        path: "/chat/:id",
+        element: <ChatSession />,
+      },
+      {
+        path: "/chat/settings",
+        element: <Settings />,
+      },
+    ],
+  },
+]);
 export default Router;

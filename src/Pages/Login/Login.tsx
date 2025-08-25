@@ -14,8 +14,10 @@ type Inputs = {
 };
 
 const Login = () => {
+
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(false);
+  const [isSubmitted, setSubmitted] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const axios = useAxios();
   const navigate = useNavigate();
@@ -80,6 +82,7 @@ const Login = () => {
     }
   };
 
+
   return (
     <div className=" bg-[url('/background.png')] min-h-screen font-inter">
       <div className="flex items-center justify-center px-5  py-24  text-white">
@@ -142,9 +145,14 @@ const Login = () => {
                 </button>
               </div>
               {/* ======================== Forgot Password ============================== */}
-              <Link to={"/forgot-password"} className="text-[#fafafd99] ">
+              <div onClick={()=> {
+                const modal = document.getElementById(
+                  "password_modal"
+                ) as HTMLDialogElement | null;
+                if (modal) modal.showModal();
+              }} className="text-[#fafafd99] cursor-pointer">
                 <p className=" text-start pt-2">Forgot password?</p>
-              </Link>
+              </div>
               {error && <p className="text-red-500">{error}</p>}
             </div>
             <button
@@ -167,6 +175,88 @@ const Login = () => {
           </Link>
         </div>
       </div>
+      <dialog id="password_modal" className="modal">
+        <div className="modal-box max-w-lg bg-[#000000cc] border border-hCard rounded-[10px] px-5 md:px-10 pt-10 pb-6 flex flex-col items-center">
+          <h1 className="font-semibold font-inter text-3xl text-cCard mb-2">
+        Forgot Password
+          </h1>
+          <p className="py-2 font-inter text-base text-[#fafafdcc] mb-4 text-center">
+        Enter your email address to receive password reset instructions.
+          </p>
+          <form
+        className="flex flex-col gap-4 items-center w-full"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const form = e.target as HTMLFormElement;
+          const email = (form.elements.namedItem("forgot_email") as HTMLInputElement)?.value;
+          if (!email) return;
+          try {
+            setSubmitted(true);
+            await axios.post("/api/users/password/reset/", { email });
+            Swal.fire({
+          title: "Email Sent!",
+          text: "Check your inbox for reset instructions.",
+          icon: "success",
+          confirmButtonText: "OK",
+          background: "rgba(255, 255, 255, 0.1)",
+          backdrop: "rgba(0, 0, 0, 0.4)",
+          customClass: {
+            popup: "glassmorphic-popup",
+            title: "glassmorphic-title",
+            htmlContainer: "glassmorphic-text",
+            confirmButton: "glassmorphic-button",
+          },
+            });
+            setSubmitted(false);
+            (document.getElementById("password_modal") as HTMLDialogElement)?.close();
+          } catch (err) {
+            Swal.fire({
+          title: "Error",
+          text: "Failed to send reset email. Please try again.",
+          icon: "error",
+          confirmButtonText: "OK",
+          background: "rgba(255, 255, 255, 0.1)",
+          backdrop: "rgba(0, 0, 0, 0.4)",
+          customClass: {
+            popup: "glassmorphic-popup",
+            title: "glassmorphic-title",
+            htmlContainer: "glassmorphic-text",
+            confirmButton: "glassmorphic-button",
+          },
+            });
+            setSubmitted(false);
+          }
+        }}
+          >
+        <input
+          type="email"
+          name="forgot_email"
+          placeholder="Enter your email"
+          className="input w-full max-w-xs bg-transparent border border-cCard rounded-[6px] px-3 py-2 text-white placeholder-[#fafafd99] focus:outline-none text-lg font-medium"
+          required
+        />
+        <button
+          disabled={isSubmitted}
+          type="submit"
+          className="bg-cCard text-black cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed rounded-[6px] px-6 py-2 font-medium mt-2 transition hover:bg-opacity-90"
+        >
+          Send Reset Link
+        </button>
+          </form>
+          <div className="modal-action w-full flex justify-center mt-6">
+        <button
+          disabled={isSubmitted}
+          className="btn btn-outline border-cCard text-cCard rounded-[6px] px-6 py-2 font-medium hover:bg-cCard hover:text-black transition"
+          onClick={() =>
+            (document.getElementById("password_modal") as HTMLDialogElement)?.close()
+          }
+        >
+          Close
+        </button>
+          </div>
+        </div>
+      </dialog>
+      
     </div>
   );
 };

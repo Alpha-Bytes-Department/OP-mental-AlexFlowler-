@@ -118,7 +118,7 @@ const Navigation = ({
         `}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4  md:pt-10 md:px-7">
+        <div className="flex items-center justify-between px-4  md:pt-10 md:px-7">
           {!isDesktopCollapsed && (
             <h1 className="md:text-5xl text-2xl font-montserrat text-center font-bold text-white">
               OP Ai
@@ -157,7 +157,7 @@ const Navigation = ({
               to="/chat/general"
               end
               className={`
-                w-full flex items-center gap-3 p-3 rounded-lg
+                w-full flex items-center gap-3 px-3 rounded-lg
                 hover:bg-[#2D2A2B] transition-colors
                 ${chatgeneral ? "bg-[#2D2A2B] font-bold" : "hidden"}
                 ${isDesktopCollapsed ? "justify-center" : "justify-start"}
@@ -171,7 +171,7 @@ const Navigation = ({
             <NavLink
               to="/chat/mindset"
               className={({ isActive }) => `
-                    w-full flex items-center gap-3 p-3 rounded-lg
+                    w-full flex items-center gap-3 px-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
                   ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
@@ -183,9 +183,9 @@ const Navigation = ({
               )}
             </NavLink>
             <NavLink
-              to="/chat/journal"
+              to="/chat/journal/options"
               className={({ isActive }) => `
-                    w-full flex items-center gap-3 p-3 rounded-lg
+                    w-full flex items-center gap-3 px-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
                   ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
@@ -199,7 +199,7 @@ const Navigation = ({
             <NavLink
               to="/chat/internal-challenge"
               className={({ isActive }) => `
-                    w-full flex items-center gap-3 p-3 rounded-lg
+                    w-full flex items-center gap-3 px-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
                   ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
@@ -215,7 +215,7 @@ const Navigation = ({
             <NavLink
               to="/chat/settings"
               className={({ isActive }) => ` lg:hidden
-                    w-full flex items-center gap-3 p-3 rounded-lg
+                    w-full flex items-center gap-3 px-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
                   ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
@@ -230,7 +230,8 @@ const Navigation = ({
 
           {/* ----------------------------Bottom Section--------------- - Other Navigation Items and User Profile */}
           <div>
-            <div className="p-4 space-y-2">
+            {/* ---------bottom links------------- */}
+            <div className="p-4 ">
               <NavLink
                 to="/chat/general"
                 className={`
@@ -264,7 +265,7 @@ const Navigation = ({
                 )}
               </NavLink>
               <NavLink
-                to="/chat/journal"
+                to="/chat/journal/options"
                 className={({ isActive }) => `
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
@@ -310,21 +311,21 @@ const Navigation = ({
                 )}
               </NavLink>
             </div>
+            {/* -----divider---------- */}
             <div className="w-10/12 h-[1.5px] bg-cCard mx-auto" />
-            <div className={`${!isDesktopCollapsed ? "lg:mb-18" : "mb-0"}`}>
+            <div className={`${!isDesktopCollapsed ? "lg:mb-5" : "mb-0"}`}>
               <NavLink
                 to="/"
                 end
-                className={`
-                w-full flex items-center gap-3 p-3 rounded-lg mx-3
+                className={`w-10/12  flex justify-center items-center gap-3 p-3 rounded-lg px-3
                     hover:bg-[#2D2A2B] transition-colors
-                  ${isDesktopCollapsed ? "mb-2" : "mb-0"}
+                  ${isDesktopCollapsed ? "mb-2 mx-auto" : "mb-0"}
                   cursor-pointer
                   hover:bg-[#232021]
                   transition-all duration-700 ease-in-out"}
               `}
               >
-                <FaHome  size={24} className=" " />
+                <FaHome  size={24} className="" />
                 {!isDesktopCollapsed && (
                   <span className="text-xl font-montserrat font-semibold">Back to Home</span>
                 )}
@@ -374,6 +375,7 @@ const Navigation = ({
                   </span>
                 </div>
               </div>
+              {/* ------logout-------- */}
               <div
                 className={`
                   flex items-center justify-center
@@ -388,8 +390,8 @@ const Navigation = ({
                   transition-all duration-700 ease-in-out
                   ${
                     isLogOutActive
-                      ? "opacity-100 max-h-20 mt-1 pointer-events-auto"
-                      : "opacity-0 max-h-0 mt-0 pointer-events-none"
+                      ? "opacity-100 max-h-20 mt-1 pointer-events-auto "
+                      : "opacity-0 max-h-0 mt-0 pointer-events-none hidden"
                   }
                   overflow-hidden
                 `}

@@ -65,7 +65,7 @@ const Router = createBrowserRouter([
         element: <MindsetMantra />,
       },
       {
-        path: "/chat/journal",
+        path: "/chat/journal/options",
         element: <Journal />,
       },
       {

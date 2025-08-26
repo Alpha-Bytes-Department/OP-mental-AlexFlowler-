@@ -39,10 +39,10 @@ const Navigation = ({
 
   //matching active navigation for handle navigation style
   const chatgeneral = useMatch("/chat/general/*");
+  const journalLinkMatched = useMatch("/chat/journal/*");
 
   // logout handler
   const handleLogOut = async () => {
-
     console.log("Logging out...");
     try {
       const response = await axios.post("/api/users/logout/");
@@ -75,8 +75,8 @@ const Navigation = ({
       console.error("Error logging out:", error);
     }
   };
-  
-  const user = JSON.parse(localStorage.getItem('user') || "{}")
+
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   console.log("User:", user);
 
@@ -157,7 +157,7 @@ const Navigation = ({
               to="/chat/general"
               end
               className={`
-                w-full flex items-center gap-3 px-3 rounded-lg
+                w-full flex items-center gap-3 p-3 rounded-lg
                 hover:bg-[#2D2A2B] transition-colors
                 ${chatgeneral ? "bg-[#2D2A2B] font-bold" : "hidden"}
                 ${isDesktopCollapsed ? "justify-center" : "justify-start"}
@@ -171,7 +171,7 @@ const Navigation = ({
             <NavLink
               to="/chat/mindset"
               className={({ isActive }) => `
-                    w-full flex items-center gap-3 px-3 rounded-lg
+                    w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
                   ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
@@ -182,24 +182,46 @@ const Navigation = ({
                 <span className="text-xl font-montserrat ">Mindset Mantra</span>
               )}
             </NavLink>
-            <NavLink
-              to="/chat/journal/options"
-              className={({ isActive }) => `
-                    w-full flex items-center gap-3 px-3 rounded-lg
+            <div className="flex flex-col gap-3">
+              <NavLink
+                to="/chat/journal/options"
+                className={({ isActive }) => `
+                    w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
-                  ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
+                  ${journalLinkMatched  ? "block" : "hidden"}
+                  ${isActive ? "bg-[#2D2A2B] font-bold" : ""}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
                 `}
-            >
-              <FaBookJournalWhills size={24} className=" " />
-              {!isDesktopCollapsed && (
-                <span className="text-xl font-montserrat ">Add a Journal</span>
-              )}
-            </NavLink>
+              >
+                <FaBookJournalWhills size={24} className=" " />
+                {!isDesktopCollapsed && (
+                  <span className="text-xl font-montserrat ">
+                    Add a Journal
+                  </span>
+                )}
+              </NavLink>
+              <NavLink
+                to="/chat/journal/list"
+                className={({ isActive }) => `
+                    w-full flex items-center gap-3 p-3 rounded-lg
+                    hover:bg-[#2D2A2B] transition-colors
+                  ${journalLinkMatched ? "block" : "hidden"}
+                  ${isActive ? "bg-[#2D2A2B] font-bold" : ""}
+                  ${isDesktopCollapsed ? "justify-center" : "justify-start"}
+                `}
+              >
+                <FaBookJournalWhills size={24} className=" " />
+                {!isDesktopCollapsed && (
+                  <span className="text-xl font-montserrat ">
+                    Journal History
+                  </span>
+                )}
+              </NavLink>
+            </div>
             <NavLink
               to="/chat/internal-challenge"
               className={({ isActive }) => `
-                    w-full flex items-center gap-3 px-3 rounded-lg
+                    w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
                   ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
@@ -215,7 +237,7 @@ const Navigation = ({
             <NavLink
               to="/chat/settings"
               className={({ isActive }) => ` lg:hidden
-                    w-full flex items-center gap-3 px-3 rounded-lg
+                    w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
                   ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
@@ -325,9 +347,11 @@ const Navigation = ({
                   transition-all duration-700 ease-in-out"}
               `}
               >
-                <FaHome  size={24} className="" />
+                <FaHome size={24} className="" />
                 {!isDesktopCollapsed && (
-                  <span className="text-xl font-montserrat font-semibold">Back to Home</span>
+                  <span className="text-xl font-montserrat font-semibold">
+                    Back to Home
+                  </span>
                 )}
               </NavLink>
               {/* User Profile Section */}
@@ -459,7 +483,6 @@ const Navigation = ({
                   handleLogOut();
                 }}
                 className="btn bg-cCard px-8 text-2xl font-semibold font-inter py-1 border-none "
-
               >
                 Confirm
               </button>

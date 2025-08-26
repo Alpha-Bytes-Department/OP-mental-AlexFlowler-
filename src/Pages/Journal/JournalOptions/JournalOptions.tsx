@@ -1,4 +1,4 @@
-import { Form } from "react-router-dom";
+import { Form, useNavigate } from "react-router-dom";
 import { FaBook } from "react-icons/fa6";
 import { useState } from "react";
 
@@ -7,14 +7,16 @@ import { useState } from "react";
 //   message: string;
 // }
 
-const Journal = () => {
+const JournalOptions = () => {
   //--------states--------
   const [selectedCategory, setSelectedCategory] = useState<string>("")
+  const navigate = useNavigate()
   
   //--------- handler for category selection --------
   const handleCategorySelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedCategory(event.target.value);
     console.log("Selected Category:", event.target.value);
+    navigate("/chat/journal/journal-chat");
   }
 
   return (
@@ -82,4 +84,4 @@ const Journal = () => {
   );
 };
 
-export default Journal;
+export default JournalOptions;

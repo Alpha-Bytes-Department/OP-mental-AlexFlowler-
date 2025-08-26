@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useRef, useState } from "react";
 import { FaArrowUp } from "react-icons/fa6";
 
@@ -10,7 +8,7 @@ interface Message {
   sender: "user" | "bot";
 }
 
-const MindsetMantra = () => {
+const JournalChat = () => {
   //--------states--------
   const [messages, setMessages] = useState<Message[]>([]); // stores chat messages
   const [inputMessage, setInputMessage] = useState(""); // handles input field text
@@ -115,4 +113,4 @@ const MindsetMantra = () => {
   );
 };
 
-export default MindsetMantra;
+export default JournalChat;

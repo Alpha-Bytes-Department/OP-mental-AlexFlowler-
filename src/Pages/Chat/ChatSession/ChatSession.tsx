@@ -238,9 +238,9 @@ const ChatSession = () => {
         }
       `}</style>
 
-      <main className="min-h-screen w-full flex flex-col relative overflow-hidden">
+      <main className="h-screen w-full flex flex-col relative">
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto pt-3 sm:pt-4 md:pt-6 pb-32 sm:pb-36 md:pb-40 lg:pb-44 xl:pb-52 2xl:pb-60 px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 scroll-smooth">
+        <div className="flex-1 overflow-y-auto pt-3 sm:pt-4 md:pt-6 pb-24 px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 scroll-smooth mb-2">
           <div className="max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto">
             <div className="flex flex-col gap-4">
               {messages.length === 0 ? (
@@ -311,7 +311,7 @@ const ChatSession = () => {
         </div>
 
         {/* Input Form - Fixed at bottom */}
-        <div className="absolute bottom-5 sm:bottom-3 md:bottom-4 lg:bottom-6 xl:bottom-8 2xl:bottom-12 left-0 right-0 px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 z-30">
+        <div className="fixed bottom-0 left-0 right-0 px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-4 lg:ml-[280px] z-10">
           <form
             className="w-full max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl mx-auto"
             onSubmit={handleSubmit}

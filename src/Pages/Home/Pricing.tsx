@@ -1,11 +1,42 @@
 import { IoCheckmarkCircleOutline } from "react-icons/io5";
-import { useState } from "react";
-const Pricing = () => {
+import { useEffect, useState } from "react";
+import { useAxios } from "../../Providers/AxiosProvider";
+import Swal from "sweetalert2";
 
-  const [planDuration, setPlanDuration] = useState<("monthly" | "yearly")>("monthly");
+const Pricing = () => {
+  const axios = useAxios();
+  const [planDuration, setPlanDuration] = useState<"monthly" | "yearly">(
+    "monthly"
+  );
+
+  useEffect(() => {
+    const getPriceCardData = async () => {
+      try {
+        const res = await axios.get("api/subscriptions/plans/");
+        console.log(res);
+      } catch (error) {
+        console.log("failed to load subscribe data", error);
+        Swal.fire({
+          title: "Error!",
+          text: "Something went wrong. Please try again.",
+          icon: "error",
+          background: "rgba(255, 255, 255, 0.1)",
+          backdrop: "rgba(0, 0, 0, 0.4)",
+          timer: 3000, // auto close after 3 seconds
+          showConfirmButton: false,
+          customClass: {
+            popup: "glassmorphic-popup",
+            title: "glassmorphic-title",
+            htmlContainer: "glassmorphic-text",
+          },
+        });
+      }
+    };
+    getPriceCardData();
+  }, []);
 
   return (
-    <div  className="bg-[url('/background.png')] py-28 bg-cover">
+    <div className="bg-[url('/background.png')] py-28 bg-cover">
       <style>
         {`@keyframes gradient-light {
           0% { opacity: 0.7; transform: translateY(20px);}
@@ -38,33 +69,30 @@ const Pricing = () => {
 
       <div id="pricing" className="flex justify-center">
         <div className="flex rounded-xl p-1 backdrop:blur-2xl border gap-2 justify-center mb-12">
-              <button
-                className={`px-8 py-3 bg-gradient-to-t  rounded-xl text-sm transition-colors duration-300 ${
-                  planDuration === "monthly"
-                  ? "from-[#8E7D3F] to-[#DBD0A6] text-black font-semibold "
-                    : " text-gray-100 font-normal from-[#0706061a] to-[#FFFFFF1A]"
-                }`}
-                onClick={() => setPlanDuration("monthly")}
-              >
-                Monthly
-              </button>
-              <button
-                className={`px-8 py-3 bg-gradient-to-t   rounded-xl text-sm transition-colors duration-200 ${
-                  planDuration === "yearly"
-                    ? "from-[#8E7D3F] to-[#DBD0A6] text-black font-semibold "
-                    : " text-gray-100 font-normal from-[#0706061a] to-[#FFFFFF1A]"
-                }`}
-                onClick={() => setPlanDuration("yearly")}
-              >
-                Yearly
-              </button>
+          <button
+            className={`px-8 py-3 bg-gradient-to-t  rounded-xl text-sm transition-colors duration-300 ${
+              planDuration === "monthly"
+                ? "from-[#8E7D3F] to-[#DBD0A6] text-black font-semibold "
+                : " text-gray-100 font-normal from-[#0706061a] to-[#FFFFFF1A]"
+            }`}
+            onClick={() => setPlanDuration("monthly")}
+          >
+            Monthly
+          </button>
+          <button
+            className={`px-8 py-3 bg-gradient-to-t   rounded-xl text-sm transition-colors duration-200 ${
+              planDuration === "yearly"
+                ? "from-[#8E7D3F] to-[#DBD0A6] text-black font-semibold "
+                : " text-gray-100 font-normal from-[#0706061a] to-[#FFFFFF1A]"
+            }`}
+            onClick={() => setPlanDuration("yearly")}
+          >
+            Yearly
+          </button>
         </div>
       </div>
-    
 
       <div className="text-white sm:flex-row flex-col gap-6 sm:gap-4 flex items-center justify-center">
-
-
         {[
           {
             title: "Corporate",
@@ -115,18 +143,19 @@ const Pricing = () => {
 
               <div className="text-start mb-8">
                 <span className="text-6xl font-bold text-white">
-                  {planDuration === "monthly" ? plan.monthlyPrice : plan.annualPrice}
-
+                  {planDuration === "monthly"
+                    ? plan.monthlyPrice
+                    : plan.annualPrice}
                 </span>
-               {plan.annualPrice!== "Free" &&<span className=" px-3">
-                  {planDuration === "monthly" ? "/per month" : "/per year"}
-                </span>}
+                {plan.annualPrice !== "Free" && (
+                  <span className=" px-3">
+                    {planDuration === "monthly" ? "/per month" : "/per year"}
+                  </span>
+                )}
               </div>
 
               <div className="flex justify-center mb-8">
-                <button
-                  className="w-full py-3 rounded-full bg-gradient-to-t from-[#0706061a] to-[#FFFFFF1A] border-[1px] group-hover:from-[#8E7D3F] group-hover:to-[#DBD0A6] text-white group-hover:text-black font-semibold shadow-lg transition-all duration-500 transform hover:scale-105"
-                >
+                <button className="w-full py-3 rounded-full bg-gradient-to-t from-[#0706061a] to-[#FFFFFF1A] border-[1px] group-hover:from-[#8E7D3F] group-hover:to-[#DBD0A6] text-white group-hover:text-black font-semibold shadow-lg transition-all duration-500 transform hover:scale-105">
                   Get Started
                 </button>
               </div>
@@ -154,4 +183,3 @@ const Pricing = () => {
 };
 
 export default Pricing;
-

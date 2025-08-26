@@ -55,7 +55,7 @@ const Login = () => {
          localStorage.setItem("access", response.data.access);
          localStorage.setItem("refresh", response.data.refresh);
          localStorage.setItem("user", JSON.stringify(response.data.user));
-         navigate("/chat");
+         navigate("/chat/general");
       }
     } catch (error) {
       let errorMessage = "An unknown error occurred";

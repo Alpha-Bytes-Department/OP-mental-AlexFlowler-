@@ -17,7 +17,7 @@ const ChatLayout = () => {
 
   return (
     <div
-      className="flex  bg-black text-white relative"
+      className="flex h-screen bg-black text-white fixed w-full"
       style={{
         backgroundImage: "url('/background.png')",
         backgroundSize: "cover",

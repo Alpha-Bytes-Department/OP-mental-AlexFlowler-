@@ -7,9 +7,17 @@ import {
   HiOutlineUser,
 } from "react-icons/hi2";
 import { SiGoogletasks } from "react-icons/si";
-import { FaAngleDown, FaBookJournalWhills, FaBrain } from "react-icons/fa6";
-import { NavLink, useNavigate } from "react-router-dom";
-import {  useState } from "react";
+
+import {
+  FaAngleDown,
+  FaBookJournalWhills,
+  FaBrain,
+  FaAngleRight,
+} from "react-icons/fa6";
+import { FaHome } from "react-icons/fa";
+import { Link, NavLink, useMatch, useNavigate } from "react-router-dom";
+import { useState } from "react";
+
 import { useAxios } from "../Providers/AxiosProvider";
 import Swal from "sweetalert2";
 interface NavigationProps {
@@ -27,9 +35,14 @@ const Navigation = ({
 }: NavigationProps) => {
   const [isLogOutActive, setLogOutActive] = useState(false);
   const navigate = useNavigate();
-  const axios=useAxios()
-  const user = JSON.parse(localStorage.getItem("user") || "{}");  
-  const handleLogOut=async()=>{
+  const axios = useAxios();
+
+  //matching active navigation for handle navigation style
+  const chatgeneral = useMatch("/chat/general/*");
+
+  // logout handler
+  const handleLogOut = async () => {
+
     console.log("Logging out...");
     try {
       const response = await axios.post("/api/users/logout/");
@@ -43,27 +56,25 @@ const Navigation = ({
         ) as HTMLDialogElement | null;
         if (modal) modal.close();
       }
-       Swal.fire({
-                  title: "Success!",
-                  text: "Logout successful.",
-                  icon: "success",
-                  confirmButtonText: "OK",
-                  background: "rgba(255, 255, 255, 0.1)",
-                  backdrop: "rgba(0, 0, 0, 0.4)",
-                  customClass: {
-                    popup: "glassmorphic-popup",
-                    title: "glassmorphic-title",
-                    htmlContainer: "glassmorphic-text",
-                    confirmButton: "glassmorphic-button",
-                  },
-                });
-                navigate("/");
+      Swal.fire({
+        title: "Success!",
+        text: "Logout successful.",
+        icon: "success",
+        confirmButtonText: "OK",
+        background: "rgba(255, 255, 255, 0.1)",
+        backdrop: "rgba(0, 0, 0, 0.4)",
+        customClass: {
+          popup: "glassmorphic-popup",
+          title: "glassmorphic-title",
+          htmlContainer: "glassmorphic-text",
+          confirmButton: "glassmorphic-button",
+        },
+      });
+      navigate("/");
     } catch (error) {
       console.error("Error logging out:", error);
     }
-
-    
-  }
+  };
 
   console.log("User:", user);
 
@@ -138,34 +149,108 @@ const Navigation = ({
 
         {/* Main Actions - Flex container to separate top and bottom sections */}
         <div className="flex flex-col flex-1 justify-between">
-          {/* Top Section - Start New Chat */}
+          {/* -----------------Top Section ------------------------ Start New Chat */}
           <div className="p-4 space-y-2">
             <NavLink
-              to="/chat"
+              to="/chat/general"
               end
-              className={({ isActive }) => `
+              className={`
                 w-full flex items-center gap-3 p-3 rounded-lg
                 hover:bg-[#2D2A2B] transition-colors
-                ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
+                ${chatgeneral ? "bg-[#2D2A2B] font-bold" : "hidden"}
                 ${isDesktopCollapsed ? "justify-center" : "justify-start"}
               `}
             >
               <FiPlusCircle size={24} className=" " />
               {!isDesktopCollapsed && (
-                <span className="text-xl font-montserrat ">Start new chat</span>
+                <span className="text-xl font-montserrat ">Start chat</span>
+              )}
+            </NavLink>
+            <NavLink
+              to="/chat/mindset"
+              className={({ isActive }) => `
+                    w-full flex items-center gap-3 p-3 rounded-lg
+                    hover:bg-[#2D2A2B] transition-colors
+                  ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
+                  ${isDesktopCollapsed ? "justify-center" : "justify-start"}
+                `}
+            >
+              <FaBrain size={24} className=" " />
+              {!isDesktopCollapsed && (
+                <span className="text-xl font-montserrat ">Mindset Mantra</span>
+              )}
+            </NavLink>
+            <NavLink
+              to="/chat/journal"
+              className={({ isActive }) => `
+                    w-full flex items-center gap-3 p-3 rounded-lg
+                    hover:bg-[#2D2A2B] transition-colors
+                  ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
+                  ${isDesktopCollapsed ? "justify-center" : "justify-start"}
+                `}
+            >
+              <FaBookJournalWhills size={24} className=" " />
+              {!isDesktopCollapsed && (
+                <span className="text-xl font-montserrat ">Add a Journal</span>
+              )}
+            </NavLink>
+            <NavLink
+              to="/chat/internal-challenge"
+              className={({ isActive }) => `
+                    w-full flex items-center gap-3 p-3 rounded-lg
+                    hover:bg-[#2D2A2B] transition-colors
+                  ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
+                  ${isDesktopCollapsed ? "justify-center" : "justify-start"}
+                `}
+            >
+              <SiGoogletasks size={24} className=" " />
+              {!isDesktopCollapsed && (
+                <span className="text-xl font-montserrat ">
+                  Internal Challenge
+                </span>
+              )}
+            </NavLink>
+            <NavLink
+              to="/chat/settings"
+              className={({ isActive }) => ` lg:hidden
+                    w-full flex items-center gap-3 p-3 rounded-lg
+                    hover:bg-[#2D2A2B] transition-colors
+                  ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
+                  ${isDesktopCollapsed ? "justify-center" : "justify-start"}
+                `}
+            >
+              <HiOutlineCog6Tooth size={24} className=" " />
+              {!isDesktopCollapsed && (
+                <span className="text-xl font-montserrat ">Settings</span>
               )}
             </NavLink>
           </div>
 
-          {/* Bottom Section - Other Navigation Items and User Profile */}
+          {/* ----------------------------Bottom Section--------------- - Other Navigation Items and User Profile */}
           <div>
             <div className="p-4 space-y-2">
               <NavLink
-                to="/mindset"
+                to="/chat/general"
+                className={`
+                w-full flex items-center gap-3 p-3 rounded-lg
+                hover:bg-[#2D2A2B] transition-colors
+                ${chatgeneral ? "hidden" : "font-medium"}
+                ${isDesktopCollapsed ? "justify-center" : "justify-start"}
+              `}
+              >
+                <FiPlusCircle size={24} className=" " />
+                {!isDesktopCollapsed && (
+                  <span className="text-xl font-montserrat ">
+                    Start new chat
+                  </span>
+                )}
+              </NavLink>
+              <NavLink
+                to="/chat/mindset"
                 className={({ isActive }) => `
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
-                  ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
+                  ${isActive ? "hidden" : "font-medium"}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
                 `}
               >
@@ -177,25 +262,27 @@ const Navigation = ({
                 )}
               </NavLink>
               <NavLink
-                to="/journal"
+                to="/chat/journal"
                 className={({ isActive }) => `
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
-                  ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
+                  ${isActive ? "hidden" : "font-medium"}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
                 `}
               >
                 <FaBookJournalWhills size={24} className=" " />
                 {!isDesktopCollapsed && (
-                  <span className="text-xl font-montserrat ">Journal</span>
+                  <span className="text-xl font-montserrat ">
+                    Add a Journal
+                  </span>
                 )}
               </NavLink>
               <NavLink
-                to="/internal-challenge"
+                to="/chat/internal-challenge"
                 className={({ isActive }) => `
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
-                  ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
+                  ${isActive ? "hidden" : "font-medium"}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
                 `}
               >
@@ -211,7 +298,7 @@ const Navigation = ({
                 className={({ isActive }) => ` lg:hidden
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
-                  ${isActive ? "bg-[#2D2A2B] font-bold" : "font-medium"}
+                  ${isActive ? "hidden" : "font-medium"}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
                 `}
               >
@@ -223,6 +310,23 @@ const Navigation = ({
             </div>
             <div className="w-10/12 h-[1.5px] bg-cCard mx-auto" />
             <div className={`${!isDesktopCollapsed ? "lg:mb-18" : "mb-0"}`}>
+              <NavLink
+                to="/"
+                end
+                className={`
+                w-full flex items-center gap-3 p-3 rounded-lg mx-3
+                    hover:bg-[#2D2A2B] transition-colors
+                  ${isDesktopCollapsed ? "mb-2" : "mb-0"}
+                  cursor-pointer
+                  hover:bg-[#232021]
+                  transition-all duration-700 ease-in-out"}
+              `}
+              >
+                <FaHome  size={24} className=" " />
+                {!isDesktopCollapsed && (
+                  <span className="text-xl font-montserrat font-semibold">Back to Home</span>
+                )}
+              </NavLink>
               {/* User Profile Section */}
               <div
                 className={`
@@ -230,8 +334,8 @@ const Navigation = ({
                   transition-colors
                   ${
                     isDesktopCollapsed
-                      ? "justify-center mb-5 mt-2"
-                      : "justify-start mb-4 mt-2"
+                      ? "justify-center mb-5 "
+                      : "justify-start mb-4 "
                   }
                   hover:bg-[#2d2a2b]
                   px-2 py-2
@@ -350,7 +454,8 @@ const Navigation = ({
                 onClick={() => {
                   handleLogOut();
                 }}
-                className="btn bg-cCard px-8 text-2xl text-black font-semibold font-inter py-1 border-none transition-colors duration-200 hover:bg-[#ffe066] hover:text-[#111] focus:outline-none focus:ring-2 focus:ring-cCard transform hover:scale-105 active:scale-95"
+                className="btn bg-cCard px-8 text-2xl font-semibold font-inter py-1 border-none "
+
               >
                 Confirm
               </button>

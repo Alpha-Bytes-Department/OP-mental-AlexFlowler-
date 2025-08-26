@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext } from "react";
 import type { AxiosInstance } from "axios";
 import axios from "axios";
@@ -63,12 +64,12 @@ axiosInstance.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    if (
-      config.url &&
-      !config.url.startsWith("http") &&
-      config.url.startsWith("/api")
-    ) {
-    }
+    // if (
+    //   config.url &&
+    //   !config.url.startsWith("http") &&
+    //   config.url.startsWith("/api")
+    // ) {
+    // }
 
     return config;
   },

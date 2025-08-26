@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { FaArrowUp } from "react-icons/fa6";
 import { useAxios } from "../../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 interface Message {
   id: number | string;
@@ -23,6 +24,7 @@ const ChatHome = () => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const axios = useAxios();
+  const navigate = useNavigate();
 
   const { register, handleSubmit, reset, watch } = useForm<FormData>({
     defaultValues: { message: "" },
@@ -43,9 +45,9 @@ const ChatHome = () => {
   const LoadData = async () => {
     try {
       setIsInitialLoading(true);
-      const response = await axios.get('/api/chatbot/history/all/');
+      const response = await axios.get("/api/chatbot/history/all/");
       console.log("Loaded data:", response);
-      
+
       if (response.status === 200) {
         const transformedMessages: Message[] = [];
 
@@ -54,21 +56,21 @@ const ChatHome = () => {
             // Add user message if present
             if (item.role === "user") {
               transformedMessages.push({
-          id: `user-${item.id ?? idx}`,
-          message: item.message,
-          sender: "user",
-          status: "success",
-          timestamp: item.timestamp,
+                id: `user-${item.id ?? idx}`,
+                message: item.message,
+                sender: "user",
+                status: "success",
+                timestamp: item.timestamp,
               });
             }
             // Add assistant (bot) message if present
             if (item.role === "assistant") {
               transformedMessages.push({
-          id: `bot-${item.id ?? idx}`,
-          message: item.message,
-          sender: "bot",
-          status: "success",
-          timestamp: item.timestamp,
+                id: `bot-${item.id ?? idx}`,
+                message: item.message,
+                sender: "bot",
+                status: "success",
+                timestamp: item.timestamp,
               });
             }
           });
@@ -81,14 +83,12 @@ const ChatHome = () => {
     } finally {
       setIsInitialLoading(false);
     }
-    
   };
 
   useEffect(() => {
     LoadData();
   }, []);
 
-  // Send message to AI and handle response
   const onSubmit = async (data: FormData) => {
     if (!data.message.trim()) return;
 
@@ -122,53 +122,63 @@ const ChatHome = () => {
 
       // Send message to API
       const response = await axios.post("/api/chatbot/", {
-        message: data.message
+        message: data.message,
       });
       // Handle response
       if (response.status === 208) {
         // console.log("AI Response:", response.data.reply);
-        Swal.fire({
-                  title: "Verification Email Sent!",
-                  text:  response.data.reply,
-                  icon: "info",
-                  confirmButtonText: "OK",
-                  showCancelButton: true,
-                  background: "rgba(255, 255, 255, 0.1)",
-                  backdrop: "rgba(0, 0, 0, 0.4)",
-                  customClass: {
-                    popup: "glassmorphic-popup",
-                    title: "glassmorphic-title",
-                    htmlContainer: "glassmorphic-text",
-                    confirmButton: "glassmorphic-button",
-                  },
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    // User clicked "OK"
-                    console.log("User confirmed:", result);
-                  } else {
-                   return;
-                  }
-                });
 
+        Swal.fire({
+          title: "Verification Email Sent!",
+          text: response.data.reply,
+          icon: "info",
+          confirmButtonText: "OK",
+          showCancelButton: true,
+          background: "rgba(255, 255, 255, 0.1)",
+          backdrop: "rgba(0, 0, 0, 0.4)",
+          customClass: {
+            popup: "glassmorphic-popup",
+            title: "glassmorphic-title",
+            htmlContainer: "glassmorphic-text",
+            confirmButton: "glassmorphic-button",
+          },
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate("/", { replace: false });
+            setTimeout(() => {
+              const pricingElement = document.getElementById("pricing");
+              if (pricingElement) {
+                pricingElement.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }
+            }, 500); // Adjust delay if needed
+          } else {
+            return;
+          }
+        });
       }
 
       // Remove loading message and add actual response
       setMessageData((prev) => {
-        const filteredMessages = prev.filter(msg => msg.id !== botMessageId);
+        const filteredMessages = prev.filter((msg) => msg.id !== botMessageId);
         return [
           ...filteredMessages,
           {
             id: response?.data?.session_id || Date.now(),
-            message: response?.data?.reply || response?.data?.relpy || "I received your message!",
+            message:
+              response?.data?.reply ||
+              response?.data?.relpy ||
+              "I received your message!",
             sender: "bot",
             status: "success",
-          }
+          },
         ];
       });
-
     } catch (error) {
       console.error("Error sending message:", error);
-      
+
       // Update loading message to show error
       setMessageData((prev) =>
         prev.map((msg) =>
@@ -199,15 +209,21 @@ const ChatHome = () => {
         <div className="flex flex-col items-center space-y-4">
           <div className="flex space-x-2">
             <div className="w-3 h-3 bg-white rounded-full animate-bounce"></div>
-            <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-            <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+            <div
+              className="w-3 h-3 bg-white rounded-full animate-bounce"
+              style={{ animationDelay: "0.1s" }}
+            ></div>
+            <div
+              className="w-3 h-3 bg-white rounded-full animate-bounce"
+              style={{ animationDelay: "0.2s" }}
+            ></div>
           </div>
           <p className="text-lg">Loading chat history...</p>
         </div>
       </div>
     );
   }
-  
+
   return (
     <>
       <style>
@@ -321,8 +337,6 @@ const ChatHome = () => {
           </div>
         </div>
       </div>
-
-      
     </>
   );
 };

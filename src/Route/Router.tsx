@@ -42,9 +42,9 @@ const Router = createBrowserRouter([
   {
     path: "/chat",
     element: (
-      <PrivateRoute>
+      //<PrivateRoute>
         <ChatLayout />
-      </PrivateRoute>
+      //</PrivateRoute>
     ),
     errorElement: <Error />,
     children: [

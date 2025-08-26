@@ -23,7 +23,8 @@ const Pricing = () => {
     "monthly"
   );
   const [subscriptionData, setSubscriptionData] = useState({});
-  const [splitFeature, setSplitFeature] = useState({})
+
+
 
   useEffect(() => {
     const getPriceCardData = async () => {
@@ -32,16 +33,7 @@ const Pricing = () => {
         console.log("response",res);
         setSubscriptionData(res?.data);
         // triming features
-        res?.data.map((item: Feature, index:number) => {
-          const featureArray = item?.features?.split("\\n\r\n");
-          if(index === 0){
-            const monthlyFeature = featureArray
-            setSplitFeature(monthlyFeature)
-          }else{
-            const yearlyFeature = featureArray
-            setSplitFeature(yearlyFeature)
-          }
-        });
+        
       } catch (error) {
         console.log("failed to load subscribe data", error);
         Swal.fire({
@@ -63,7 +55,6 @@ const Pricing = () => {
     getPriceCardData();
   }, []);
 
-  console.log("Split feature", splitFeature);
 
   return (
     <div className="bg-[url('/background.png')] py-28 bg-cover">

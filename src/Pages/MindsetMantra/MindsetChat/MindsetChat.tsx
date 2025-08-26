@@ -1,6 +1,6 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import { FaArrowUp } from "react-icons/fa6";
+import brain from "../../../../public/Brain.png";
 
 // ----type declaration---------
 interface Message {
@@ -63,7 +63,16 @@ const MindsetChat = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen ">
+    <div className="flex flex-col h-screen">
+      <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none">
+        <div className="flex flex-col items-center gap-3">
+          <img
+            src={brain}
+            alt="Mindset chat background"
+            className="ms-10 mt-40 lg:mt-20 lg:ms-52 h-[600px] w-[600px] lg:h-[900px] lg:w-[900px]"
+          />
+        </div>
+      </div>
       {/* --------------- Messages area ---------------------- */}
       <div className="flex-1 p-4 overflow-y-auto">
         <div className="max-w-3xl mx-auto space-y-4">
@@ -90,15 +99,15 @@ const MindsetChat = () => {
       </div>
 
       {/* --------------- Input area ---------------------- */}
-      <div className="p-4">
-        <div className="max-w-3xl mx-auto flex gap-4 border rounded-lg bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm p-3">
+      <div className="p-4 mb-15 lg:mb-0">
+        <div className="max-w-3xl mx-auto flex gap-4 rounded-lg bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm p-4">
           <input
             type="text"
             value={inputMessage}
             onChange={handleInputChange}
             onKeyPress={handleKeyPress}
             placeholder="Type your message..."
-            className="flex-1 border bg-[#393B3C] rounded-lg px-4 py-2 focus:outline-none focus:border-[#DBD0A6"
+            className="w-full py-2 sm:py-3 lg:py-4 pl-2 sm:pl-4 pr-8 sm:pr-12 text-sm sm:text-base text-white bg-white/20 backdrop-blur-md rounded-lg sm:rounded-xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300"
           />
           <button
             type="submit"

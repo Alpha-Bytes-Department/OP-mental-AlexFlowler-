@@ -13,7 +13,7 @@ import MindsetMantra from "../Pages/MindsetMantra/MindsetMantra";
 import Journal from "../Pages/Journal/Journal";
 import InternalChallenges from "../Pages/InternalChallenges/InternalChallenges";
 import PrivateRoute from "../Pages/Chat/PrivateRoute";
-import UserVerify from "../Pages/MailVerifiy/UserVerify";
+// import UserVerify from "../Pages/MailVerifiy/UserVerify";
 
 const Router = createBrowserRouter([
   {
@@ -28,10 +28,6 @@ const Router = createBrowserRouter([
       {
         path: "/verify",
         element: <Verify />,
-      },
-      {
-        path: "/users/verify",
-        element: <UserVerify />,
       },
     ],
   },

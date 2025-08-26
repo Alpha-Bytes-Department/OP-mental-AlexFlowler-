@@ -129,7 +129,7 @@ const ChatHome = () => {
         // console.log("AI Response:", response.data.reply);
 
         Swal.fire({
-          title: "Verification Email Sent!",
+          title: "Free Tier Limit Reached",
           text: response.data.reply,
           icon: "info",
           confirmButtonText: "OK",

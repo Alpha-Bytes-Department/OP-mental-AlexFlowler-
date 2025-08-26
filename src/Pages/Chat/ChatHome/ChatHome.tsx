@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { FaArrowUp } from "react-icons/fa6";
 import { useAxios } from "../../../Providers/AxiosProvider";
+import Swal from "sweetalert2";
 
 interface Message {
   id: number | string;
@@ -123,8 +124,33 @@ const ChatHome = () => {
       const response = await axios.post("/api/chatbot/", {
         message: data.message
       });
+      // Handle response
+      if (response.status === 208) {
+        // console.log("AI Response:", response.data.reply);
+        Swal.fire({
+                  title: "Verification Email Sent!",
+                  text:  response.data.reply,
+                  icon: "info",
+                  confirmButtonText: "OK",
+                  showCancelButton: true,
+                  background: "rgba(255, 255, 255, 0.1)",
+                  backdrop: "rgba(0, 0, 0, 0.4)",
+                  customClass: {
+                    popup: "glassmorphic-popup",
+                    title: "glassmorphic-title",
+                    htmlContainer: "glassmorphic-text",
+                    confirmButton: "glassmorphic-button",
+                  },
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    // User clicked "OK"
+                    console.log("User confirmed:", result);
+                  } else {
+                   return;
+                  }
+                });
 
-      console.log("AI Response:", response);
+      }
 
       // Remove loading message and add actual response
       setMessageData((prev) => {
@@ -181,7 +207,7 @@ const ChatHome = () => {
       </div>
     );
   }
-  console.log(messageData)
+  
   return (
     <>
       <style>
@@ -295,6 +321,8 @@ const ChatHome = () => {
           </div>
         </div>
       </div>
+
+      
     </>
   );
 };

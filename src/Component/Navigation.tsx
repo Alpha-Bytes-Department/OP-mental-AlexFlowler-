@@ -20,6 +20,7 @@ import { useState } from "react";
 
 import { useAxios } from "../Providers/AxiosProvider";
 import Swal from "sweetalert2";
+import { TbBrandMessenger } from "react-icons/tb";
 interface NavigationProps {
   isMobileMenuOpen: boolean;
   isDesktopCollapsed: boolean;
@@ -120,7 +121,7 @@ const Navigation = ({
         {/* Header */}
         <div className="flex items-center justify-between px-4  md:pt-10 md:px-7">
           {!isDesktopCollapsed && (
-            <h1 className="md:text-5xl text-2xl font-montserrat text-center font-bold text-white">
+            <h1 className="md:text-4xl text-2xl font-montserrat text-center font-bold text-white">
               OP Ai
             </h1>
           )}
@@ -163,9 +164,9 @@ const Navigation = ({
                 ${isDesktopCollapsed ? "justify-center" : "justify-start"}
               `}
             >
-              <FiPlusCircle size={24} className=" " />
+              <TbBrandMessenger size={24} className=" " />
               {!isDesktopCollapsed && (
-                <span className="text-xl font-montserrat ">Start chat</span>
+                <span className="text-xl font-montserrat ">Ai chat</span>
               )}
             </NavLink>
             <NavLink
@@ -188,7 +189,7 @@ const Navigation = ({
                 className={({ isActive }) => `
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
-                  ${journalLinkMatched  ? "block" : "hidden"}
+                  ${journalLinkMatched ? "block" : "hidden"}
                   ${isActive ? "bg-[#2D2A2B] font-bold" : ""}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
                 `}
@@ -265,9 +266,7 @@ const Navigation = ({
               >
                 <FiPlusCircle size={24} className=" " />
                 {!isDesktopCollapsed && (
-                  <span className="text-xl font-montserrat ">
-                    Start new chat
-                  </span>
+                  <span className="text-xl font-montserrat ">Ai chat</span>
                 )}
               </NavLink>
               <NavLink
@@ -390,8 +389,13 @@ const Navigation = ({
                     )}
                   </div>
                   {!isDesktopCollapsed && (
-                    <div className="text-base sm:text-lg md:text-xl font-bold text-white truncate">
+                    <div className="text-base sm:text-lg md:text-xl flex flex-col font-bold text-white truncate">
                       {user.name ? user.name : "Unknown User"}
+                      <span className="text-sm font-medium text-gray-400">
+                        {user.is_subscribed
+                          ? "Enterprise Package"
+                          : "Free Package "}
+                      </span>
                     </div>
                   )}
                   <span className="ml-auto">

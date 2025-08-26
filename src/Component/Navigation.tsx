@@ -7,6 +7,7 @@ import {
   HiOutlineUser,
 } from "react-icons/hi2";
 import { SiGoogletasks } from "react-icons/si";
+
 import {
   FaAngleDown,
   FaBookJournalWhills,
@@ -16,9 +17,9 @@ import {
 import { FaHome } from "react-icons/fa";
 import { Link, NavLink, useMatch, useNavigate } from "react-router-dom";
 import { useState } from "react";
+
 import { useAxios } from "../Providers/AxiosProvider";
 import Swal from "sweetalert2";
-
 interface NavigationProps {
   isMobileMenuOpen: boolean;
   isDesktopCollapsed: boolean;
@@ -41,6 +42,7 @@ const Navigation = ({
 
   // logout handler
   const handleLogOut = async () => {
+
     console.log("Logging out...");
     try {
       const response = await axios.post("/api/users/logout/");
@@ -73,6 +75,8 @@ const Navigation = ({
       console.error("Error logging out:", error);
     }
   };
+
+  console.log("User:", user);
 
   return (
     <>
@@ -342,11 +346,25 @@ const Navigation = ({
               >
                 <div className="flex items-center gap-2 w-full">
                   <div className="border rounded-full p-1 flex-shrink-0">
-                    <HiOutlineUser size={24} />
+                    {user.profile_image &&
+                    typeof user.profile_image === "string" &&
+                    user.profile_image.length > 0 ? (
+                      <img
+                        src={
+                          user.profile_image.startsWith("/media")
+                            ? `http://10.10.12.53:8000${user.profile_image}`
+                            : user.profile_image
+                        }
+                        alt="Profile"
+                        className="w-8 h-8 rounded-full"
+                      />
+                    ) : (
+                      <HiOutlineUser size={24} />
+                    )}
                   </div>
                   {!isDesktopCollapsed && (
                     <div className="text-base sm:text-lg md:text-xl font-bold text-white truncate">
-                      alex_fowler
+                      {user.name ? user.name : "Unknown User"}
                     </div>
                   )}
                   <span className="ml-auto">
@@ -420,7 +438,7 @@ const Navigation = ({
             Press ESC key or click the button below to close
           </p>
           <div className="modal-action">
-            <div className="flex justify-center w-full gap-6 pb-10 lg:pb-40  ">
+            <div className="flex justify-center w-full gap-6 pb-10 lg:pb-40">
               <button
                 onClick={() => {
                   const modal = document.getElementById(
@@ -428,7 +446,7 @@ const Navigation = ({
                   ) as HTMLDialogElement | null;
                   if (modal) modal.close();
                 }}
-                className="btn bg-[#2a2f2d] px-8 text-2xl font-semibold font-inter py-1 border-none text-white"
+                className="btn bg-[#2a2f2d] px-8 text-2xl font-semibold font-inter py-1 border-none text-white transition-colors duration-200 hover:bg-[#393939] hover:text-cCard focus:outline-none focus:ring-2 focus:ring-cCard transform hover:scale-105 active:scale-95"
               >
                 Cancel
               </button>
@@ -437,6 +455,7 @@ const Navigation = ({
                   handleLogOut();
                 }}
                 className="btn bg-cCard px-8 text-2xl font-semibold font-inter py-1 border-none "
+
               >
                 Confirm
               </button>

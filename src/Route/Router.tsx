@@ -73,4 +73,61 @@ const Router = createBrowserRouter(
   ],
   
 );
+=======
+import PrivateRoute from "../Pages/Chat/PrivateRoute";
+import UserVerify from "../Pages/MailVerifiy/UserVerify";
+
+const Router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Layout />,
+    errorElement: <Error />,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+      {
+        path: "/verify",
+        element: <Verify />,
+      },
+      {
+        path: "/users/verify",
+        element: <UserVerify />,
+      },
+    ],
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Signup />,
+  },
+  {
+    path: "/chat",
+    element: (
+      <PrivateRoute>
+        <ChatLayout />
+      </PrivateRoute>
+    ),
+    errorElement: <Error />,
+    children: [
+      {
+        path: "/chat",
+        element: <ChatHome />,
+      },
+      {
+        path: "/chat/:id",
+        element: <ChatSession />,
+      },
+      {
+        path: "/chat/settings",
+        element: <Settings />,
+      },
+    ],
+  },
+]);
+
 export default Router;

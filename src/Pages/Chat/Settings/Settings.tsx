@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import {  useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { IoCamera, IoPencil, IoSave, IoClose } from "react-icons/io5";
 import { FaUserCircle } from "react-icons/fa";
 import { useAxios } from "../../../Providers/AxiosProvider";
@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 interface SettingsFormData {
   logo: FileList;
   name: string;
-  address: string;
+  phone: string;
   username: string;
   description: string;
   gender: string;
@@ -21,7 +21,7 @@ const Settings = () => {
     return JSON.parse(localStorage.getItem("user") || "{}");
   });
   const axios = useAxios();
-  const baseUrl = "http://10.10.12.53:8000";
+  const baseUrl = "http://10.10.12.53:8000"; // Uncomment and use your base URL
 
   const {
     register,
@@ -32,7 +32,7 @@ const Settings = () => {
   } = useForm<SettingsFormData>({
     defaultValues: {
       name: userData.name || "",
-      address: userData.address || "",
+      phone: userData.phone || "",
       username: userData.username || "",
       description: userData.description || "",
       gender: userData.gender || "",
@@ -48,6 +48,7 @@ const Settings = () => {
 
       // Append text fields
       formData.append("name", data.name);
+      formData.append("phone", data.phone || "");
       formData.append("username", data.username);
       formData.append("description", data.description || "");
       formData.append("gender", data.gender);
@@ -82,7 +83,7 @@ const Settings = () => {
           // Update form values with new data
           reset({
             name: updatedUser.name || "",
-            address: updatedUser.address || "",
+            phone: updatedUser.phone || "",
             username: updatedUser.username || "",
             description: updatedUser.description || "",
             gender: updatedUser.gender || "",
@@ -121,6 +122,13 @@ const Settings = () => {
     } catch (error) {
       console.error("Error updating settings:", error);
       setLoading(false);
+
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to update profile. Please try again.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -130,29 +138,35 @@ const Settings = () => {
   const genderOptions = ["Select Gender", "Men", "Women", "Other"];
 
   // State for image preview
-  const [previewImage, setPreviewImage] = useState<string | null>(
-    userData.profile_image ? `${baseUrl}${userData.profile_image}` : null
-  );
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   // Update form when userData changes
   useEffect(() => {
     reset({
       name: userData.name || "",
-      address: userData.address || "",
+      phone: userData.phone || "",
       username: userData.username || "",
       description: userData.description || "",
       gender: userData.gender || "",
     });
     setSelectedGender(userData.gender || "Select Gender");
-    setPreviewImage(
-      userData.profile_image ? `${baseUrl}${userData.profile_image}` : null
-    );
-  }, [userData, reset]);
+
+    // Fix profile image URL construction
+    if (userData.profile_image) {
+      const imageUrl = userData.profile_image.startsWith("http")
+        ? userData.profile_image
+        : `${baseUrl}${userData.profile_image}`;
+      setPreviewImage(imageUrl);
+    } else {
+      setPreviewImage(null);
+    }
+  }, [userData, reset, baseUrl]);
 
   const handleGenderSelect = (value: string) => {
     if (!isEditing) return;
     setSelectedGender(value);
-    setValue("gender", value === "Select Gender" ? "" : value);
+    const genderValue = value === "Select Gender" ? "" : value;
+    setValue("gender", genderValue);
     setIsOpen(false);
   };
 
@@ -160,6 +174,28 @@ const Settings = () => {
     if (!isEditing) return;
     const file = event.target.files?.[0];
     if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        Swal.fire({
+          title: "Invalid File!",
+          text: "Please select an image file.",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
+
+      // Validate file size (e.g., max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        Swal.fire({
+          title: "File Too Large!",
+          text: "Please select an image smaller than 5MB.",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
+
       // Create preview URL
       const previewUrl = URL.createObjectURL(file);
       setPreviewImage(previewUrl);
@@ -174,15 +210,22 @@ const Settings = () => {
       // Cancel edit - reset form to original values
       reset({
         name: userData.name || "",
-        address: userData.address || "",
+        phone: userData.phone || "",
         username: userData.username || "",
         description: userData.description || "",
         gender: userData.gender || "",
       });
       setSelectedGender(userData.gender || "Select Gender");
-      setPreviewImage(
-        userData.profile_image ? `${baseUrl}${userData.profile_image}` : null
-      );
+
+      // Reset preview image
+      if (userData.profile_image) {
+        const imageUrl = userData.profile_image.startsWith("http")
+          ? userData.profile_image
+          : `${baseUrl}${userData.profile_image}`;
+        setPreviewImage(imageUrl);
+      } else {
+        setPreviewImage(null);
+      }
     }
     setIsEditing(!isEditing);
   };
@@ -194,6 +237,10 @@ const Settings = () => {
           src={previewImage}
           alt="Profile"
           className="w-full h-full object-cover rounded-full"
+          onError={(e) => {
+            console.error("Error loading image:", previewImage);
+            setPreviewImage(null);
+          }}
         />
       );
     }
@@ -204,26 +251,10 @@ const Settings = () => {
     <div className="min-h-screen text-white py-4 sm:py-8 lg:py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8 sm:mb-12 flex justify-between items-center">
+        <div className="mb-8 sm:mb-12 flex justify-center items-center">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
             General Settings
           </h1>
-          <button
-            onClick={toggleEdit}
-            className="flex items-center gap-2 px-4 py-2 bg-transparent border border-white/30 rounded-lg hover:bg-white/10 transition-colors"
-          >
-            {isEditing ? (
-              <>
-                <IoClose size={20} />
-                <span className="hidden sm:inline">Cancel</span>
-              </>
-            ) : (
-              <>
-                <IoPencil size={20} />
-                <span className="hidden sm:inline">Edit Profile</span>
-              </>
-            )}
-          </button>
         </div>
 
         <form
@@ -260,6 +291,9 @@ const Settings = () => {
               {isEditing
                 ? "Click to Upload Profile Picture"
                 : "Profile Picture"}
+            </p>
+            <p className="text-base text-hCard sm:text-lg font-medium text-center">
+              {userData.email}
             </p>
           </div>
 
@@ -328,8 +362,14 @@ const Settings = () => {
                   Gender
                 </label>
                 <div className="relative">
-                  <div
+                  <input
+                    type="hidden"
                     {...register("gender")}
+                    value={
+                      selectedGender === "Select Gender" ? "" : selectedGender
+                    }
+                  />
+                  <div
                     className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-cCard rounded-lg text-white focus:outline-none focus:border-white/60 transition-colors bg-transparent flex items-center justify-between text-sm sm:text-base ${
                       isEditing
                         ? "cursor-pointer"
@@ -371,24 +411,29 @@ const Settings = () => {
 
             {/* Right Column */}
             <div className="w-full lg:w-1/2 max-w-md mx-auto lg:mx-0 space-y-6 sm:space-y-8">
-              {/* Address Field */}
+              {/* Phone Field */}
               <div className="space-y-2">
                 <label
-                  htmlFor="address"
+                  htmlFor="phone"
                   className="block text-base sm:text-lg font-medium"
                 >
-                  Address
+                  Phone Number
                 </label>
                 <input
-                  {...register("address")}
-                  type="text"
-                  id="address"
-                  placeholder="your address"
+                  {...register("phone")}
+                  type="tel"
+                  id="phone"
+                  placeholder="your phone number"
                   disabled={!isEditing}
                   className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-transparent border border-cCard rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/60 transition-colors text-sm sm:text-base ${
                     !isEditing ? "opacity-70 cursor-not-allowed" : ""
                   }`}
                 />
+                {errors.phone && isEditing && (
+                  <p className="text-red-400 text-xs sm:text-sm">
+                    {errors.phone.message}
+                  </p>
+                )}
               </div>
 
               {/* Description Field */}
@@ -414,19 +459,39 @@ const Settings = () => {
           </div>
 
           {/* Save Button - Only show when editing */}
-          {isEditing && (
-            <div className="flex justify-center pt-6 sm:pt-8">
+          <div className="flex justify-center pt-6 sm:pt-8">
+            {isEditing && (
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full disabled:opacity-50 sm:w-auto px-8 sm:px-12 lg:px-16 py-3 sm:py-4 bg-cCard text-black font-bold text-base sm:text-lg rounded-lg transition-all duration-200 transform hover:scale-105 max-w-xs flex items-center justify-center gap-2"
+                className="w-full cursor-pointer disabled:opacity-50 sm:w-auto px-8 sm:px-12 lg:px-16 py-3 sm:py-4 bg-cCard text-black font-bold text-base sm:text-lg rounded-lg transition-all duration-200 transform hover:scale-105 max-w-xs flex items-center justify-center gap-2"
               >
                 <IoSave size={20} />
                 {loading ? "Saving..." : "Save Settings"}
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </form>
+
+        <div className="flex justify-center pt-5">
+          <button
+            type="button"
+            onClick={toggleEdit}
+            className="flex items-center gap-2 px-4 py-2 bg-transparent border border-white/30 rounded-lg hover:bg-white/10 transition-colors"
+          >
+            {isEditing ? (
+              <>
+                <IoClose size={20} />
+                <span className="hidden sm:inline">Cancel</span>
+              </>
+            ) : (
+              <>
+                <IoPencil size={20} />
+                <span className="hidden sm:inline">Edit Profile</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

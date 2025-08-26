@@ -3,17 +3,45 @@ import { useEffect, useState } from "react";
 import { useAxios } from "../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
 
+// type declaration
+interface Feature {
+  created_at: string;
+  description: string;
+  duration_days: number;
+  features: string;
+  id: number;
+  name: string;
+  price: string;
+  recommended: boolean;
+  stripe_price_id: string;
+  updated_at: string;
+}
+
 const Pricing = () => {
   const axios = useAxios();
   const [planDuration, setPlanDuration] = useState<"monthly" | "yearly">(
     "monthly"
   );
+  const [subscriptionData, setSubscriptionData] = useState({});
+  const [splitFeature, setSplitFeature] = useState({})
 
   useEffect(() => {
     const getPriceCardData = async () => {
       try {
         const res = await axios.get("api/subscriptions/plans/");
-        console.log(res);
+        console.log("response",res);
+        setSubscriptionData(res?.data);
+        // triming features
+        res?.data.map((item: Feature, index:number) => {
+          const featureArray = item?.features?.split("\\n\r\n");
+          if(index === 0){
+            const monthlyFeature = featureArray
+            setSplitFeature(monthlyFeature)
+          }else{
+            const yearlyFeature = featureArray
+            setSplitFeature(yearlyFeature)
+          }
+        });
       } catch (error) {
         console.log("failed to load subscribe data", error);
         Swal.fire({
@@ -34,6 +62,8 @@ const Pricing = () => {
     };
     getPriceCardData();
   }, []);
+
+  console.log("Split feature", splitFeature);
 
   return (
     <div className="bg-[url('/background.png')] py-28 bg-cover">

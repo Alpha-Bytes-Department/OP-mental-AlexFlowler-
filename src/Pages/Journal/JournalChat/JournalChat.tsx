@@ -1,7 +1,6 @@
-
-
 import React, { useEffect, useRef, useState } from "react";
 import { FaArrowUp } from "react-icons/fa6";
+import { FaBook } from "react-icons/fa6";
 
 // ----type declaration---------
 interface Message {
@@ -10,7 +9,7 @@ interface Message {
   sender: "user" | "bot";
 }
 
-const MindsetMantra = () => {
+const JournalChat = () => {
   //--------states--------
   const [messages, setMessages] = useState<Message[]>([]); // stores chat messages
   const [inputMessage, setInputMessage] = useState(""); // handles input field text
@@ -64,7 +63,13 @@ const MindsetMantra = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen ">
+    <div className="flex flex-col h-screen relative">
+      <div className="absolute inset-0 flex items-center justify-center opacity-15 pointer-events-none">
+        <div className="flex flex-col items-center gap-3">
+          <FaBook className="text-white" fontSize={300} />
+          <span className="text-4xl text-white font-semibold">Journal</span>
+        </div>
+      </div>
       {/* --------------- Messages area ---------------------- */}
       <div className="flex-1 p-4 overflow-y-auto">
         <div className="max-w-3xl mx-auto space-y-4">
@@ -79,7 +84,7 @@ const MindsetMantra = () => {
                 className={`max-w-[70%] rounded-lg p-3 ${
                   message.sender === "user"
                     ? "bg-[#DBD0A6] text-black"
-                    : "bg-[#393B3C] text-white"
+                    : "bg-[#313435] text-white"
                 }`}
               >
                 {message.text}
@@ -92,14 +97,14 @@ const MindsetMantra = () => {
 
       {/* --------------- Input area ---------------------- */}
       <div className="p-4">
-        <div className="max-w-3xl mx-auto flex gap-4 border rounded-lg bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm p-3">
+        <div className="max-w-3xl mx-auto flex gap-4 rounded-lg bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm p-4">
           <input
             type="text"
             value={inputMessage}
             onChange={handleInputChange}
             onKeyPress={handleKeyPress}
             placeholder="Type your message..."
-            className="flex-1 border bg-[#393B3C] rounded-lg px-4 py-2 focus:outline-none focus:border-[#DBD0A6"
+            className="w-full py-1 sm:py-3 lg:py-4 xl:py-4 2xl:py-5 pl-3 sm:pl-4 md:pl-5 lg:pl-6 xl:pl-7 2xl:pl-8 pr-12 sm:pr-14 md:pr-16 lg:pr-18 xl:pr-20 2xl:pr-24 text-sm sm:text-base md:text-lg lg:text-xl text-white bg-white/20 backdrop-blur-md rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300"
           />
           <button
             type="submit"
@@ -115,4 +120,4 @@ const MindsetMantra = () => {
   );
 };
 
-export default MindsetMantra;
+export default JournalChat;

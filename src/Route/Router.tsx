@@ -10,9 +10,11 @@ import ChatSession from "../Pages/Chat/ChatSession/ChatSession";
 import Settings from "../Pages/Chat/Settings/Settings";
 import Verify from "../Pages/MailVerifiy/Verify";
 import MindsetMantra from "../Pages/MindsetMantra/MindsetMantra";
-import Journal from "../Pages/Journal/Journal";
 import InternalChallenges from "../Pages/InternalChallenges/InternalChallenges";
 import PrivateRoute from "../Pages/Chat/PrivateRoute";
+import JournalOptions from "../Pages/Journal/JournalOptions/JournalOptions";
+import JournalChat from "../Pages/Journal/JournalChat/JournalChat";
+import JournalList from "../Pages/Journal/JournalList/JournalList";
 // import UserVerify from "../Pages/MailVerifiy/UserVerify";
 
 const Router = createBrowserRouter([
@@ -65,8 +67,16 @@ const Router = createBrowserRouter([
         element: <MindsetMantra />,
       },
       {
-        path: "/chat/journal",
-        element: <Journal />,
+        path: "/chat/journal/options",
+        element: <JournalOptions />,
+      },
+      {
+        path: "/chat/journal/journal-chat",
+        element: <JournalChat />,
+      },
+      {
+        path: "/chat/journal/list",
+        element: <JournalList />,
       },
       {
         path: "/chat/internal-challenge",

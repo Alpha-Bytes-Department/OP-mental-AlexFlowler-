@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { MdDelete } from "react-icons/md";
+import { FaFilter } from "react-icons/fa";
 
 // ----type declarations---------
 interface JournalEntry {
@@ -138,7 +140,7 @@ const JournalList: React.FC = () => {
           <div className="flex items-center justify-between mb-6">
             <span className="text-gray-400">Your Journal Entries</span>
             <div className="flex items-center gap-2">
-              <span className="text-gray-400">🔍</span>
+              <span className="text-gray-400"><FaFilter /></span>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
@@ -155,7 +157,7 @@ const JournalList: React.FC = () => {
           </div>
 
           {/* --------------- Table columns ---------------------- */}
-          <div className="grid grid-cols-12 gap-4 pb-2 border-b border-gray-700 text-gray-400 text-sm">
+          <div className="grid grid-cols-12 gap-4  text-gray-400 text-sm">
             <div className="col-span-2">Entry ID</div>
             <div className="col-span-5">Description</div>
             <div className="col-span-3">Created Date</div>
@@ -176,7 +178,7 @@ const JournalList: React.FC = () => {
                   index % 2 === 0 ? "bg-gray-900/50" : "bg-gray-800/30"
                 } hover:bg-gray-700/50 transition-colors`}
               >
-                <div className="col-span-2 text-blue-400 font-mono text-sm">
+                <div className="col-span-2 text-gray-300 font-mono text-sm">
                   {entry.id}
                 </div>
                 <div className="col-span-5 text-gray-300">
@@ -188,10 +190,10 @@ const JournalList: React.FC = () => {
                 <div className="col-span-2">
                   <button
                     onClick={() => deleteEntry(entry.id)}
-                    className="text-red-400 hover:text-red-300 transition-colors p-1"
+                    className="text-red-400 hover:text-red-300 transition-colors p-1 cursor-pointer"
                     title="Delete entry"
                   >
-                    🗑️
+                    <MdDelete className="text-red-700 text-xl" />
                   </button>
                 </div>
               </div>

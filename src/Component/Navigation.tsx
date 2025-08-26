@@ -75,6 +75,8 @@ const Navigation = ({
       console.error("Error logging out:", error);
     }
   };
+  
+  const user = JSON.parse(localStorage.getItem('user') || "{}")
 
   console.log("User:", user);
 

@@ -2,19 +2,31 @@ import { IoCheckmarkCircleOutline } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import { useAxios } from "../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
+import {  useNavigate } from "react-router-dom";
 
 // type declaration
 interface Feature {
   created_at: string;
   description: string;
   duration_days: number;
-  features: string;
+  features: string[];
   id: number;
   name: string;
   price: string;
   recommended: boolean;
   stripe_price_id: string;
   updated_at: string;
+  currency: string;
+  status: string;
+}
+
+interface PlanData {
+  title: string;
+  subtitle: string;
+  price: string;
+  services: string[];
+  recommended?: boolean;
+  stripe_price_id?: number;
 }
 
 const Pricing = () => {
@@ -22,26 +34,15 @@ const Pricing = () => {
   const [planDuration, setPlanDuration] = useState<"monthly" | "yearly">(
     "monthly"
   );
-  const [subscriptionData, setSubscriptionData] = useState({});
-  const [splitFeature, setSplitFeature] = useState({})
-
+  const [subscriptionData, setSubscriptionData] = useState<Feature[]>([]);
+  const [displayPlan, setDisplayPlan] = useState<PlanData | null>(null);
+  const navigate = useNavigate();
   useEffect(() => {
     const getPriceCardData = async () => {
       try {
         const res = await axios.get("api/subscriptions/plans/");
-        console.log("response",res);
-        setSubscriptionData(res?.data);
-        // triming features
-        res?.data.map((item: Feature, index:number) => {
-          const featureArray = item?.features?.split("\\n\r\n");
-          if(index === 0){
-            const monthlyFeature = featureArray
-            setSplitFeature(monthlyFeature)
-          }else{
-            const yearlyFeature = featureArray
-            setSplitFeature(yearlyFeature)
-          }
-        });
+        console.log("response", res.data);
+        setSubscriptionData(res?.data || []);
       } catch (error) {
         console.log("failed to load subscribe data", error);
         Swal.fire({
@@ -50,7 +51,7 @@ const Pricing = () => {
           icon: "error",
           background: "rgba(255, 255, 255, 0.1)",
           backdrop: "rgba(0, 0, 0, 0.4)",
-          timer: 3000, // auto close after 3 seconds
+          timer: 3000,
           showConfirmButton: false,
           customClass: {
             popup: "glassmorphic-popup",
@@ -63,10 +64,74 @@ const Pricing = () => {
     getPriceCardData();
   }, []);
 
-  console.log("Split feature", splitFeature);
+  // Function to process and set display data based on plan duration
+  useEffect(() => {
+    if (subscriptionData.length > 0) {
+      const currentPlan = subscriptionData.find(
+        (plan) => plan.name === planDuration
+      );
+
+      if (currentPlan) {
+        // Clean up features by removing \\n
+        const cleanFeatures = currentPlan.features
+          .map((feature) => feature.replace(/\\n/g, "").trim())
+          .filter((feature) => feature.length > 0);
+
+        setDisplayPlan({
+          title: "EnterPrise",
+          subtitle: currentPlan.description,
+          price: `$${currentPlan.price}`,
+          services: cleanFeatures,
+          recommended: currentPlan.recommended,
+          stripe_price_id: currentPlan.id,
+        });
+      }
+    }
+  }, [subscriptionData, planDuration]);
+
+  // Static free plan
+  const freePlan: PlanData = {
+    title: "Corporate",
+    subtitle: "For large teams & corporations.",
+    price: "Free",
+    services: [
+      "Advanced employee directory",
+      "Project management",
+      "Resource scheduling",
+      "Version control",
+      "Team collaboration",
+      "Advanced analytics",
+    ],
+  };
+
+  // Combine plans for rendering
+  const plansToRender = [freePlan];
+  if (displayPlan) {
+    plansToRender.push(displayPlan);
+  }
+
+  const handlePlanClick = async(plan: PlanData) => {
+    // Handle plan click event (e.g., navigate to checkout)
+    console.log("Selected plan:", plan);
+
+    // Navigate to checkout or perform any other action
+    console.log(plan.title)
+    if (plan.title !== "Corporate") {
+      const res = await axios.post(
+        `/api/subscriptions/create-checkout-session/`,
+        { plan_id: plan?.stripe_price_id }
+      );
+
+      if (res.status === 200) {
+        window.location.href = res.data.url;
+      }
+    } else {
+      navigate('/chat/general')
+    }
+  };
 
   return (
-    <div className="bg-[url('/background.png')] py-28 bg-cover">
+    <div className="bg-[url('/background.png')] py-28 px-5 bg-cover">
       <style>
         {`@keyframes gradient-light {
           0% { opacity: 0.7; transform: translateY(20px);}
@@ -83,13 +148,29 @@ const Pricing = () => {
         }
         .card-gradient:hover {         
           box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .recommended-card {
+          position: relative;
+        }
+        .recommended-card::before {
+          content: 'Recommended';
+          position: absolute;
+          top: 15px;
+          right: 15px;
+          background: linear-gradient(135deg, #8E7D3F, #DBD0A6);
+          color: black;
+          padding: 4px 12px;
+          border-radius: 12px;
+          font-size: 12px;
+          font-weight: 600;
+          z-index: 20;
         }`}
       </style>
       <h2 className="py-2 px-3 rounded-r-full text-center w-80 mx-auto rounded-l-full bg-transparent backdrop-blur-lg text-white border-2 border-gray-200/20 ">
         Bring your business to the best scale
       </h2>
 
-      <h1 className="sm:text-[86px] text-6xl font-normal font-league-gothic text-center text-white bg-gradient-to-t from-black to-white bg-clip-text">
+      <h1 className="sm:text-[86px] text-5xl  py-5 font-normal font-league-gothic text-center text-white bg-gradient-to-t from-black to-white bg-clip-text">
         Discover Products With <br /> the Best Pricing
       </h1>
       <p className="text-center pb-16 text-xl text-white font-montserrat">
@@ -122,40 +203,13 @@ const Pricing = () => {
         </div>
       </div>
 
-      <div className="text-white sm:flex-row flex-col gap-6 sm:gap-4 flex items-center justify-center">
-        {[
-          {
-            title: "Corporate",
-            subtitle: "For large teams & corporations.",
-            monthlyPrice: "Free",
-            annualPrice: "Free",
-            services: [
-              "Advanced employee directory",
-              "Project management",
-              "Resource scheduling",
-              "Version control",
-              "Team collaboration",
-              "Advanced analytics",
-            ],
-          },
-          {
-            title: "Enterprise",
-            subtitle: "For businesses owners.",
-            monthlyPrice: "$15",
-            annualPrice: "$150",
-            services: [
-              "Customizable employee directory",
-              "Client project management",
-              "Client meeting schedule",
-              "Compliance tracking",
-              "Client communication",
-              "Create custom reports tailored",
-            ],
-          },
-        ].map((plan, idx) => (
+      <div className="text-white sm:flex-row flex-col  gap-6 sm:gap-4 flex items-center justify-center">
+        {plansToRender.map((plan, idx) => (
           <div
             key={idx}
-            className="card-gradient group mx-6 w-96 rounded-3xl shadow-2xl transition-all duration-300 relative overflow-hidden"
+            className={`card-gradient group mx-6 w-96 rounded-3xl shadow-2xl transition-all duration-300 relative overflow-hidden ${
+              plan.recommended ? "recommended-card" : ""
+            }`}
           >
             <div className="relative z-10 p-8">
               <div className="flex justify-start mb-6">
@@ -172,12 +226,10 @@ const Pricing = () => {
               <p className="text-start text-gray-300 mb-6">{plan.subtitle}</p>
 
               <div className="text-start mb-8">
-                <span className="text-6xl font-bold text-white">
-                  {planDuration === "monthly"
-                    ? plan.monthlyPrice
-                    : plan.annualPrice}
+                <span className="text-5xl font-bold text-white">
+                  {plan.price}
                 </span>
-                {plan.annualPrice !== "Free" && (
+                {plan.price !== "Free" && (
                   <span className=" px-3">
                     {planDuration === "monthly" ? "/per month" : "/per year"}
                   </span>
@@ -185,7 +237,11 @@ const Pricing = () => {
               </div>
 
               <div className="flex justify-center mb-8">
-                <button className="w-full py-3 rounded-full bg-gradient-to-t from-[#0706061a] to-[#FFFFFF1A] border-[1px] group-hover:from-[#8E7D3F] group-hover:to-[#DBD0A6] text-white group-hover:text-black font-semibold shadow-lg transition-all duration-500 transform hover:scale-105">
+                <button
+                  onClick={() => handlePlanClick(plan)}
+                 
+                  className="w-full text-center py-3 rounded-full bg-gradient-to-t from-[#0706061a] to-[#FFFFFF1A] border-[1px] group-hover:from-[#8E7D3F] group-hover:to-[#DBD0A6] text-white group-hover:text-black font-semibold shadow-lg transition-all duration-500 transform hover:scale-105"
+                >
                   Get Started
                 </button>
               </div>

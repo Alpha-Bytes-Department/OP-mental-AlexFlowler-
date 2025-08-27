@@ -9,12 +9,13 @@ import ChatLayout from "../Pages/Chat/ChatLayout/ChatLayout";
 import ChatSession from "../Pages/Chat/ChatSession/ChatSession";
 import Settings from "../Pages/Chat/Settings/Settings";
 import Verify from "../Pages/MailVerifiy/Verify";
-import MindsetMantra from "../Pages/MindsetMantra/MindsetMantra";
-import InternalChallenges from "../Pages/InternalChallenges/InternalChallenges";
-import PrivateRoute from "../Pages/Chat/PrivateRoute";
 import JournalOptions from "../Pages/Journal/JournalOptions/JournalOptions";
 import JournalChat from "../Pages/Journal/JournalChat/JournalChat";
 import JournalList from "../Pages/Journal/JournalList/JournalList";
+import MindsetHome from "../Pages/MindsetMantra/MindsetHome/MindsetHome";
+import MindsetChat from "../Pages/MindsetMantra/MindsetChat/MindsetChat";
+import InternalHome from "../Pages/InternalChallenges/InternalHome/InternalHome";
+import InternalChat from "../Pages/InternalChallenges/InternalChat/InternalChat";
 // import UserVerify from "../Pages/MailVerifiy/UserVerify";
 
 const Router = createBrowserRouter([
@@ -63,10 +64,6 @@ const Router = createBrowserRouter([
         element: <Settings />,
       },
       {
-        path: "/chat/mindset",
-        element: <MindsetMantra />,
-      },
-      {
         path: "/chat/journal/options",
         element: <JournalOptions />,
       },
@@ -79,8 +76,20 @@ const Router = createBrowserRouter([
         element: <JournalList />,
       },
       {
-        path: "/chat/internal-challenge",
-        element: <InternalChallenges />,
+        path: "/chat/mindsetHome",
+        element: <MindsetHome />,
+      },
+      {
+        path: "/chat/mindsetChat",
+        element: <MindsetChat />,
+      },
+      {
+        path: "/chat/internalHome",
+        element: <InternalHome />,
+      },
+      {
+        path: "/chat/internalChat/:session_id",
+        element: <InternalChat />,
       },
     ],
   },

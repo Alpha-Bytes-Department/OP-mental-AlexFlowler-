@@ -88,7 +88,7 @@ const Router = createBrowserRouter([
         element: <InternalHome />,
       },
       {
-        path: "/chat/internalChat",
+        path: "/chat/internalChat/:session_id",
         element: <InternalChat />,
       },
     ],

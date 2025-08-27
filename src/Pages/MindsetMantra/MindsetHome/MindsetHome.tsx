@@ -1,15 +1,15 @@
 import { Link } from "react-router-dom";
-import brain from "../../../../public/Brain.png";
+import logo from "../../../../public/image.png";
 
 const MindsetHome = () => {
   return (
     <div className="flex flex-col h-screen">
-      <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none">
+      <div className="absolute inset-0 flex items-center justify-center opacity-15 pointer-events-none">
         <div className="flex flex-col items-center gap-3">
           <img
-            src={brain}
+            src={logo}
             alt="Mindset chat background"
-            className="ms-10 mt-40 lg:mt-20 lg:ms-52 h-[600px] w-[600px] lg:h-[900px] lg:w-[900px]"
+            className=" lg:ms-52 h-[400px] w-[400px] lg:h-[600px] lg:w-[600px]"
           />
         </div>
       </div>

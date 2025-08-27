@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FaArrowUp } from "react-icons/fa6";
 import { useAxios } from "../../../Providers/AxiosProvider";
+import { useParams } from "react-router-dom";
 
 
 // ----type declaration---------
@@ -18,7 +19,9 @@ const InternalChat = () => {
   const [inputMessage, setInputMessage] = useState(""); // handles input field text
   const messagesEndRef = useRef<HTMLDivElement>(null); // ref for auto-scroll
   const axios = useAxios();
-  
+  const params = useParams();
+
+
 
   //--------- auto-scroll function --------
   const scrollToBottom = () => {
@@ -36,7 +39,7 @@ const InternalChat = () => {
   };
 
   useEffect( ()=>{
-    axios.get("/api/internal-challenge/").then((res)=>console.log("Ai response", res));
+    axios.get(`/api/internal-challenge/${params?.session_id}/history/`).then((res)=>console.log("Ai response", res));
   },[])
 
   //--------- message send handler --------

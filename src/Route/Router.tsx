@@ -16,6 +16,8 @@ import MindsetHome from "../Pages/MindsetMantra/MindsetHome/MindsetHome";
 import MindsetChat from "../Pages/MindsetMantra/MindsetChat/MindsetChat";
 import InternalHome from "../Pages/InternalChallenges/InternalHome/InternalHome";
 import InternalChat from "../Pages/InternalChallenges/InternalChat/InternalChat";
+import Payment from "../Pages/Payment/Payment";
+import PrivateRoute from "../Pages/Chat/PrivateRoute";
 // import UserVerify from "../Pages/MailVerifiy/UserVerify";
 
 const Router = createBrowserRouter([
@@ -45,9 +47,9 @@ const Router = createBrowserRouter([
   {
     path: "/chat",
     element: (
-      //<PrivateRoute>
-        <ChatLayout />
-      //</PrivateRoute>
+      <PrivateRoute>
+      <ChatLayout />
+      </PrivateRoute>
     ),
     errorElement: <Error />,
     children: [
@@ -93,59 +95,12 @@ const Router = createBrowserRouter([
       },
     ],
   },
+  {
+    path: "/payment/success",
+    element: <Payment />,
+  },
 ]);
 
-// const Router = createBrowserRouter([
-//   {
-//     path: "/",
-//     element: <Layout />,
-//     errorElement: <Error />,
-//     children: [
-//       {
-//         path: "/",
-//         element: <Home />,
-//       },
-//       {
-//         path: "/verify",
-//         element: <Verify />,
-//       },
-//       {
-//         path: "/users/verify",
-//         element: <UserVerify />,
-//       },
-//     ],
-//   },
-//   {
-//     path: "/login",
-//     element: <Login />,
-//   },
-//   {
-//     path: "/register",
-//     element: <Signup />,
-//   },
-//   {
-//     path: "/chat",
-//     element: (
-//       <PrivateRoute>
-//         <ChatLayout />
-//       </PrivateRoute>
-//     ),
-//     errorElement: <Error />,
-//     children: [
-//       {
-//         path: "/chat",
-//         element: <ChatHome />,
-//       },
-//       {
-//         path: "/chat/:id",
-//         element: <ChatSession />,
-//       },
-//       {
-//         path: "/chat/settings",
-//         element: <Settings />,
-//       },
-//     ],
-//   },
-// ]);
+
 
 export default Router;

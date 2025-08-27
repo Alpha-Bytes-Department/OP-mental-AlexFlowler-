@@ -64,7 +64,7 @@ const JournalChat = () => {
 
   return (
     <div className="flex flex-col h-screen relative">
-      <div className="absolute inset-0 flex items-center justify-center opacity-15 pointer-events-none">
+      <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
         <div className="flex flex-col items-center gap-3">
           <img
             src={logo}

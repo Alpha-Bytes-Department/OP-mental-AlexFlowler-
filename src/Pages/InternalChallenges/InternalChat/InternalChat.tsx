@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { FaArrowUp } from "react-icons/fa6";
 import { useAxios } from "../../../Providers/AxiosProvider";
 import { useParams } from "react-router-dom";
+import logo from "../../../../public/image.png"
 
 
 // ----type declaration---------
@@ -77,6 +78,15 @@ const InternalChat = () => {
 
   return (
     <div className="flex flex-col h-screen">
+      <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
+        <div className="flex flex-col items-center gap-3">
+          <img
+            src={logo}
+            alt="Mindset chat background"
+            className=" lg:ms-52 h-[400px] w-[400px] lg:h-[600px] lg:w-[600px]"
+          />
+        </div>
+      </div>
       {/* --------------- Messages area ---------------------- */}
       <div className="flex-1 p-4 overflow-y-auto">
         <div className="max-w-3xl mx-auto space-y-4">

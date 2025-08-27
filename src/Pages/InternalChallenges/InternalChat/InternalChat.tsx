@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FaArrowUp } from "react-icons/fa6";
-import brain from "../../../../public/Brain.png";
+import { useAxios } from "../../../Providers/AxiosProvider";
+
 
 // ----type declaration---------
 interface Message {
@@ -9,11 +10,15 @@ interface Message {
   sender: "user" | "bot";
 }
 
+
+
 const InternalChat = () => {
   //--------states--------
   const [messages, setMessages] = useState<Message[]>([]); // stores chat messages
   const [inputMessage, setInputMessage] = useState(""); // handles input field text
   const messagesEndRef = useRef<HTMLDivElement>(null); // ref for auto-scroll
+  const axios = useAxios();
+  
 
   //--------- auto-scroll function --------
   const scrollToBottom = () => {
@@ -30,10 +35,15 @@ const InternalChat = () => {
     setInputMessage(e.target.value);
   };
 
+  useEffect( ()=>{
+    axios.get("/api/internal-challenge/").then((res)=>console.log("Ai response", res));
+  },[])
+
   //--------- message send handler --------
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (inputMessage.trim()) {
       // add user message
+      
       const newMessage: Message = {
         id: Date.now(),
         text: inputMessage,
@@ -88,17 +98,17 @@ const InternalChat = () => {
           <div ref={messagesEndRef} />
         </div>
       </div>
-
+        
       {/* --------------- Input area ---------------------- */}
       <div className="p-4 mb-15 lg:mb-0">
-        <div className="max-w-3xl mx-auto flex gap-4 rounded-lg bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm p-4">
+        <div className="max-w-3xl mx-auto flex gap-4 rounded-lg bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm p-4 ">
           <input
             type="text"
             value={inputMessage}
             onChange={handleInputChange}
             onKeyPress={handleKeyPress}
             placeholder="Type your message..."
-            className="w-full py-2 sm:py-3 lg:py-4 pl-2 sm:pl-4 pr-8 sm:pr-12 text-sm sm:text-base text-white bg-white/20 backdrop-blur-md rounded-lg sm:rounded-xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300"
+            className="w-full py-2 sm:py-3 lg:py-4 pl-2 sm:pl-4 pr-8 sm:pr-12 text-sm sm:text-base  text-white bg-white/20 backdrop-blur-md rounded-lg sm:rounded-xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300"
           />
           <button
             type="submit"

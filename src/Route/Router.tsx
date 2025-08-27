@@ -17,6 +17,7 @@ import MindsetChat from "../Pages/MindsetMantra/MindsetChat/MindsetChat";
 import InternalHome from "../Pages/InternalChallenges/InternalHome/InternalHome";
 import InternalChat from "../Pages/InternalChallenges/InternalChat/InternalChat";
 import Payment from "../Pages/Payment/Payment";
+import PrivateRoute from "../Pages/Chat/PrivateRoute";
 // import UserVerify from "../Pages/MailVerifiy/UserVerify";
 
 const Router = createBrowserRouter([

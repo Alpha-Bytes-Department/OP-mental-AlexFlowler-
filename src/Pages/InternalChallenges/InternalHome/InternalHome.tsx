@@ -1,0 +1,53 @@
+import { useNavigate } from "react-router-dom";
+import { useAxios } from "../../../Providers/AxiosProvider";
+import Swal from "sweetalert2";
+
+const InternalHome = () => {
+  const navigate = useNavigate();
+  const axios = useAxios();
+
+  const handleTriggerChat = async () => {
+    axios
+      .post("/api/internal-challenge/", {
+        message: "Hello",
+      })
+      .then((res) => {
+        navigate(`/chat/internalChat/${res.data.session_id}`);
+      })
+      .catch((error) => {
+        Swal.fire({
+          title: "Error!",
+          text: "Something went wrong. Please try again.",
+          icon: "error",
+          background: "rgba(255, 255, 255, 0.1)",
+          backdrop: "rgba(0, 0, 0, 0.4)",
+          timer: 3000, 
+          showConfirmButton: false,
+          customClass: {
+            popup: "glassmorphic-popup",
+            title: "glassmorphic-title",
+            htmlContainer: "glassmorphic-text",
+          },
+        });
+        console.log("Failed to hi chat",error);
+      });
+  };
+
+  return (
+    <div className="flex flex-col h-screen">
+      <div className="flex flex-col justify-center items-center min-h-screen gap-3 z-50">
+        <h1 className="text-5xl lg:text-8xl font-league-gothic">
+          Internal Challenge
+        </h1>
+        <button
+          onClick={handleTriggerChat}
+          className="border cursor-pointer border-[#dbd0a6] text-[#dbd0a6] text-md lg:text-xl font-semibold py-5 rounded-full bg-[#2d2d2d] text-center w-6/12"
+        >
+          Start Internal Challenge
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default InternalHome;

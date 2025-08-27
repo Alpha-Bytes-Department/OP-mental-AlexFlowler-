@@ -34,15 +34,20 @@ const Pricing = () => {
   const [planDuration, setPlanDuration] = useState<"monthly" | "yearly">(
     "monthly"
   );
+
+
   const [subscriptionData, setSubscriptionData] = useState<Feature[]>([]);
   const [displayPlan, setDisplayPlan] = useState<PlanData | null>(null);
   const navigate = useNavigate();
+
   useEffect(() => {
     const getPriceCardData = async () => {
       try {
         const res = await axios.get("api/subscriptions/plans/");
+
         console.log("response", res.data);
         setSubscriptionData(res?.data || []);
+
       } catch (error) {
         console.log("failed to load subscribe data", error);
         Swal.fire({
@@ -63,6 +68,7 @@ const Pricing = () => {
     };
     getPriceCardData();
   }, []);
+
 
   // Function to process and set display data based on plan duration
   useEffect(() => {
@@ -129,6 +135,7 @@ const Pricing = () => {
       navigate('/chat/general')
     }
   };
+
 
   return (
     <div className="bg-[url('/background.png')] py-28 px-5 bg-cover">

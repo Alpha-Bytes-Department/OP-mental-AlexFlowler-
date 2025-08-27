@@ -9,7 +9,7 @@ interface Message {
   sender: "user" | "bot";
 }
 
-const JournalChat = () => {
+const MindsetChat = () => {
   //--------states--------
   const [messages, setMessages] = useState<Message[]>([]); // stores chat messages
   const [inputMessage, setInputMessage] = useState(""); // handles input field text
@@ -63,13 +63,13 @@ const JournalChat = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen relative">
+    <div className="flex flex-col h-screen">
       <div className="absolute inset-0 flex items-center justify-center opacity-15 pointer-events-none">
         <div className="flex flex-col items-center gap-3">
           <img
             src={logo}
             alt="Mindset chat background"
-            className="h-[400px] w-[400px] lg:h-[600px] lg:w-[600px]"
+            className=" lg:ms-52 h-[400px] w-[400px] lg:h-[600px] lg:w-[600px]"
           />
         </div>
       </div>
@@ -87,7 +87,7 @@ const JournalChat = () => {
                 className={`max-w-[70%] rounded-lg p-3 ${
                   message.sender === "user"
                     ? "bg-[#DBD0A6] text-black"
-                    : "bg-[#313435] text-white"
+                    : "bg-[#393B3C] text-white"
                 }`}
               >
                 {message.text}
@@ -99,7 +99,7 @@ const JournalChat = () => {
       </div>
 
       {/* --------------- Input area ---------------------- */}
-      <div className="p-4">
+      <div className="p-4 mb-15 lg:mb-0">
         <div className="max-w-3xl mx-auto flex gap-4 rounded-lg bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm p-4">
           <input
             type="text"
@@ -107,7 +107,7 @@ const JournalChat = () => {
             onChange={handleInputChange}
             onKeyPress={handleKeyPress}
             placeholder="Type your message..."
-            className="w-full py-1 sm:py-3 lg:py-4 xl:py-4 2xl:py-5 pl-3 sm:pl-4 md:pl-5 lg:pl-6 xl:pl-7 2xl:pl-8 pr-12 sm:pr-14 md:pr-16 lg:pr-18 xl:pr-20 2xl:pr-24 text-sm sm:text-base md:text-lg lg:text-xl text-white bg-white/20 backdrop-blur-md rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300"
+            className="w-full py-2 sm:py-3 lg:py-4 pl-2 sm:pl-4 pr-8 sm:pr-12 text-sm sm:text-base text-white bg-white/20 backdrop-blur-md rounded-lg sm:rounded-xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300"
           />
           <button
             type="submit"
@@ -123,4 +123,4 @@ const JournalChat = () => {
   );
 };
 
-export default JournalChat;
+export default MindsetChat;

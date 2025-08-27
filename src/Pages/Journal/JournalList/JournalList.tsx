@@ -135,7 +135,6 @@ const JournalList: React.FC = () => {
           <h1 className="text-4xl font-bold text-center mb-8">
             Journal Entries Management
           </h1>
-
           {/* --------------- Category filter ---------------------- */}
           <div className="flex items-center justify-between mb-6">
             <span className="text-gray-400">Your Journal Entries</span>

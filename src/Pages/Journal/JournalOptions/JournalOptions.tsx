@@ -23,7 +23,7 @@ const JournalOptions = () => {
     <div className="flex flex-col gap-5 items-center min-h-screen mt-10">
       {/* ---------------- Header with icon----------------- */}
       <div className="flex flex-col justify-center items-center">
-        <FaBook className="text-white" fontSize={40}/>
+          <FaBook className="text-[#dbd0a6]" fontSize={40}/>
         <span className="text-2xl">Journal</span>
       </div>
       <h1>Choose Journal Category</h1>

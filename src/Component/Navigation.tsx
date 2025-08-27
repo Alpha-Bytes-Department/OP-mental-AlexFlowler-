@@ -12,10 +12,9 @@ import {
   FaAngleDown,
   FaBookJournalWhills,
   FaBrain,
-  FaAngleRight,
 } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
-import { Link, NavLink, useMatch, useNavigate } from "react-router-dom";
+import { NavLink, useMatch, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 import { useAxios } from "../Providers/AxiosProvider";
@@ -170,7 +169,7 @@ const Navigation = ({
               )}
             </NavLink>
             <NavLink
-              to="/chat/mindset"
+              to="/chat/mindsetHome"
               className={({ isActive }) => `
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
@@ -220,7 +219,7 @@ const Navigation = ({
               </NavLink>
             </div>
             <NavLink
-              to="/chat/internal-challenge"
+              to="/chat/internalHome"
               className={({ isActive }) => `
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
@@ -270,7 +269,7 @@ const Navigation = ({
                 )}
               </NavLink>
               <NavLink
-                to="/chat/mindset"
+                to="/chat/mindsetHome"
                 className={({ isActive }) => `
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
@@ -302,7 +301,7 @@ const Navigation = ({
                 )}
               </NavLink>
               <NavLink
-                to="/chat/internal-challenge"
+                to="/chat/internalHome"
                 className={({ isActive }) => `
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors

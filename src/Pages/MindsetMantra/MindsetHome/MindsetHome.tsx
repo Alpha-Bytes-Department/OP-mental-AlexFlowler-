@@ -4,7 +4,7 @@ import logo from "../../../../public/image.png";
 const MindsetHome = () => {
   return (
     <div className="flex flex-col h-screen">
-      <div className="absolute inset-0 flex items-center justify-center opacity-15 pointer-events-none">
+      <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
         <div className="flex flex-col items-center gap-3">
           <img
             src={logo}
@@ -14,7 +14,7 @@ const MindsetHome = () => {
         </div>
       </div>
       <div className="flex flex-col justify-center items-center min-h-screen gap-3 z-50">
-        <h1 className="text-5xl lg:text-8xl font-league-gothic">
+        <h1 className="text-5xl lg:text-8xl font-league-gothic mx-3">
           Mindset Mantra
         </h1>
         <Link

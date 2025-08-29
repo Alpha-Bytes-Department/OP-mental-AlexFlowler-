@@ -10,9 +10,10 @@ const InternalHome = () => {
   const handleTriggerChat = async () => {
     axios
       .post("/api/internal-challenge/", {
-        message: "Hello",
+        message: "Start",
       })
       .then((res) => {
+        console.log("Response for message hellow",res);
         navigate(`/chat/internalChat/${res.data.session_id}`);
       })
       .catch((error) => {
@@ -46,12 +47,12 @@ const InternalHome = () => {
         </div>
       </div>
       <div className="flex flex-col justify-center items-center min-h-screen gap-3 z-50">
-        <h1 className="text-5xl lg:text-8xl font-league-gothic">
+        <h1 className="text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-league-gothic">
           Internal Challenge
         </h1>
         <button
           onClick={handleTriggerChat}
-          className="border cursor-pointer border-[#dbd0a6] text-[#dbd0a6] text-base lg:text-xl font-semibold py-5 rounded-full bg-[#2d2d2d] w-9/12 lg:text-center "
+          className="border cursor-pointer px-3 border-[#dbd0a6] text-[#dbd0a6] text-base lg:text-xl font-semibold py-5 rounded-full bg-[#2d2d2d] w-9/12 lg:w-8/12 xl:w-7/12 2xl:w-6/12 lg:text-center "
         >
           Click To Begain Processing Your Internal Challenge
         </button>

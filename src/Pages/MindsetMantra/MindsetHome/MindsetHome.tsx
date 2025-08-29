@@ -14,7 +14,7 @@ const MindsetHome = () => {
         </div>
       </div>
       <div className="flex flex-col justify-center items-center min-h-screen gap-3 z-50">
-        <h1 className="text-5xl lg:text-8xl font-league-gothic">
+        <h1 className="text-5xl lg:text-8xl font-league-gothic mx-3">
           Mindset Mantra
         </h1>
         <Link

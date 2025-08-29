@@ -40,6 +40,7 @@ const Navigation = ({
   //matching active navigation for handle navigation style
   const chatgeneral = useMatch("/chat/general/*");
   const journalLinkMatched = useMatch("/chat/journal/*");
+  const internalChallengeMatch = useMatch("/chat/internalChat/*");
 
   // logout handler
   const handleLogOut = async () => {
@@ -219,11 +220,11 @@ const Navigation = ({
               </NavLink>
             </div>
             <NavLink
-              to="/chat/internalHome"
-              className={({ isActive }) => `
+              to="/chat/internalChat/Home"
+              className={`
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
-                  ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
+                  ${internalChallengeMatch ? "bg-[#2D2A2B] font-bold" : "hidden"}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
                 `}
             >
@@ -301,11 +302,11 @@ const Navigation = ({
                 )}
               </NavLink>
               <NavLink
-                to="/chat/internalHome"
-                className={({ isActive }) => `
+                to="/chat/internalChat/Home"
+                className={`
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
-                  ${isActive ? "hidden" : "font-medium"}
+                  ${internalChallengeMatch ? "hidden" : "font-medium"}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
                 `}
               >

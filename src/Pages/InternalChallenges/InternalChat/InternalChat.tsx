@@ -56,18 +56,20 @@ const InternalChat = () => {
           message: inputMessage,
           session_id: params?.session_id,
         });
+
         // Clear input field
         setInputMessage("");
-        // Update messages with the AI response
-        if (response?.data) {
-          setMessages((prev) => [...prev, response.data]);
+
+        // Fetch all messages after sending
+        const res = await axios.get(
+          `/api/internal-challenge/${params?.session_id}/`
+        );
+
+        if (res?.data) {
+          // Combine fetched messages with the new one from POST
+          const updatedMessages = [...res.data, response?.data];
+          setMessages(updatedMessages);
         }
-        axios
-          .get(`/api/internal-challenge/${params?.session_id}/`)
-          .then((res) => {
-            console.log("from get api", res);
-            setMessages(res?.data);
-          });
       } catch (error) {
         Swal.fire({
           title: "Error!",

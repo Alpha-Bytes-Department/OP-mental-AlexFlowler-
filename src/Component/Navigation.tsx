@@ -8,11 +8,7 @@ import {
 } from "react-icons/hi2";
 import { SiGoogletasks } from "react-icons/si";
 
-import {
-  FaAngleDown,
-  FaBookJournalWhills,
-  FaBrain,
-} from "react-icons/fa6";
+import { FaAngleDown, FaBookJournalWhills, FaBrain } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
 import { NavLink, useMatch, useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -33,14 +29,21 @@ const Navigation = ({
   toggleMobileMenu,
   toggleDesktopCollapse,
 }: NavigationProps) => {
+  //hooks
   const [isLogOutActive, setLogOutActive] = useState(false);
   const navigate = useNavigate();
   const axios = useAxios();
+
+  //getting chat session from localstorage
+  const session_id = localStorage.getItem("chat-session");
+  
 
   //matching active navigation for handle navigation style
   const chatgeneral = useMatch("/chat/general/*");
   const journalLinkMatched = useMatch("/chat/journal/*");
   const internalChallengeMatch = useMatch("/chat/internalChat/*");
+  
+
 
   // logout handler
   const handleLogOut = async () => {
@@ -166,7 +169,7 @@ const Navigation = ({
             >
               <TbBrandMessenger size={24} className=" " />
               {!isDesktopCollapsed && (
-                <span className="text-xl font-montserrat ">Ai chat</span>
+                <span className="text-lg font-montserrat ">Ai chat</span>
               )}
             </NavLink>
             <NavLink
@@ -180,7 +183,7 @@ const Navigation = ({
             >
               <FaBrain size={24} className=" " />
               {!isDesktopCollapsed && (
-                <span className="text-xl font-montserrat ">Mindset Mantra</span>
+                <span className="text-lg font-montserrat ">Mindset Mantra</span>
               )}
             </NavLink>
             <div className="flex flex-col gap-3">
@@ -196,7 +199,7 @@ const Navigation = ({
               >
                 <FaBookJournalWhills size={24} className=" " />
                 {!isDesktopCollapsed && (
-                  <span className="text-xl font-montserrat ">
+                  <span className="text-lg font-montserrat ">
                     Add a Journal
                   </span>
                 )}
@@ -213,28 +216,49 @@ const Navigation = ({
               >
                 <FaBookJournalWhills size={24} className=" " />
                 {!isDesktopCollapsed && (
-                  <span className="text-xl font-montserrat ">
+                  <span className="text-lg font-montserrat ">
                     Journal History
                   </span>
                 )}
               </NavLink>
             </div>
             <NavLink
-              to="/chat/internalChat/Home"
+              to={`/chat/internalChat/${session_id}`}
               className={`
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
-                  ${internalChallengeMatch ? "bg-[#2D2A2B] font-bold" : "hidden"}
+                  ${
+                    internalChallengeMatch ? "bg-[#2D2A2B] font-bold" : "hidden"
+                  }
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
                 `}
             >
               <SiGoogletasks size={24} className=" " />
               {!isDesktopCollapsed && (
-                <span className="text-xl font-montserrat ">
+                <span className="text-lg font-montserrat ">
                   Internal Challenge
                 </span>
               )}
             </NavLink>
+            {session_id && (
+              <NavLink
+                to="/chat/internalChat/Home"
+                className={`
+                    w-full flex items-center gap-3 p-3 rounded-lg
+                    hover:bg-[#2D2A2B] transition-colors
+                  ${
+                    internalChallengeMatch ? "bg-[#2D2A2B] font-bold" : "hidden"
+                  }
+                  ${isDesktopCollapsed ? "justify-center" : "justify-start"}
+                `}
+              >
+                {!isDesktopCollapsed && (
+                  <span className="text-lg font-montserrat ">
+                    New Internal Challenge
+                  </span>
+                )}
+              </NavLink>
+            )}
             <NavLink
               to="/chat/settings"
               className={({ isActive }) => ` lg:hidden
@@ -266,7 +290,7 @@ const Navigation = ({
               >
                 <FiPlusCircle size={24} className=" " />
                 {!isDesktopCollapsed && (
-                  <span className="text-xl font-montserrat ">Ai chat</span>
+                  <span className="text-lg font-montserrat ">Ai chat</span>
                 )}
               </NavLink>
               <NavLink
@@ -280,7 +304,7 @@ const Navigation = ({
               >
                 <FaBrain size={24} className=" " />
                 {!isDesktopCollapsed && (
-                  <span className="text-xl font-montserrat ">
+                  <span className="text-lg font-montserrat ">
                     Mindset Mantra
                   </span>
                 )}
@@ -296,13 +320,17 @@ const Navigation = ({
               >
                 <FaBookJournalWhills size={24} className=" " />
                 {!isDesktopCollapsed && (
-                  <span className="text-xl font-montserrat ">
+                  <span className="text-lg font-montserrat ">
                     Add a Journal
                   </span>
                 )}
               </NavLink>
               <NavLink
-                to="/chat/internalChat/Home"
+                to={
+                  session_id
+                    ? `/chat/internalChat/${session_id}`
+                    : "/chat/internalChat/home"
+                }
                 className={`
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
@@ -312,7 +340,7 @@ const Navigation = ({
               >
                 <SiGoogletasks size={24} className=" " />
                 {!isDesktopCollapsed && (
-                  <span className="text-xl font-montserrat ">
+                  <span className="text-lg font-montserrat ">
                     Internal Challenge
                   </span>
                 )}
@@ -348,7 +376,7 @@ const Navigation = ({
               >
                 <FaHome size={24} className="" />
                 {!isDesktopCollapsed && (
-                  <span className="text-xl font-montserrat font-semibold">
+                  <span className="text-lg font-montserrat font-semibold">
                     Back to Home
                   </span>
                 )}

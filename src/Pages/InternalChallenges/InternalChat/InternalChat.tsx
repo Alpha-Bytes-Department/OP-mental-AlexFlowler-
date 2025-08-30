@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 // ----type declaration---------
 interface Message {
   error_message?: number;
+  message: string[];
   phase?: string;
   question?: string;
   response?: string;
@@ -20,6 +21,10 @@ const InternalChat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null); // ref for auto-scroll
   const axios = useAxios();
   const params = useParams();
+
+  if (params?.session_id) {
+    localStorage.setItem("chat-session", params?.session_id);
+  }
 
   //--------- auto-scroll function --------
   const scrollToBottom = () => {
@@ -38,7 +43,6 @@ const InternalChat = () => {
 
   useEffect(() => {
     axios.get(`/api/internal-challenge/${params?.session_id}/`).then((res) => {
-      console.log("from get api", res);
       setMessages(res?.data);
     });
   }, []);
@@ -47,18 +51,23 @@ const InternalChat = () => {
   const handleSendMessage = async () => {
     if (inputMessage.trim()) {
       try {
-        // add user message
-        await axios.post("/api/internal-challenge/", {
+        // Send the message to the API
+        const response = await axios.post("/api/internal-challenge/", {
           message: inputMessage,
           session_id: params?.session_id,
         });
         // Clear input field
         setInputMessage("");
-        // Fetch updated messages after successful post
-        const response = await axios.get(
-          `/api/internal-challenge/${params?.session_id}/`
-        );
-        setMessages(response?.data);
+        // Update messages with the AI response
+        if (response?.data) {
+          setMessages((prev) => [...prev, response.data]);
+        }
+        axios
+          .get(`/api/internal-challenge/${params?.session_id}/`)
+          .then((res) => {
+            console.log("from get api", res);
+            setMessages(res?.data);
+          });
       } catch (error) {
         Swal.fire({
           title: "Error!",
@@ -79,6 +88,8 @@ const InternalChat = () => {
       }
     }
   };
+
+  console.log(messages);
 
   //--------- enter key handler --------
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -101,28 +112,65 @@ const InternalChat = () => {
       {/* --------------- Messages area ---------------------- */}
       <div className="flex-1 p-4 overflow-y-auto">
         <div className="max-w-3xl mx-auto space-y-4">
-          {messages.map((message, index: number) => (
-            <>
-              <div key={index + 1} className={"flex justify-end"}>
-                <div
-                  className={
-                    "max-w-[70%] rounded-lg p-3  bg-[#DBD0A6] text-black"
-                  }
-                >
-                  {message?.response}
-                </div>
-              </div>
-              <div key={index} className={"flex justify-start"}>
-                <div
-                  className={
-                    "max-w-[70%] rounded-lg p-3  bg-[#393B3C] text-white"
-                  }
-                >
-                  {message?.question}
-                </div>
-              </div>
-            </>
-          ))}
+          {messages.map((message, index: number) => {
+            const showPhase =
+              index === 1 || message?.phase !== messages[index - 1]?.phase;
+            return (
+              <>
+                {/* ---------- Showing message after trigger start --------------*/}
+                {message?.message && (
+                  <div
+                    key={index + 2}
+                    className={
+                      "max-w-[70%] rounded-lg p-3  bg-[#DBD0A6] text-black"
+                    }
+                  >
+                    {message?.message.map((item: string, index: number) => {
+                      return <p key={index}>{item}</p>;
+                    })}
+                  </div>
+                )}
+                {/* ---------------- Showing user response--------------- */}
+                {message?.response && (
+                  <div key={index + 1} className={"flex justify-end"}>
+                    <div
+                      className={
+                        "max-w-[70%] rounded-lg p-3  bg-[#DBD0A6] text-black"
+                      }
+                    >
+                      {message?.response}
+                    </div>
+                  </div>
+                )}
+                {/* ------- Showing phage only once for similar items ------------------*/}
+                {showPhase && (
+                  <h1
+                    key={index + 3}
+                    className="border border-[#DBD0A6] bg-[#2d2d2d] px-20 py-3 rounded text-[#DBD0A6] text-center"
+                  >
+                    {message?.phase}
+                  </h1>
+                )}
+                {/* --------------------- showing ai response---------------- */}
+                {
+                  <div key={index} className={"flex flex-col justify-start"}>
+                    <div
+                      className={
+                        "max-w-[70%] rounded-lg p-3  bg-[#393B3C] text-white"
+                      }
+                    >
+                      {message?.question}
+                    </div>
+                    {message?.error_message && (
+                      <p className="text-red-600 mt-2">
+                        {message?.error_message}
+                      </p>
+                    )}
+                  </div>
+                }
+              </>
+            );
+          })}
           <div ref={messagesEndRef} />
         </div>
       </div>

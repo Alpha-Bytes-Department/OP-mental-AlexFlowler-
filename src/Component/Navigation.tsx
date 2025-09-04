@@ -84,8 +84,6 @@ const Navigation = ({
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  console.log("User:", user);
-
   return (
     <>
       {/* Mobile Hamburger Menu */}

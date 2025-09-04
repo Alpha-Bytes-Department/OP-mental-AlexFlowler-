@@ -70,7 +70,7 @@ const InternalChat = () => {
 
         if (res?.data) {
           // Combine fetched messages with the new one from POST
-          const updatedMessages = [...res.data, response?.data];
+          const updatedMessages = [...res.data];
           setMessages(updatedMessages);
         }
       } catch (error) {

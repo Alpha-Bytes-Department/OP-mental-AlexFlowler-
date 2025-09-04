@@ -11,11 +11,10 @@ const MindsetHome = () => {
   //loading all chat at initial time
 
   //triggering mindset mantra ai
-  const handleStartChat = (events: React.MouseEvent<HTMLButtonElement>) => {
+  const handleStartChat = async (events: React.MouseEvent<HTMLButtonElement>) => {
     events.preventDefault();
-    axios
-      .post("api/mindset/", {
-        body: { message: "Start" },
+      await axios.post("api/mindset/", {
+        message: "Start" ,
       })
       .then((res) => {
         if (res.status === 200) {

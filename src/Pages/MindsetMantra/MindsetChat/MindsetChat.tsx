@@ -16,6 +16,7 @@ interface Message {
 const MindsetChat = () => {
   //--------states--------
   const [messages, setMessages] = useState<Message[]>([]); // stores chat messages
+  const [completed, setCompleted] = useState(false);
   const [inputMessage, setInputMessage] = useState(""); // handles input field text
   const [initialLoading, setinitialLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null); // ref for auto-scroll
@@ -32,7 +33,10 @@ const MindsetChat = () => {
   const initialLoadingMessage = async () => {
     try {
       setinitialLoading(true);
-      const response = await axios.get(`history/${params.mindset_session}/`);
+      const response = await axios.get(
+        `api/mindset/history/${params?.mindset_session}/`
+      );
+      console.log("debugging", response);
       if (response.status === 200) {
         const transformedMessage: Message[] = []; // array for storing message
         if (Array.isArray(response.data) && response.data.length > 0) {
@@ -40,22 +44,22 @@ const MindsetChat = () => {
             if (item?.author === "bot") {
               transformedMessage.push({
                 id: `bot-${index}`,
-                message: item.message,
+                message: item?.message,
                 sender: "bot",
                 status: "success",
               });
-
-              if (item?.author === "user") {
-                transformedMessage.push({
-                  id: `user-${index}`,
-                  message: item.message,
-                  sender: "user",
-                  status: "success",
-                });
-              }
+            }
+            if (item?.author === "user") {
+              transformedMessage.push({
+                id: `user-${index}`,
+                message: item?.message,
+                sender: "user",
+                status: "success",
+              });
             }
           });
         }
+        setMessages(transformedMessage);
       }
       setinitialLoading(false);
     } catch (error) {
@@ -107,18 +111,21 @@ const MindsetChat = () => {
       setMessages((prev) => [...prev, newMessage]);
 
       // mock bot response
-      setTimeout(() => {
-        const botResponse: Message = {
-          id: tempId + 1,
-          message: "Thinking...",
-          sender: "user",
-          status: "loading",
-        };
-        setMessages((prev) => [...prev, botResponse]);
-      }, 1000);
+      // setTimeout(() => {
+      //   const botResponse: Message = {
+      //     id: tempId + 1,
+      //     message: "Thinking...",
+      //     sender: "bot",
+      //     status: "loading",
+      //   };
+      //   setMessages((prev) => [...prev, botResponse]);
+      // }, 1000);
       setInputMessage("");
       try {
-        const response = await axios.post("api/mindset/");
+        const response = await axios.post("api/mindset/", {
+          message: inputMessage,
+          session_id: params?.mindset_session,
+        });
         if (response.status === 208) {
           Swal.fire({
             title: "Free Tier Limit Reached",
@@ -151,20 +158,23 @@ const MindsetChat = () => {
             }
           });
         }
+        console.log("response for complete",response);
+        if (response?.data.is_complete === true) {
+          setCompleted(true);
+        }
 
         setMessages((prev) => {
-        const filteredMessages = prev.filter((msg) => msg.id !== tempId);
-        return [
-          ...filteredMessages,
-          {
-            id: Date.now(),
-            message:
-              response?.data?.reply || "I received your message!",
-            sender: "bot",
-            status: "success",
-          },
-        ];
-      });
+          const filteredMessages = prev.filter((msg) => msg.id !== tempId + 1);
+          return [
+            ...filteredMessages,
+            {
+              id: Date.now(),
+              message: response?.data?.reply || "I received your message!",
+              sender: "bot",
+              status: "success",
+            },
+          ];
+        });
       } catch (error) {
         console.error("Error sending message:", error);
         // Update loading message to show error
@@ -225,69 +235,54 @@ const MindsetChat = () => {
       </div>
       {/* --------------- Messages area ---------------------- */}
       <div className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 pb-24">
-          <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto min-h-full">
-            {messages.length > 0 ? (
-              <>
-                {messages.map((item) => (
+        <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto min-h-full">
+          {messages.length > 0 ? (
+            <>
+              {messages.map((item) => (
+                <div
+                  key={item.id}
+                  className={`flex animate-fadeInUp ${
+                    item.sender === "user" ? "justify-end" : "justify-start"
+                  }`}
+                >
                   <div
-                    key={item.id}
-                    className={`flex animate-fadeInUp ${
-                      item.sender === "user" ? "justify-end" : "justify-start"
+                    className={`text-start max-w-[85%] sm:max-w-xs md:max-w-sm lg:max-w-lg xl:max-w-2xl 2xl:max-w-3xl p-3 sm:p-4 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl text-sm sm:text-base md:text-lg leading-relaxed ${
+                      item.sender === "user"
+                        ? "bg-cCard text-black ml-auto"
+                        : item.status === "error"
+                        ? "bg-red-900/30 border border-red-500 text-red-200 mr-auto"
+                        : "bg-transparent border border-cCard text-white mr-auto"
                     }`}
                   >
-                    <div
-                      className={`text-start max-w-[85%] sm:max-w-xs md:max-w-sm lg:max-w-lg xl:max-w-2xl 2xl:max-w-3xl p-3 sm:p-4 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl text-sm sm:text-base md:text-lg leading-relaxed ${
-                        item.sender === "user"
-                          ? "bg-cCard text-black ml-auto"
-                          : item.status === "error"
-                          ? "bg-red-900/30 border border-red-500 text-red-200 mr-auto"
-                          : "bg-transparent border border-cCard text-white mr-auto"
-                      }`}
-                    >
-                      {item.status === "loading" ? (
-                        <div className="flex items-center gap-2">
-                          <div className="flex space-x-1">
-                            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-bounce"></div>
-                            <div
-                              className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-bounce"
-                              style={{ animationDelay: "0.1s" }}
-                            ></div>
-                            <div
-                              className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-bounce"
-                              style={{ animationDelay: "0.2s" }}
-                            ></div>
-                          </div>
-                          <span className="text-xs sm:text-sm text-gray-300">
-                            Thinking...
-                          </span>
-                        </div>
-                      ) : (
-                        <p>{item.message}</p>
-                      )}
-                    </div>
+                    {<p>{item.message}</p>}
+                    {completed && (
+                      <p className="text-red-600">Your session is complete</p>
+                    )}
                   </div>
-                ))}
-                <div ref={messagesEndRef} />
-              </>
-            ) : (
-              <div className="flex flex-col justify-center items-center h-full text-center space-y-8">
-                <div className="space-y-4">
-                  <h1 className="text-5xl md:text-6xl font-bold text-white font-league-gothic">
-                    Start a New Chat
-                  </h1>
-                  <h2 className="text-2xl md:text-3xl font-medium text-white/80 font-league-gothic">
-                    What can I help with?
-                  </h2>
                 </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </>
+          ) : (
+            <div className="flex flex-col justify-center items-center h-full text-center space-y-8">
+              <div className="space-y-4">
+                <h1 className="text-5xl md:text-6xl font-bold text-white font-league-gothic">
+                  Start a New Chat
+                </h1>
+                <h2 className="text-2xl md:text-3xl font-medium text-white/80 font-league-gothic">
+                  What can I help with?
+                </h2>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
+      </div>
 
       {/* --------------- Input area ---------------------- */}
       <div className="p-4 mb-15 lg:mb-0">
         <div className="max-w-3xl mx-auto flex gap-4 rounded-lg bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm p-4">
           <input
+            disabled={completed}
             type="text"
             value={inputMessage}
             onChange={handleInputChange}

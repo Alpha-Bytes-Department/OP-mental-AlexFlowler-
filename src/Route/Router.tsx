@@ -70,7 +70,7 @@ const Router = createBrowserRouter([
         element: <JournalOptions />,
       },
       {
-        path: "/chat/journal/journal-chat",
+        path: "/chat/journal/journal-chat/:session_id",
         element: <JournalChat />,
       },
       {
@@ -78,7 +78,7 @@ const Router = createBrowserRouter([
         element: <JournalList />,
       },
       {
-        path: "/chat/mindsetHome",
+        path: "/chat/mindsetChat/home",
         element: <MindsetHome />,
       },
       {

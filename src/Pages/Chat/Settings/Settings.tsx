@@ -8,10 +8,7 @@ import Swal from "sweetalert2";
 interface SettingsFormData {
   logo: FileList;
   name: string;
-  phone: string;
   username: string;
-  description: string;
-  gender: string;
 }
 
 const Settings = () => {
@@ -32,10 +29,7 @@ const Settings = () => {
   } = useForm<SettingsFormData>({
     defaultValues: {
       name: userData.name || "",
-      phone: userData.phone || "",
       username: userData.username || "",
-      description: userData.description || "",
-      gender: userData.gender || "",
     },
   });
 
@@ -48,21 +42,14 @@ const Settings = () => {
 
       // Append text fields
       formData.append("name", data.name);
-      formData.append("phone", data.phone || "");
       formData.append("username", data.username);
-      formData.append("description", data.description || "");
-      formData.append("gender", data.gender);
 
       // Only append profile_image if a file was selected
       if (data.logo && data.logo.length > 0) {
         formData.append("profile_image", data.logo[0]);
       }
-
-      // Log FormData contents for debugging
-      console.log("FormData contents:");
-      for (let [key, value] of formData.entries()) {
-        console.log(key, value);
-      }
+;
+  
 
       const response = await axios.patch("/api/users/profile/", formData, {
         headers: {
@@ -83,14 +70,8 @@ const Settings = () => {
           // Update form values with new data
           reset({
             name: updatedUser.name || "",
-            phone: updatedUser.phone || "",
             username: updatedUser.username || "",
-            description: updatedUser.description || "",
-            gender: updatedUser.gender || "",
           });
-
-          // Update gender dropdown
-          setSelectedGender(updatedUser.gender || "Select Gender");
 
           // Update profile image preview
           setPreviewImage(
@@ -133,9 +114,7 @@ const Settings = () => {
   };
 
   // State for custom gender dropdown
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedGender, setSelectedGender] = useState("Select Gender");
-  const genderOptions = ["Select Gender", "Men", "Women", "Other"];
+
 
   // State for image preview
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -144,12 +123,8 @@ const Settings = () => {
   useEffect(() => {
     reset({
       name: userData.name || "",
-      phone: userData.phone || "",
       username: userData.username || "",
-      description: userData.description || "",
-      gender: userData.gender || "",
     });
-    setSelectedGender(userData.gender || "Select Gender");
 
     // Fix profile image URL construction
     if (userData.profile_image) {
@@ -162,13 +137,7 @@ const Settings = () => {
     }
   }, [userData, reset, baseUrl]);
 
-  const handleGenderSelect = (value: string) => {
-    if (!isEditing) return;
-    setSelectedGender(value);
-    const genderValue = value === "Select Gender" ? "" : value;
-    setValue("gender", genderValue);
-    setIsOpen(false);
-  };
+
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!isEditing) return;
@@ -210,12 +179,8 @@ const Settings = () => {
       // Cancel edit - reset form to original values
       reset({
         name: userData.name || "",
-        phone: userData.phone || "",
-        username: userData.username || "",
-        description: userData.description || "",
-        gender: userData.gender || "",
+        username: userData.username || ""
       });
-      setSelectedGender(userData.gender || "Select Gender");
 
       // Reset preview image
       if (userData.profile_image) {
@@ -300,7 +265,7 @@ const Settings = () => {
           {/* Form Fields Container */}
           <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 lg:gap-12 xl:gap-16 justify-center items-start">
             {/* Left Column */}
-            <div className="w-full lg:w-1/2 max-w-md mx-auto lg:mx-0 space-y-6 sm:space-y-8">
+            <div className="w-full flex flex-col md:flex-row gap-10 max-w-md mx-auto lg:mx-0">
               {/* Name Field */}
               <div className="space-y-2">
                 <label
@@ -351,109 +316,6 @@ const Settings = () => {
                     {errors.username.message}
                   </p>
                 )}
-              </div>
-
-              {/* Gender Field (Custom Dropdown) */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="gender"
-                  className="block text-base sm:text-lg font-medium"
-                >
-                  Gender
-                </label>
-                <div className="relative">
-                  <input
-                    type="hidden"
-                    {...register("gender")}
-                    value={
-                      selectedGender === "Select Gender" ? "" : selectedGender
-                    }
-                  />
-                  <div
-                    className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-cCard rounded-lg text-white focus:outline-none focus:border-white/60 transition-colors bg-transparent flex items-center justify-between text-sm sm:text-base ${
-                      isEditing
-                        ? "cursor-pointer"
-                        : "cursor-not-allowed opacity-70"
-                    }`}
-                    onClick={() => isEditing && setIsOpen(!isOpen)}
-                    style={{
-                      backgroundImage: isEditing
-                        ? `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`
-                        : "none",
-                      backgroundPosition: "right 0.75rem center",
-                      backgroundRepeat: "no-repeat",
-                      backgroundSize: "1.5em 1.5em",
-                    }}
-                  >
-                    {selectedGender}
-                  </div>
-                  {isOpen && isEditing && (
-                    <div className="absolute w-full mt-1 border border-cCard rounded-lg z-10 max-h-48 overflow-y-auto">
-                      {genderOptions.map((option) => (
-                        <div
-                          key={option}
-                          className="px-3 sm:px-4 py-2 bg-cCard text-black duration-300 font-semibold hover:bg-opacity-80 cursor-pointer text-sm sm:text-base first:rounded-t-lg last:rounded-b-lg"
-                          onClick={() => handleGenderSelect(option)}
-                        >
-                          {option}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                {errors.gender && isEditing && (
-                  <p className="text-red-400 text-xs sm:text-sm">
-                    {errors.gender.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Right Column */}
-            <div className="w-full lg:w-1/2 max-w-md mx-auto lg:mx-0 space-y-6 sm:space-y-8">
-              {/* Phone Field */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="phone"
-                  className="block text-base sm:text-lg font-medium"
-                >
-                  Phone Number
-                </label>
-                <input
-                  {...register("phone")}
-                  type="tel"
-                  id="phone"
-                  placeholder="your phone number"
-                  disabled={!isEditing}
-                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-transparent border border-cCard rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/60 transition-colors text-sm sm:text-base ${
-                    !isEditing ? "opacity-70 cursor-not-allowed" : ""
-                  }`}
-                />
-                {errors.phone && isEditing && (
-                  <p className="text-red-400 text-xs sm:text-sm">
-                    {errors.phone.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Description Field */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="description"
-                  className="block text-base sm:text-lg font-medium"
-                >
-                  Description
-                </label>
-                <textarea
-                  {...register("description")}
-                  id="description"
-                  rows={4}
-                  placeholder="your information here!"
-                  disabled={!isEditing}
-                  className={`w-full min-h-[120px] sm:min-h-[140px] lg:min-h-[160px] px-3 sm:px-4 py-2.5 sm:py-3 bg-transparent border border-cCard rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/60 transition-colors resize-none text-sm sm:text-base ${
-                    !isEditing ? "opacity-70 cursor-not-allowed" : ""
-                  }`}
-                />
               </div>
             </div>
           </div>

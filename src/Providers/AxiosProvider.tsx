@@ -47,7 +47,7 @@ const processQueue = (error: any, token: string | null = null) => {
 };
 
 const axiosInstance = axios.create({
-  baseURL: "https://td4zvtcp-8000.inc1.devtunnels.ms/",
+  baseURL: "http://10.10.12.53:8001/",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
@@ -147,7 +147,7 @@ axiosInstance.interceptors.response.use(
 
         throw new Error("No refresh token available");
       } catch (refreshError) {
-        console.error("❌ Token refresh failed:", refreshError);
+        console.error("Token refresh failed:", refreshError);
 
         // Process queue with error
         processQueue(refreshError, null);

@@ -41,6 +41,7 @@ const Navigation = ({
   //matching active navigation for handle navigation style
   const chatgeneral = useMatch("/chat/general/*");
   const journalLinkMatched = useMatch("/chat/journal/*");
+  const mindsetLinkMatched = useMatch("/chat/mindsetChat/*");
   const internalChallengeMatch = useMatch("/chat/internalChat/*");
   
 
@@ -174,11 +175,11 @@ const Navigation = ({
               )}
             </NavLink>
             <NavLink
-              to="/chat/mindsetHome"
-              className={({ isActive }) => `
+              to="/chat/mindsetChat/home"
+              className={`
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
-                  ${isActive ? "bg-[#2D2A2B] font-bold" : "hidden"}
+                  ${mindsetLinkMatched ? "bg-[#2D2A2B] font-bold" : "hidden"}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
                 `}
             >
@@ -295,11 +296,11 @@ const Navigation = ({
                 )}
               </NavLink>
               <NavLink
-                to="/chat/mindsetHome"
-                className={({ isActive }) => `
+                to="/chat/mindsetChat/home"
+                className={`
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
-                  ${isActive ? "hidden" : "font-medium"}
+                  ${mindsetLinkMatched ? "hidden" : "font-medium"}
                   ${isDesktopCollapsed ? "justify-center" : "justify-start"}
                 `}
               >

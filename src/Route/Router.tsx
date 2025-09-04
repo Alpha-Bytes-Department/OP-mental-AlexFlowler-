@@ -78,7 +78,7 @@ const Router = createBrowserRouter([
         element: <JournalList />,
       },
       {
-        path: "/chat/mindsetHome",
+        path: "/chat/mindsetChat/home",
         element: <MindsetHome />,
       },
       {

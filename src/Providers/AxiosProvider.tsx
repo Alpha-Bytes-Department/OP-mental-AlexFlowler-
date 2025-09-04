@@ -47,7 +47,7 @@ const processQueue = (error: any, token: string | null = null) => {
 };
 
 const axiosInstance = axios.create({
-  baseURL: "http://10.10.12.53:8000",
+  baseURL: "https://td4zvtcp-8000.inc1.devtunnels.ms/",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",

@@ -43,6 +43,7 @@ const InternalChat = () => {
 
   useEffect(() => {
     axios.get(`/api/internal-challenge/${params?.session_id}/`).then((res) => {
+      console.log("response when initial loading", res);
       setMessages(res?.data);
     });
   }, []);
@@ -64,6 +65,8 @@ const InternalChat = () => {
         const res = await axios.get(
           `/api/internal-challenge/${params?.session_id}/`
         );
+
+        console.log("response from get api",res);
 
         if (res?.data) {
           // Combine fetched messages with the new one from POST
@@ -91,7 +94,7 @@ const InternalChat = () => {
     }
   };
 
-  console.log(messages);
+  // console.log(messages);
 
   //--------- enter key handler --------
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -132,18 +135,6 @@ const InternalChat = () => {
                     })}
                   </div>
                 )}
-                {/* ---------------- Showing user response--------------- */}
-                {message?.response && (
-                  <div key={index + 1} className={"flex justify-end"}>
-                    <div
-                      className={
-                        "max-w-[70%] rounded-lg p-3  bg-[#DBD0A6] text-black"
-                      }
-                    >
-                      {message?.response}
-                    </div>
-                  </div>
-                )}
                 {/* ------- Showing phage only once for similar items ------------------*/}
                 {showPhase && (
                   <h1
@@ -170,6 +161,18 @@ const InternalChat = () => {
                     )}
                   </div>
                 }
+                {/* ---------------- Showing user response--------------- */}
+                {message?.response && (
+                  <div key={index + 1} className={"flex justify-end"}>
+                    <div
+                      className={
+                        "max-w-[70%] rounded-lg p-3  bg-[#DBD0A6] text-black"
+                      }
+                    >
+                      {message?.response}
+                    </div>
+                  </div>
+                )}
               </>
             );
           })}

@@ -55,6 +55,7 @@ const Navigation = ({
         localStorage.removeItem("user");
         localStorage.removeItem("access");
         localStorage.removeItem("refresh");
+        localStorage.removeItem("chat-session");
         const modal = document.getElementById(
           "Profile_Modal"
         ) as HTMLDialogElement | null;

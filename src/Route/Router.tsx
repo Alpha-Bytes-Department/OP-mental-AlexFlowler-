@@ -82,7 +82,7 @@ const Router = createBrowserRouter([
         element: <MindsetHome />,
       },
       {
-        path: "/chat/mindsetChat",
+        path: "/chat/mindsetChat/:mindset_session",
         element: <MindsetChat />,
       },
       {

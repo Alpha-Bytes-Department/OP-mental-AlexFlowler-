@@ -46,8 +46,6 @@ const ChatHome = () => {
     try {
       setIsInitialLoading(true);
       const response = await axios.get("/api/chatbot/history/all/");
-      console.log("Loaded data:", response);
-
       if (response.status === 200) {
         const transformedMessages: Message[] = [];
 
@@ -168,9 +166,7 @@ const ChatHome = () => {
           {
             id: response?.data?.session_id || Date.now(),
             message:
-              response?.data?.reply ||
-              response?.data?.relpy ||
-              "I received your message!",
+              response?.data?.reply || "I received your message!",
             sender: "bot",
             status: "success",
           },

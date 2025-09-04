@@ -27,7 +27,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsLoading(true);
     try {
       const res = await axios.get("/api/users/profile/");
-      console.log("Fetched User:", res.data);
       setUser(res.data);
     } catch {
       setUser(null);

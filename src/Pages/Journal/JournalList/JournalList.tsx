@@ -1,94 +1,117 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MdDelete } from "react-icons/md";
 import { FaFilter } from "react-icons/fa";
+import { useAxios } from "../../../Providers/AxiosProvider";
 
 // ----type declarations---------
 interface JournalEntry {
   id: string;
   description: string;
   category: string;
-  createdDate: string;
+  created_at: string;
 }
 
 interface CategoryStats {
   [key: string]: number;
 }
 
+// mock data
+
+// const kfsdio =[{
+//       id: "JJE-001",
+//       description: "Tips and Goals...",
+//       category: "Personal Trigger",
+//       createdDate: "2023-08-19",
+//     },
+//     {
+//       id: "JJE-002",
+//       description: "Attend Meet Up Website Redesign",
+//       category: "Negative Trigger",
+//       createdDate: "2023-08-19",
+//     },
+//     {
+//       id: "JJE-003",
+//       description: "Marketing Campaign Best Practices",
+//       category: "Recurring Thought",
+//       createdDate: "2023-08-18",
+//     },
+//     {
+//       id: "JJE-004",
+//       description: "Meeting Notes with Marketing Team",
+//       category: "Future Goal",
+//       createdDate: "2023-08-17",
+//     },
+//     {
+//       id: "JJE-005",
+//       description: "Personal Reflections on Recent Changes",
+//       category: "Milestone Gratitude",
+//       createdDate: "2023-08-16",
+//     },
+//     {
+//       id: "JJE-006",
+//       description: 'Book Notes "Moving Habits"',
+//       category: "Personal Trigger",
+//       createdDate: "2023-08-08",
+//     },
+//     {
+//       id: "JJE-007",
+//       description: "Monthly Review July 2023",
+//       category: "Recurring Thought",
+//       createdDate: "2023-08-05",
+//     },
+//     {
+//       id: "JJE-008",
+//       description: "Travel Plans for September Vacation",
+//       category: "Future Goal",
+//       createdDate: "2023-08-02",
+//     },]
+
+
 const JournalList: React.FC = () => {
   //--------states--------
-  const [entries, setEntries] = useState<JournalEntry[]>([
-    {
-      id: "JJE-001",
-      description: "Tips and Goals...",
-      category: "Personal Trigger",
-      createdDate: "2023-08-19",
-    },
-    {
-      id: "JJE-002",
-      description: "Attend Meet Up Website Redesign",
-      category: "Negative Trigger",
-      createdDate: "2023-08-19",
-    },
-    {
-      id: "JJE-003",
-      description: "Marketing Campaign Best Practices",
-      category: "Recurring Thought",
-      createdDate: "2023-08-18",
-    },
-    {
-      id: "JJE-004",
-      description: "Meeting Notes with Marketing Team",
-      category: "Future Goal",
-      createdDate: "2023-08-17",
-    },
-    {
-      id: "JJE-005",
-      description: "Personal Reflections on Recent Changes",
-      category: "Milestone Gratitude",
-      createdDate: "2023-08-16",
-    },
-    {
-      id: "JJE-006",
-      description: 'Book Notes "Moving Habits"',
-      category: "Personal Trigger",
-      createdDate: "2023-08-08",
-    },
-    {
-      id: "JJE-007",
-      description: "Monthly Review July 2023",
-      category: "Recurring Thought",
-      createdDate: "2023-08-05",
-    },
-    {
-      id: "JJE-008",
-      description: "Travel Plans for September Vacation",
-      category: "Future Goal",
-      createdDate: "2023-08-02",
-    },
-  ]);
+  const [entries, setEntries] = useState<JournalEntry[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("All Categories");
+  const [categories, setCategories] = useState<string[]>([])
+  const axios = useAxios();
 
-  const [selectedCategory, setSelectedCategory] =
-    useState<string>("All Categories");
+  //getting entries
+  const gettingData = async()=>{
+    try {
+      const res = await axios.get("api/journaling/sessions/")
+      setEntries(res?.data);
+    } catch (error) {
+      console.log("Checking error",error);
+    }
+  }
+
+  useEffect(()=>{
+    gettingData();
+  },[])
+
+
+
 
   //--------- constants --------
-  const categories = [
-    "Personal Trigger",
-    "Negative Trigger",
-    "Recurring Thought",
-    "Future Goal",
-    "Milestone Gratitude",
-  ];
+  if(Array.isArray(categories)){
+    entries.map((item)=>{
+      setCategories((prev)=>[...prev, item.category])
+    })
+  }
+  // const categories = [
+  //   "Personal Trigger",
+  //   "Negative Trigger",
+  //   "Recurring Thought",
+  //   "Future Goal",
+  //   "Milestone Gratitude",
+  // ];
 
   //--------- entry handlers --------
   const deleteEntry = (id: string) => {
-    setEntries(entries.filter((entry) => entry.id !== id));
+    setEntries(entries?.filter((entry) => entry.id !== id));
   };
 
   //--------- filter entries based on category --------
-  const filteredEntries =
-    selectedCategory === "All Categories"
-      ? entries
-      : entries.filter((entry) => entry.category === selectedCategory);
+  const filteredEntries = selectedCategory === "All Categories" ? entries : entries.filter((entry) => entry?.category === selectedCategory);
 
   //--------- statistics calculations --------
   const getCategoryStats = (): CategoryStats => {
@@ -104,7 +127,7 @@ const JournalList: React.FC = () => {
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
     return entries.filter((entry) => {
-      const entryDate = new Date(entry.createdDate);
+      const entryDate = new Date(entry.created_at);
       return (
         entryDate.getMonth() === currentMonth &&
         entryDate.getFullYear() === currentYear
@@ -116,7 +139,7 @@ const JournalList: React.FC = () => {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
     return entries.filter((entry) => {
-      const entryDate = new Date(entry.createdDate);
+      const entryDate = new Date(entry.created_at);
       return entryDate >= oneWeekAgo;
     }).length;
   };
@@ -172,19 +195,19 @@ const JournalList: React.FC = () => {
           <div className="space-y-1 mb-8">
             {filteredEntries.map((entry, index) => (
               <div
-                key={entry.id}
+                key={index}
                 className={`grid grid-cols-12 gap-4 py-3 px-2 rounded ${
                   index % 2 === 0 ? "bg-gray-900/50" : "bg-gray-800/30"
                 } hover:bg-gray-700/50 transition-colors`}
               >
                 <div className="col-span-2 text-gray-300 font-mono text-sm">
-                  {entry.id}
+                  {entry?.id}
                 </div>
                 <div className="col-span-5 text-gray-300">
-                  {entry.description}
+                  {entry?.category}
                 </div>
                 <div className="col-span-3 text-gray-400 text-sm">
-                  {entry.createdDate}
+                  {entry?.created_at?.split("T")[0]}
                 </div>
                 <div className="col-span-2">
                   <button

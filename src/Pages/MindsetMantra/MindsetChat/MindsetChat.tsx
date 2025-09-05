@@ -128,7 +128,7 @@ const MindsetChat = () => {
         });
         if (response.status === 208) {
           Swal.fire({
-            title: "Free Tier Limit Reached",
+            title: "Subscribe for chat",
             text: response.data.reply,
             icon: "info",
             confirmButtonText: "OK",

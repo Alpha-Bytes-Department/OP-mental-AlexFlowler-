@@ -2,11 +2,7 @@ import { Form, useNavigate } from "react-router-dom";
 import { FaBook } from "react-icons/fa6";
 import { useAxios } from "../../../Providers/AxiosProvider";
 import { useState } from "react";
-
-// ----type declaration---------
-// interface FormData {
-//   message: string;
-// }
+import Swal from "sweetalert2";
 
 const JournalOptions = () => {
   //--------states--------
@@ -18,14 +14,17 @@ const JournalOptions = () => {
   const handleCategorySelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedCategory = event.target.value;
     console.log("Selected Category:", selectedCategory);
+    
     if (selectedCategory === "Positive trigger") {
       handleTrigger("1");
     } else if (selectedCategory === "Negative trigger") {
       handleTrigger("2");
     } else if (selectedCategory === "Recurring Thought") {
+      handleTrigger("3");
+    } else if (selectedCategory === "Future goal") {
       handleTrigger("4");
     } else if (selectedCategory === "Milestone gratitude") {
-      handleTrigger("4");
+      handleTrigger("5");
     } else {
       return;
     }
@@ -33,16 +32,50 @@ const JournalOptions = () => {
 
   //post request to the api
   const handleTrigger = async (option: string) => {
-    setLoading(true);
-    const res = await axios.post("api/journaling/chat/", { message: option });
-    console.log("journal", res);
-    if (res) {
+    try {
+      setLoading(true);
+      const res = await axios.post("api/journaling/chat/", { message: option });
+      console.log("journal", res);
+      
+      if (res.status === 200) {
+        navigate(`/chat/journal/journal-chat/${res?.data?.session_id}`);
+      } else {
+        console.log("Failed to trigger journal", res);
+        // Show error message
+        Swal.fire({
+          title: "Error!",
+          text: "Failed to start journal session. Please try again.",
+          icon: "error",
+          background: "rgba(255, 255, 255, 0.1)",
+          backdrop: "rgba(0, 0, 0, 0.4)",
+          timer: 3000,
+          showConfirmButton: false,
+          customClass: {
+            popup: "glassmorphic-popup",
+            title: "glassmorphic-title",
+            htmlContainer: "glassmorphic-text",
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Error starting journal session:", error);
+      // Show error message
+      Swal.fire({
+        title: "Error!",
+        text: "Something went wrong. Please try again.",
+        icon: "error",
+        background: "rgba(255, 255, 255, 0.1)",
+        backdrop: "rgba(0, 0, 0, 0.4)",
+        timer: 3000,
+        showConfirmButton: false,
+        customClass: {
+          popup: "glassmorphic-popup",
+          title: "glassmorphic-title",
+          htmlContainer: "glassmorphic-text",
+        },
+      });
+    } finally {
       setLoading(false);
-    }
-    if (res.status === 200) {
-      navigate(`/chat/journal/journal-chat/${res?.data?.session_id}`);
-    }else{
-      console.log("Failed to trigger journal", res);
     }
   };
 
@@ -61,7 +94,7 @@ const JournalOptions = () => {
               style={{ animationDelay: "0.2s" }}
             ></div>
           </div>
-          <p className="text-lg">Loading chat history...</p>
+          <p className="text-lg">Starting journal session...</p>
         </div>
       </div>
     );
@@ -77,7 +110,7 @@ const JournalOptions = () => {
       <h1>Choose Journal Category</h1>
       {/* --------------- Journal options---------------------- */}
       <Form className="flex flex-col gap-5 w-full overflow-y-auto max-h-[70vh] pb-5">
-        <label className="py-5 bg-[#2D2D2D] rounded text-center mx-20 cursor-pointer">
+        <label className="py-5 bg-[#2D2D2D] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
           <span>Positive Trigger</span>
           <input
             type="radio"
@@ -85,9 +118,10 @@ const JournalOptions = () => {
             className="hidden"
             value="Positive trigger"
             onChange={handleCategorySelect}
+            disabled={loading}
           />
         </label>
-        <label className="py-5 bg-[#2D2D2D] rounded text-center mx-20 cursor-pointer">
+        <label className="py-5 bg-[#2D2D2D] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
           <span>Negative Trigger</span>
           <input
             type="radio"
@@ -95,9 +129,10 @@ const JournalOptions = () => {
             className="hidden"
             value="Negative trigger"
             onChange={handleCategorySelect}
+            disabled={loading}
           />
         </label>
-        <label className="py-5 bg-[#2D2D2D] rounded text-center mx-20 cursor-pointer">
+        <label className="py-5 bg-[#2D2D2D] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
           <span>Recurring Thought</span>
           <input
             type="radio"
@@ -105,9 +140,10 @@ const JournalOptions = () => {
             className="hidden"
             value="Recurring Thought"
             onChange={handleCategorySelect}
+            disabled={loading}
           />
         </label>
-        <label className="py-5 bg-[#2D2D2D] rounded text-center mx-20 cursor-pointer">
+        <label className="py-5 bg-[#2D2D2D] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
           <span>Future Goal</span>
           <input
             type="radio"
@@ -115,9 +151,10 @@ const JournalOptions = () => {
             className="hidden"
             value="Future goal"
             onChange={handleCategorySelect}
+            disabled={loading}
           />
         </label>
-        <label className="py-5 bg-[#2D2D2D] rounded text-center mx-20 cursor-pointer">
+        <label className="py-5 bg-[#2D2D2D] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
           <span>Milestone Gratitude</span>
           <input
             type="radio"
@@ -125,6 +162,7 @@ const JournalOptions = () => {
             className="hidden"
             value="Milestone gratitude"
             onChange={handleCategorySelect}
+            disabled={loading}
           />
         </label>
       </Form>

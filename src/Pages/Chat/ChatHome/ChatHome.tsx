@@ -127,7 +127,7 @@ const ChatHome = () => {
         // console.log("AI Response:", response.data.reply);
 
         Swal.fire({
-          title: "Free Tier Limit Reached",
+          title: "Subscribe to chat",
           text: response.data.reply,
           icon: "info",
           confirmButtonText: "OK",

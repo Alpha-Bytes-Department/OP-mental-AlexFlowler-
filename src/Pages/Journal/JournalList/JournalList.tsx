@@ -15,103 +15,48 @@ interface CategoryStats {
   [key: string]: number;
 }
 
-// mock data
-
-// const kfsdio =[{
-//       id: "JJE-001",
-//       description: "Tips and Goals...",
-//       category: "Personal Trigger",
-//       createdDate: "2023-08-19",
-//     },
-//     {
-//       id: "JJE-002",
-//       description: "Attend Meet Up Website Redesign",
-//       category: "Negative Trigger",
-//       createdDate: "2023-08-19",
-//     },
-//     {
-//       id: "JJE-003",
-//       description: "Marketing Campaign Best Practices",
-//       category: "Recurring Thought",
-//       createdDate: "2023-08-18",
-//     },
-//     {
-//       id: "JJE-004",
-//       description: "Meeting Notes with Marketing Team",
-//       category: "Future Goal",
-//       createdDate: "2023-08-17",
-//     },
-//     {
-//       id: "JJE-005",
-//       description: "Personal Reflections on Recent Changes",
-//       category: "Milestone Gratitude",
-//       createdDate: "2023-08-16",
-//     },
-//     {
-//       id: "JJE-006",
-//       description: 'Book Notes "Moving Habits"',
-//       category: "Personal Trigger",
-//       createdDate: "2023-08-08",
-//     },
-//     {
-//       id: "JJE-007",
-//       description: "Monthly Review July 2023",
-//       category: "Recurring Thought",
-//       createdDate: "2023-08-05",
-//     },
-//     {
-//       id: "JJE-008",
-//       description: "Travel Plans for September Vacation",
-//       category: "Future Goal",
-//       createdDate: "2023-08-02",
-//     },]
-
-
 const JournalList: React.FC = () => {
   //--------states--------
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("All Categories");
-  const [categories, setCategories] = useState<string[]>([])
+  const [categories, setCategories] = useState<string[]>([]);
   const axios = useAxios();
 
   //getting entries
-  const gettingData = async()=>{
+  const gettingData = async () => {
     try {
-      const res = await axios.get("api/journaling/sessions/")
+      const res = await axios.get("api/journaling/sessions/");
       setEntries(res?.data);
     } catch (error) {
-      console.log("Checking error",error);
+      console.log("Checking error", error);
     }
-  }
+  };
 
-  useEffect(()=>{
+  useEffect(() => {
     gettingData();
-  },[])
+  }, []);
 
-
-
-
-  //--------- constants --------
-  if(Array.isArray(categories)){
-    entries.map((item)=>{
-      setCategories((prev)=>[...prev, item.category])
-    })
-  }
-  // const categories = [
-  //   "Personal Trigger",
-  //   "Negative Trigger",
-  //   "Recurring Thought",
-  //   "Future Goal",
-  //   "Milestone Gratitude",
-  // ];
+  // Extract unique categories from entries
+  useEffect(() => {
+    const uniqueCategories = [...new Set(entries.map(item => item.category))];
+    setCategories(uniqueCategories);
+  }, [entries]);
 
   //--------- entry handlers --------
-  const deleteEntry = (id: string) => {
-    setEntries(entries?.filter((entry) => entry.id !== id));
+  const deleteEntry = async (id: string) => {
+    try {
+      await axios.delete(`api/journaling/sessions/${id}/`);
+      // Remove the deleted entry from state
+      setEntries(prevEntries => prevEntries.filter(entry => entry.id !== id));
+    } catch (error) {
+      console.log("Delete error", error);
+    }
   };
 
   //--------- filter entries based on category --------
-  const filteredEntries = selectedCategory === "All Categories" ? entries : entries.filter((entry) => entry?.category === selectedCategory);
+  const filteredEntries = selectedCategory === "All Categories" 
+    ? entries 
+    : entries.filter((entry) => entry?.category === selectedCategory);
 
   //--------- statistics calculations --------
   const getCategoryStats = (): CategoryStats => {
@@ -179,9 +124,9 @@ const JournalList: React.FC = () => {
           </div>
 
           {/* --------------- Table columns ---------------------- */}
-          <div className="grid grid-cols-12 gap-4  text-gray-400 text-sm">
+          <div className="grid grid-cols-12 gap-4 text-gray-400 text-sm">
             <div className="col-span-2">Entry ID</div>
-            <div className="col-span-5">Description</div>
+            <div className="col-span-5">Category</div>
             <div className="col-span-3">Created Date</div>
             <div className="col-span-2">Actions</div>
           </div>
@@ -195,7 +140,7 @@ const JournalList: React.FC = () => {
           <div className="space-y-1 mb-8">
             {filteredEntries.map((entry, index) => (
               <div
-                key={index}
+                key={entry.id} // Use entry.id instead of index for better React performance
                 className={`grid grid-cols-12 gap-4 py-3 px-2 rounded ${
                   index % 2 === 0 ? "bg-gray-900/50" : "bg-gray-800/30"
                 } hover:bg-gray-700/50 transition-colors`}
@@ -239,7 +184,7 @@ const JournalList: React.FC = () => {
                   return (
                     <div key={category} className="flex items-center gap-3">
                       <div
-                        className={`w-3 h-3 ${colors[index]} rounded-full`}
+                        className={`w-3 h-3 ${colors[index % colors.length]} rounded-full`}
                       ></div>
                       <span className="text-gray-300 flex-1">{category}</span>
                       <span className="text-white font-mono">
@@ -281,7 +226,7 @@ const JournalList: React.FC = () => {
                     <div
                       className="bg-yellow-600 h-2 rounded-full"
                       style={{
-                        width: `${(thisMonthCount / totalEntries) * 100}%`,
+                        width: totalEntries > 0 ? `${(thisMonthCount / totalEntries) * 100}%` : '0%',
                       }}
                     ></div>
                   </div>
@@ -298,7 +243,7 @@ const JournalList: React.FC = () => {
                     <div
                       className="bg-yellow-600 h-2 rounded-full"
                       style={{
-                        width: `${(lastWeekCount / totalEntries) * 100}%`,
+                        width: totalEntries > 0 ? `${(lastWeekCount / totalEntries) * 100}%` : '0%',
                       }}
                     ></div>
                   </div>

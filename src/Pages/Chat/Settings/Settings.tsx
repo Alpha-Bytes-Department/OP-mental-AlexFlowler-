@@ -60,8 +60,6 @@ const Settings = () => {
       if (response.status === 200 || response.status === 201) {
         setTimeout(async () => {
           const userDetail = await axios.get("/api/users/profile/");
-          console.log("User details fetched successfully:", userDetail.data);
-
           // Update local state and localStorage
           const updatedUser = userDetail.data;
           setUserData(updatedUser);
@@ -256,9 +254,6 @@ const Settings = () => {
               {isEditing
                 ? "Click to Upload Profile Picture"
                 : "Profile Picture"}
-            </p>
-            <p className="text-base text-hCard sm:text-lg font-medium text-center">
-              {userData.email}
             </p>
           </div>
 

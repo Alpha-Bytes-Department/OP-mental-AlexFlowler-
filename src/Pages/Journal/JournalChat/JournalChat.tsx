@@ -74,6 +74,7 @@ const JournalChat = () => {
         }
         setMessages(transformedMessages);
       }
+      
     } catch (error) {
       console.error("Error loading initial messages:", error);
       Swal.fire({
@@ -153,7 +154,7 @@ const JournalChat = () => {
         setMessages((prev) => prev.filter((msg) => msg.id !== botMessageId));
         
         const result = await Swal.fire({
-          title: "Free Tier Limit Reached",
+          title: "Subscribe for chat",
           text: response.data.reply,
           icon: "info",
           confirmButtonText: "OK",
@@ -216,6 +217,7 @@ const JournalChat = () => {
         )
       );
     } finally {
+      console.log("I am in finally state");
       setIsLoading(false);
     }
   };
@@ -229,9 +231,9 @@ const JournalChat = () => {
   };
 
   //-------------showing loading status-----------
-  if (initialLoading) {
-    return (
-      <div className="h-screen flex items-center justify-center text-white">
+ 
+   return (
+    initialLoading ? <div className="h-screen flex items-center justify-center text-white">
         <div className="flex flex-col items-center space-y-4">
           <div className="flex space-x-2">
             <div className="w-3 h-3 bg-white rounded-full animate-bounce"></div>
@@ -246,12 +248,7 @@ const JournalChat = () => {
           </div>
           <p className="text-lg">Loading chat history...</p>
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex flex-col h-screen">
+      </div> : <div className="flex flex-col h-screen">
       <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
         <div className="flex flex-col items-center gap-3">
           <img

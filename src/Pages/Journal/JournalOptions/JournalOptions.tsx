@@ -15,16 +15,14 @@ const JournalOptions = () => {
     const selectedCategory = event.target.value;
     console.log("Selected Category:", selectedCategory);
     
-    if (selectedCategory === "Positive trigger") {
+    if (selectedCategory === "Personal Win") {
       handleTrigger("1");
-    } else if (selectedCategory === "Negative trigger") {
+    } else if (selectedCategory === "Personal Challenge") {
       handleTrigger("2");
-    } else if (selectedCategory === "Recurring Thought") {
+    } else if (selectedCategory === "Professional Win") {
       handleTrigger("3");
-    } else if (selectedCategory === "Future goal") {
+    } else if (selectedCategory === "Professional Challenges") {
       handleTrigger("4");
-    } else if (selectedCategory === "Milestone gratitude") {
-      handleTrigger("5");
     } else {
       return;
     }
@@ -35,8 +33,7 @@ const JournalOptions = () => {
     try {
       setLoading(true);
       const res = await axios.post("api/journaling/chat/", { message: option });
-      console.log("journal", res);
-      
+      console.log("response for post api", res);
       if (res.status === 200) {
         navigate(`/chat/journal/journal-chat/${res?.data?.session_id}`);
       } else {
@@ -111,56 +108,45 @@ const JournalOptions = () => {
       {/* --------------- Journal options---------------------- */}
       <Form className="flex flex-col gap-5 w-full overflow-y-auto max-h-[70vh] pb-5">
         <label className="py-5 bg-[#2D2D2D] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
-          <span>Positive Trigger</span>
+          <span>Personal win</span>
           <input
             type="radio"
             name="category"
             className="hidden"
-            value="Positive trigger"
+            value="Personal Win"
             onChange={handleCategorySelect}
             disabled={loading}
           />
         </label>
         <label className="py-5 bg-[#2D2D2D] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
-          <span>Negative Trigger</span>
+          <span>Personal Challenge</span>
           <input
             type="radio"
             name="category"
             className="hidden"
-            value="Negative trigger"
+            value="Personal Challenge"
             onChange={handleCategorySelect}
             disabled={loading}
           />
         </label>
         <label className="py-5 bg-[#2D2D2D] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
-          <span>Recurring Thought</span>
+          <span>Professional Win</span>
           <input
             type="radio"
             name="category"
             className="hidden"
-            value="Recurring Thought"
+            value="Professional Win"
             onChange={handleCategorySelect}
             disabled={loading}
           />
         </label>
         <label className="py-5 bg-[#2D2D2D] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
-          <span>Future Goal</span>
+          <span>Professional Challenges</span>
           <input
             type="radio"
             name="category"
             className="hidden"
-            value="Future goal"
-            onChange={handleCategorySelect}
-            disabled={loading}
-          />
-        </label>
-        <label className="py-5 bg-[#2D2D2D] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
-          <span>Milestone Gratitude</span>
-          <input
-            type="radio"
-            name="category"
-            className="hidden"
-            value="Milestone gratitude"
+            value="Professional Challenges"
             onChange={handleCategorySelect}
             disabled={loading}
           />

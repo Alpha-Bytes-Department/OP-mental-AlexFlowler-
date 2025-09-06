@@ -46,6 +46,7 @@ const JournalChat = () => {
 
   //---------------getting chat at initial loading---------
   const initialLoadingMessage = useCallback(async () => {
+
     if (!params?.session_id) {
       console.error("No session ID provided");
       return;
@@ -53,30 +54,50 @@ const JournalChat = () => {
 
     try {
       setInitialLoading(true);
-      const response = await axios.get<ApiResponse>(
+      const response = await axios.get(
         `api/journaling/sessions/${params.session_id}/`
       );
-      
+
+      console.log("console log for debugging...........", response);
+
       if (response.status === 200 && response.data) {
         const transformedMessages: Message[] = []; // array for storing message
         
-        if (Array.isArray(response.data.Entries) && response.data.Entries.length > 0) {
+        // More robust checking for Entries
+        if (response.data.Entries && Array.isArray(response.data.Entries)) {
+          console.log("Processing entries, length:", response.data.Entries.length);
+          
           response.data.Entries.forEach((item: JournalEntry, index: number) => {
+            
             if (item?.author && item?.message) {
-              transformedMessages.push({
-                id: `${item.author}-${index}`,
+              const transformedMessage = {
+                id: `${item.author}-${index}-${Date.now()}`, // More unique ID
                 message: item.message,
                 sender: item.author,
-                status: "success",
-              });
+                status: "success" as const,
+              };
+              console.log("Adding transformed message:", transformedMessage);
+              transformedMessages.push(transformedMessage);
+            } else {
+              console.warn(`Skipping entry ${index} due to missing author or message:`, item);
             }
           });
+        } else {
+          console.warn("No valid entries found in response data");
+          // Check if the data structure is different than expected
+          console.log("Available keys in response.data:", Object.keys(response.data || {}));
         }
+        
+        console.log("Final transformed messages:", transformedMessages);
         setMessages(transformedMessages);
+      } else {
+        console.warn("Unexpected response status or no data:", response.status, response.data);
       }
       
     } catch (error) {
       console.error("Error loading initial messages:", error);
+      
+      
       Swal.fire({
         title: "Error!",
         text: "Something went wrong loading the chat history. Please try again.",
@@ -97,6 +118,7 @@ const JournalChat = () => {
   }, [axios, params?.session_id]);
 
   useEffect(() => {
+    console.log("useEffect triggered for initialLoadingMessage");
     initialLoadingMessage();
   }, [initialLoadingMessage]);
 
@@ -217,7 +239,6 @@ const JournalChat = () => {
         )
       );
     } finally {
-      console.log("I am in finally state");
       setIsLoading(false);
     }
   };
@@ -230,9 +251,9 @@ const JournalChat = () => {
     }
   };
 
+
   //-------------showing loading status-----------
- 
-   return (
+  return (
     initialLoading ? <div className="h-screen flex items-center justify-center text-white">
         <div className="flex flex-col items-center space-y-4">
           <div className="flex space-x-2">

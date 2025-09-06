@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { MdDelete } from "react-icons/md";
 import { FaFilter } from "react-icons/fa";
 import { useAxios } from "../../../Providers/AxiosProvider";
+import Swal from "sweetalert2";
 
 // ----type declarations---------
 interface JournalEntry {
@@ -11,6 +12,11 @@ interface JournalEntry {
   created_at: string;
 }
 
+interface Entry {
+  id: string;
+  // other fields if needed
+}
+
 interface CategoryStats {
   [key: string]: number;
 }
@@ -18,7 +24,8 @@ interface CategoryStats {
 const JournalList: React.FC = () => {
   //--------states--------
   const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("All Categories");
+  const [selectedCategory, setSelectedCategory] =
+    useState<string>("All Categories");
   const [categories, setCategories] = useState<string[]>([]);
   const axios = useAxios();
 
@@ -38,25 +45,82 @@ const JournalList: React.FC = () => {
 
   // Extract unique categories from entries
   useEffect(() => {
-    const uniqueCategories = [...new Set(entries.map(item => item.category))];
+    const uniqueCategories = [...new Set(entries.map((item) => item.category))];
     setCategories(uniqueCategories);
   }, [entries]);
 
   //--------- entry handlers --------
-  const deleteEntry = async (id: string) => {
-    try {
-      await axios.delete(`api/journaling/sessions/${id}/`);
-      // Remove the deleted entry from state
-      setEntries(prevEntries => prevEntries.filter(entry => entry.id !== id));
-    } catch (error) {
-      console.log("Delete error", error);
-    }
+  const deleteEntry = (
+    id: string,
+  ) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+      background: "rgba(255, 255, 255, 0.1)",
+      backdrop: "rgba(0, 0, 0, 0.4)",
+      customClass: {
+        popup: "glassmorphic-popup",
+        title: "glassmorphic-title",
+        htmlContainer: "glassmorphic-text",
+        confirmButton: "glassmorphic-confirm",
+        cancelButton: "glassmorphic-cancel",
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await axios.delete(`api/journaling/sessions/${id}/`);
+          
+          console.log("deleted response", res);
+
+          if (res.status === 204) {
+            setEntries((prevEntries) =>
+              prevEntries.filter((entry) => entry.id !== id)
+            );
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your entry has been deleted.",
+              icon: "success",
+              timer: 2000,
+              showConfirmButton: false,
+              background: "rgba(255, 255, 255, 0.1)",
+              backdrop: "rgba(0, 0, 0, 0.4)",
+              customClass: {
+                popup: "glassmorphic-popup",
+                title: "glassmorphic-title",
+                htmlContainer: "glassmorphic-text",
+              },
+            });
+          }
+        } catch (error) {
+          console.error("Delete error", error);
+          Swal.fire({
+            title: "Error!",
+            text: "Something went wrong while deleting.",
+            icon: "error",
+            confirmButtonText: "OK",
+            background: "rgba(255, 255, 255, 0.1)",
+            backdrop: "rgba(0, 0, 0, 0.4)",
+            customClass: {
+              popup: "glassmorphic-popup",
+              title: "glassmorphic-title",
+              htmlContainer: "glassmorphic-text",
+              confirmButton: "glassmorphic-button",
+            },
+          });
+        }
+      }
+    });
   };
 
   //--------- filter entries based on category --------
-  const filteredEntries = selectedCategory === "All Categories" 
-    ? entries 
-    : entries.filter((entry) => entry?.category === selectedCategory);
+  const filteredEntries =
+    selectedCategory === "All Categories"
+      ? entries
+      : entries.filter((entry) => entry?.category === selectedCategory);
 
   //--------- statistics calculations --------
   const getCategoryStats = (): CategoryStats => {
@@ -107,7 +171,9 @@ const JournalList: React.FC = () => {
           <div className="flex items-center justify-between mb-6">
             <span className="text-gray-400">Your Journal Entries</span>
             <div className="flex items-center gap-2">
-              <span className="text-gray-400"><FaFilter /></span>
+              <span className="text-gray-400">
+                <FaFilter />
+              </span>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
@@ -184,7 +250,9 @@ const JournalList: React.FC = () => {
                   return (
                     <div key={category} className="flex items-center gap-3">
                       <div
-                        className={`w-3 h-3 ${colors[index % colors.length]} rounded-full`}
+                        className={`w-3 h-3 ${
+                          colors[index % colors.length]
+                        } rounded-full`}
                       ></div>
                       <span className="text-gray-300 flex-1">{category}</span>
                       <span className="text-white font-mono">
@@ -226,7 +294,10 @@ const JournalList: React.FC = () => {
                     <div
                       className="bg-yellow-600 h-2 rounded-full"
                       style={{
-                        width: totalEntries > 0 ? `${(thisMonthCount / totalEntries) * 100}%` : '0%',
+                        width:
+                          totalEntries > 0
+                            ? `${(thisMonthCount / totalEntries) * 100}%`
+                            : "0%",
                       }}
                     ></div>
                   </div>
@@ -243,7 +314,10 @@ const JournalList: React.FC = () => {
                     <div
                       className="bg-yellow-600 h-2 rounded-full"
                       style={{
-                        width: totalEntries > 0 ? `${(lastWeekCount / totalEntries) * 100}%` : '0%',
+                        width:
+                          totalEntries > 0
+                            ? `${(lastWeekCount / totalEntries) * 100}%`
+                            : "0%",
                       }}
                     ></div>
                   </div>

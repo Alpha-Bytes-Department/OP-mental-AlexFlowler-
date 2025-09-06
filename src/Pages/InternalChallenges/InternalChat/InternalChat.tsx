@@ -105,6 +105,8 @@ const InternalChat = () => {
         session_id: params.session_id,
       });
 
+      console.log("debuging internal challenge....", response);
+
       // Fetch all messages after sending
       const res = await axios.get(`/api/internal-challenge/${params.session_id}/`);
 

@@ -7,6 +7,7 @@ import { IoLockClosedOutline } from "react-icons/io5";
 import { useForm } from "react-hook-form";
 import { useAxios } from "../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
+import { GoogleBtnBackend } from "../Login/Google";
 
 type Inputs = {
   email: string;
@@ -158,11 +159,8 @@ const Signup = () => {
             </Link>
           </p>
           <div className="flex flex-col gap-4 mt-8">
-            <button className="flex items-center text-black text-sm font-medium justify-center gap-2 bg-cCard rounded-[6px] py-5 ">
-              {/* =========================== Google Login ================================ */}
-              <FcGoogle />
-              <span className="font-inter">Continue with Google</span>
-            </button>
+             <GoogleBtnBackend/>
+            
           </div>
           <div className="divider divider-accent py-7 px-10">OR</div>
           <form

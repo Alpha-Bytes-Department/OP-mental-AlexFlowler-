@@ -169,6 +169,7 @@ const JournalChat = () => {
           message: trimmedMessage,
           session_id: parseInt(params.session_id),
         });
+        
 
         console.log("Response:........", response);
 
@@ -242,8 +243,8 @@ const JournalChat = () => {
       } finally {
         setIsLoading(false);
       }
-    }else{
-      return ;
+    } else {
+      return;
     }
   };
 

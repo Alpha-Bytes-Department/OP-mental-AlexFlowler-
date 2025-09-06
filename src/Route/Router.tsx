@@ -18,6 +18,7 @@ import InternalHome from "../Pages/InternalChallenges/InternalHome/InternalHome"
 import InternalChat from "../Pages/InternalChallenges/InternalChat/InternalChat";
 import Payment from "../Pages/Payment/Payment";
 import PrivateRoute from "../Pages/Chat/PrivateRoute";
+import JournalDetails from "../Pages/Journal/JournalDetails/JournalDetails";
 // import UserVerify from "../Pages/MailVerifiy/UserVerify";
 
 const Router = createBrowserRouter([
@@ -76,6 +77,10 @@ const Router = createBrowserRouter([
       {
         path: "/chat/journal/list",
         element: <JournalList />,
+      },
+      {
+        path: "/chat/journal/details/:session_id",
+        element: <JournalDetails />,
       },
       {
         path: "/chat/mindsetChat/home",

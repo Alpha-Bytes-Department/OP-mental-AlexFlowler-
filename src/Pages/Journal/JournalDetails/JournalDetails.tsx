@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { FaArrowUp } from "react-icons/fa6";
 import logo from "../../../../public/image.png";
-import { useNavigate, useParams } from "react-router-dom";
 import { useAxios } from "../../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
+import { useParams } from "react-router-dom";
 
 // ----type declaration---------
 interface Message {
@@ -18,17 +17,13 @@ interface JournalEntry {
   message: string;
 }
 
-const JournalChat = () => {
+const JournalDetails = () => {
   //--------states--------
   const [messages, setMessages] = useState<Message[]>([]); // stores chat messages
-  const [completed, setCompleted] = useState(false);
-  const [inputMessage, setInputMessage] = useState<string>(""); // handles input field text
   const [initialLoading, setInitialLoading] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Add loading state for sending messages
   const messagesEndRef = useRef<HTMLDivElement>(null); // ref for auto-scroll
   const axios = useAxios();
   const params = useParams();
-  const navigate = useNavigate();
 
   //--------- auto-scroll function --------
   const scrollToBottom = useCallback(() => {
@@ -47,8 +42,6 @@ const JournalChat = () => {
       const response = await axios.get(
         `api/journaling/sessions/${params.session_id}/`
       );
-
-      console.log("console log for debugging...........", response);
 
       if (response.status === 200 && response.data) {
         const transformedMessages: Message[] = []; // array for storing message
@@ -127,134 +120,7 @@ const JournalChat = () => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  //--------- input change handler --------
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputMessage(e.target.value);
-  };
 
-  //--------- message send handler --------
-  const handleSendMessage = async () => {
-    const trimmedMessage = inputMessage.trim();
-    if (!trimmedMessage || isLoading) return;
-
-    // Prevent sending if already loading
-    setIsLoading(true);
-
-    // Generate unique ID for user message
-    const userMessageId = `user-${Date.now()}`;
-    const botMessageId = `bot-${Date.now() + 1}`;
-
-    // Add user message
-    const userMessage: Message = {
-      id: userMessageId,
-      message: trimmedMessage,
-      sender: "user",
-      status: "success",
-    };
-
-    // Add loading bot message
-    const loadingBotMessage: Message = {
-      id: botMessageId,
-      message: "Thinking",
-      sender: "bot",
-      status: "loading",
-    };
-
-    setMessages((prev) => [...prev, userMessage, loadingBotMessage]);
-    setInputMessage("");
-
-    if (params.session_id) {
-      try {
-        const response = await axios.post("api/journaling/chat/", {
-          message: trimmedMessage,
-          session_id: parseInt(params.session_id),
-        });
-        
-
-        console.log("Response:........", response);
-
-        if (response.status === 208) {
-          // Remove loading message on limit reached
-          setMessages((prev) => prev.filter((msg) => msg.id !== botMessageId));
-
-          const result = await Swal.fire({
-            title: "Subscribe for chat",
-            text: response.data.reply,
-            icon: "info",
-            confirmButtonText: "OK",
-            showCancelButton: true,
-            background: "rgba(255, 255, 255, 0.1)",
-            backdrop: "rgba(0, 0, 0, 0.4)",
-            customClass: {
-              popup: "glassmorphic-popup",
-              title: "glassmorphic-title",
-              htmlContainer: "glassmorphic-text",
-              confirmButton: "glassmorphic-button",
-            },
-          });
-
-          if (result.isConfirmed) {
-            navigate("/", { replace: false });
-            setTimeout(() => {
-              const pricingElement = document.getElementById("pricing");
-              if (pricingElement) {
-                pricingElement.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                });
-              }
-            }, 500);
-          }
-          return;
-        }
-
-        // Check if session is complete
-        if (response.data?.is_complete === true) {
-          setCompleted(true);
-        }
-
-        // Update the loading message with the actual response
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === botMessageId
-              ? {
-                  ...msg,
-                  message: response.data?.reply || "I received your message!",
-                  status: "success" as const,
-                }
-              : msg
-          )
-        );
-      } catch (error) {
-        console.error("Error sending message:", error);
-
-        // Update loading message to show error
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === botMessageId
-              ? {
-                  ...msg,
-                  message: "Failed to get response. Please try again.",
-                  status: "error" as const,
-                }
-              : msg
-          )
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
-      return;
-    }
-  };
-
-  //--------- enter key handler --------
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
 
   //-------------showing loading status-----------
   return initialLoading ? (
@@ -329,11 +195,6 @@ const JournalChat = () => {
                         item.message
                       )}
                     </p>
-                    {completed && item.sender === "bot" && (
-                      <p className="text-red-600 text-xs mt-2">
-                        Your session is complete
-                      </p>
-                    )}
                   </div>
                 </div>
               ))}
@@ -353,31 +214,8 @@ const JournalChat = () => {
           )}
         </div>
       </div>
-
-      {/* --------------- Input area ---------------------- */}
-      <div className="p-4 mb-15 lg:mb-0">
-        <div className="max-w-3xl mx-auto flex gap-4 rounded-lg bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm p-4">
-          <input
-            type="text"
-            value={inputMessage}
-            onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
-            placeholder="Type your message..."
-            disabled={isLoading}
-            className="w-full py-2 sm:py-3 lg:py-4 pl-2 sm:pl-4 pr-8 sm:pr-12 text-sm sm:text-base text-white bg-white/20 backdrop-blur-md rounded-lg sm:rounded-xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300 disabled:opacity-50"
-          />
-          <button
-            type="submit"
-            onClick={handleSendMessage}
-            disabled={isLoading || !inputMessage.trim()}
-            className="bg-cCard disabled:bg-cCard/20 disabled:cursor-not-allowed text-white rounded-md sm:rounded-lg p-1.5 sm:p-2 md:p-2.5 lg:p-3 transition-colors"
-          >
-            <FaArrowUp className="text-black w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-          </button>
-        </div>
-      </div>
     </div>
   );
 };
 
-export default JournalChat;
+export default JournalDetails;

@@ -18,15 +18,6 @@ interface JournalEntry {
   message: string;
 }
 
-interface ApiResponse {
-  Entries?: JournalEntry[];
-}
-
-interface ChatResponse {
-  reply: string;
-  is_complete?: boolean;
-}
-
 const JournalChat = () => {
   //--------states--------
   const [messages, setMessages] = useState<Message[]>([]); // stores chat messages
@@ -46,7 +37,6 @@ const JournalChat = () => {
 
   //---------------getting chat at initial loading---------
   const initialLoadingMessage = useCallback(async () => {
-
     if (!params?.session_id) {
       console.error("No session ID provided");
       return;
@@ -62,13 +52,15 @@ const JournalChat = () => {
 
       if (response.status === 200 && response.data) {
         const transformedMessages: Message[] = []; // array for storing message
-        
+
         // More robust checking for Entries
         if (response.data.Entries && Array.isArray(response.data.Entries)) {
-          console.log("Processing entries, length:", response.data.Entries.length);
-          
+          console.log(
+            "Processing entries, length:",
+            response.data.Entries.length
+          );
+
           response.data.Entries.forEach((item: JournalEntry, index: number) => {
-            
             if (item?.author && item?.message) {
               const transformedMessage = {
                 id: `${item.author}-${index}-${Date.now()}`, // More unique ID
@@ -79,25 +71,33 @@ const JournalChat = () => {
               console.log("Adding transformed message:", transformedMessage);
               transformedMessages.push(transformedMessage);
             } else {
-              console.warn(`Skipping entry ${index} due to missing author or message:`, item);
+              console.warn(
+                `Skipping entry ${index} due to missing author or message:`,
+                item
+              );
             }
           });
         } else {
           console.warn("No valid entries found in response data");
           // Check if the data structure is different than expected
-          console.log("Available keys in response.data:", Object.keys(response.data || {}));
+          console.log(
+            "Available keys in response.data:",
+            Object.keys(response.data || {})
+          );
         }
-        
+
         console.log("Final transformed messages:", transformedMessages);
         setMessages(transformedMessages);
       } else {
-        console.warn("Unexpected response status or no data:", response.status, response.data);
+        console.warn(
+          "Unexpected response status or no data:",
+          response.status,
+          response.data
+        );
       }
-      
     } catch (error) {
       console.error("Error loading initial messages:", error);
-      
-      
+
       Swal.fire({
         title: "Error!",
         text: "Something went wrong loading the chat history. Please try again.",
@@ -139,7 +139,7 @@ const JournalChat = () => {
 
     // Prevent sending if already loading
     setIsLoading(true);
-    
+
     // Generate unique ID for user message
     const userMessageId = `user-${Date.now()}`;
     const botMessageId = `bot-${Date.now() + 1}`;
@@ -163,83 +163,87 @@ const JournalChat = () => {
     setMessages((prev) => [...prev, userMessage, loadingBotMessage]);
     setInputMessage("");
 
-    try {
-      const response = await axios.post("api/journaling/chat/", {
-        message: trimmedMessage,
-        session_id: params?.session_id,
-      });
-
-      console.log("Response:........", response);
-
-      if (response.status === 208) {
-        // Remove loading message on limit reached
-        setMessages((prev) => prev.filter((msg) => msg.id !== botMessageId));
-        
-        const result = await Swal.fire({
-          title: "Subscribe for chat",
-          text: response.data.reply,
-          icon: "info",
-          confirmButtonText: "OK",
-          showCancelButton: true,
-          background: "rgba(255, 255, 255, 0.1)",
-          backdrop: "rgba(0, 0, 0, 0.4)",
-          customClass: {
-            popup: "glassmorphic-popup",
-            title: "glassmorphic-title",
-            htmlContainer: "glassmorphic-text",
-            confirmButton: "glassmorphic-button",
-          },
+    if (params.session_id) {
+      try {
+        const response = await axios.post("api/journaling/chat/", {
+          message: trimmedMessage,
+          session_id: parseInt(params.session_id),
         });
 
-        if (result.isConfirmed) {
-          navigate("/", { replace: false });
-          setTimeout(() => {
-            const pricingElement = document.getElementById("pricing");
-            if (pricingElement) {
-              pricingElement.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-              });
-            }
-          }, 500);
+        console.log("Response:........", response);
+
+        if (response.status === 208) {
+          // Remove loading message on limit reached
+          setMessages((prev) => prev.filter((msg) => msg.id !== botMessageId));
+
+          const result = await Swal.fire({
+            title: "Subscribe for chat",
+            text: response.data.reply,
+            icon: "info",
+            confirmButtonText: "OK",
+            showCancelButton: true,
+            background: "rgba(255, 255, 255, 0.1)",
+            backdrop: "rgba(0, 0, 0, 0.4)",
+            customClass: {
+              popup: "glassmorphic-popup",
+              title: "glassmorphic-title",
+              htmlContainer: "glassmorphic-text",
+              confirmButton: "glassmorphic-button",
+            },
+          });
+
+          if (result.isConfirmed) {
+            navigate("/", { replace: false });
+            setTimeout(() => {
+              const pricingElement = document.getElementById("pricing");
+              if (pricingElement) {
+                pricingElement.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }
+            }, 500);
+          }
+          return;
         }
-        return;
-      }
 
-      // Check if session is complete
-      if (response.data?.is_complete === true) {
-        setCompleted(true);
-      }
+        // Check if session is complete
+        if (response.data?.is_complete === true) {
+          setCompleted(true);
+        }
 
-      // Update the loading message with the actual response
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === botMessageId
-            ? {
-                ...msg,
-                message: response.data?.reply || "I received your message!",
-                status: "success" as const,
-              }
-            : msg
-        )
-      );
-    } catch (error) {
-      console.error("Error sending message:", error);
-      
-      // Update loading message to show error
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === botMessageId
-            ? {
-                ...msg,
-                message: "Failed to get response. Please try again.",
-                status: "error" as const,
-              }
-            : msg
-        )
-      );
-    } finally {
-      setIsLoading(false);
+        // Update the loading message with the actual response
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === botMessageId
+              ? {
+                  ...msg,
+                  message: response.data?.reply || "I received your message!",
+                  status: "success" as const,
+                }
+              : msg
+          )
+        );
+      } catch (error) {
+        console.error("Error sending message:", error);
+
+        // Update loading message to show error
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === botMessageId
+              ? {
+                  ...msg,
+                  message: "Failed to get response. Please try again.",
+                  status: "error" as const,
+                }
+              : msg
+          )
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    }else{
+      return ;
     }
   };
 
@@ -251,25 +255,26 @@ const JournalChat = () => {
     }
   };
 
-
   //-------------showing loading status-----------
-  return (
-    initialLoading ? <div className="h-screen flex items-center justify-center text-white">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="flex space-x-2">
-            <div className="w-3 h-3 bg-white rounded-full animate-bounce"></div>
-            <div
-              className="w-3 h-3 bg-white rounded-full animate-bounce"
-              style={{ animationDelay: "0.1s" }}
-            ></div>
-            <div
-              className="w-3 h-3 bg-white rounded-full animate-bounce"
-              style={{ animationDelay: "0.2s" }}
-            ></div>
-          </div>
-          <p className="text-lg">Loading chat history...</p>
+  return initialLoading ? (
+    <div className="h-screen flex items-center justify-center text-white">
+      <div className="flex flex-col items-center space-y-4">
+        <div className="flex space-x-2">
+          <div className="w-3 h-3 bg-white rounded-full animate-bounce"></div>
+          <div
+            className="w-3 h-3 bg-white rounded-full animate-bounce"
+            style={{ animationDelay: "0.1s" }}
+          ></div>
+          <div
+            className="w-3 h-3 bg-white rounded-full animate-bounce"
+            style={{ animationDelay: "0.2s" }}
+          ></div>
         </div>
-      </div> : <div className="flex flex-col h-screen">
+        <p className="text-lg">Loading chat history...</p>
+      </div>
+    </div>
+  ) : (
+    <div className="flex flex-col h-screen">
       <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
         <div className="flex flex-col items-center gap-3">
           <img
@@ -279,7 +284,7 @@ const JournalChat = () => {
           />
         </div>
       </div>
-      
+
       {/* --------------- Messages area ---------------------- */}
       <div className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 pb-24">
         <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto min-h-full">
@@ -309,11 +314,11 @@ const JournalChat = () => {
                           {item.message}
                           <span className="flex space-x-1">
                             <span className="w-1 h-1 bg-current rounded-full animate-bounce inline-block"></span>
-                            <span 
+                            <span
                               className="w-1 h-1 bg-current rounded-full animate-bounce inline-block"
                               style={{ animationDelay: "0.1s" }}
                             ></span>
-                            <span 
+                            <span
                               className="w-1 h-1 bg-current rounded-full animate-bounce inline-block"
                               style={{ animationDelay: "0.2s" }}
                             ></span>
@@ -324,7 +329,9 @@ const JournalChat = () => {
                       )}
                     </p>
                     {completed && item.sender === "bot" && (
-                      <p className="text-red-600 text-xs mt-2">Your session is complete</p>
+                      <p className="text-red-600 text-xs mt-2">
+                        Your session is complete
+                      </p>
                     )}
                   </div>
                 </div>

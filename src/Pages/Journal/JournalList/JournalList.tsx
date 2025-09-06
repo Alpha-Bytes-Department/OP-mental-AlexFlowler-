@@ -3,6 +3,8 @@ import { MdDelete } from "react-icons/md";
 import { FaFilter } from "react-icons/fa";
 import { useAxios } from "../../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
+import { Link } from "react-router-dom";
+import { SiGoogledocs } from "react-icons/si";
 
 // ----type declarations---------
 interface JournalEntry {
@@ -220,9 +222,19 @@ const JournalList: React.FC = () => {
                 <div className="col-span-3 text-gray-400 text-sm">
                   {entry?.created_at?.split("T")[0]}
                 </div>
-                <div className="col-span-2">
+                <div className="col-span-2 flex justify-between items-center ">
+                  <Link 
+                    to={`/chat/journal/details/${entry?.id}`}
+                    className="transition-colors p-1 cursor-pointer"
+                    title="View Details"
+                  >
+                    <SiGoogledocs />
+                  </Link >
                   <button
-                    onClick={() => deleteEntry(entry.id)}
+                    onClick={(event) =>{
+                      event.preventDefault()
+                      return deleteEntry(entry.id)
+                    }}
                     className="text-red-400 hover:text-red-300 transition-colors p-1 cursor-pointer"
                     title="Delete entry"
                   >

@@ -12,7 +12,8 @@ interface Message {
   phase?: string;
   question?: string;
   response?: string;
-  is_session_complete?: boolean
+  summary?: string;
+  is_session_complete?: boolean;
 }
 
 const InternalChat = () => {
@@ -20,7 +21,7 @@ const InternalChat = () => {
   const [messages, setMessages] = useState<Message[]>([]); // stores chat messages
   const [inputMessage, setInputMessage] = useState(""); // handles input field text
   const [isLoading, setIsLoading] = useState(false); // loading state for sending messages
-  const [isSessionComplete, setIsSessionComplete] = useState(false)
+  const [isSessionComplete, setIsSessionComplete] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true); // loading state for initial data fetch
   const messagesEndRef = useRef<HTMLDivElement>(null); // ref for auto-scroll
   const axios = useAxios();
@@ -58,9 +59,11 @@ const InternalChat = () => {
 
       try {
         setIsInitialLoading(true);
-        const res = await axios.get(`/api/internal-challenge/${params.session_id}/`);
+        const res = await axios.get(
+          `/api/internal-challenge/${params.session_id}/`
+        );
         console.log("response when initial loading", res);
-        
+
         if (res?.data) {
           setMessages(Array.isArray(res.data) ? res.data : []);
         }
@@ -108,10 +111,11 @@ const InternalChat = () => {
       console.log("debuging internal challenge....", response);
 
       // Fetch all messages after sending
-      const res = await axios.get(`/api/internal-challenge/${params.session_id}/`);
+      const res = await axios.get(
+        `/api/internal-challenge/${params.session_id}/`
+      );
 
       console.log("get response checking.......", res);
-
 
       if (res?.data) {
         setMessages(Array.isArray(res.data) ? res.data : []);
@@ -119,14 +123,13 @@ const InternalChat = () => {
 
       const length = messages.length;
 
-      if(length > 0 && messages[length-1].is_session_complete === true){
-          setIsSessionComplete(true);
+      if (length > 0 && messages[length - 1].is_session_complete === true) {
+        setIsSessionComplete(true);
       }
-
     } catch (error) {
       // Restore the message in input on error
       setInputMessage(messageToSend);
-      
+
       Swal.fire({
         title: "Error!",
         text: "Something went wrong. Please try again.",
@@ -208,7 +211,7 @@ const InternalChat = () => {
             messages.map((message, index: number) => {
               const showPhase =
                 index === 0 || message?.phase !== messages[index - 1]?.phase;
-              
+
               return (
                 <React.Fragment key={`message-${index}`}>
                   {/* ---------- Showing message after trigger start --------------*/}
@@ -239,6 +242,12 @@ const InternalChat = () => {
                         </p>
                       )}
                     </div>
+                  )}
+                  {/*------------------- showing summery-------------------  */}
+                  {message?.summary && (
+                    <h1 className=" text-white px-20 py-3 rounded bg-[#b94326] text-center">
+                      {message.phase}
+                    </h1>
                   )}
 
                   {/* ---------------- Showing user response--------------- */}
@@ -277,11 +286,11 @@ const InternalChat = () => {
             onKeyPress={handleKeyPress}
             disabled={isLoading || isSessionComplete}
             placeholder={
-              isSessionComplete 
-                ? "Chat session has ended" 
-                : isLoading 
-                  ? "Sending..." 
-                  : "Type your message..."
+              isSessionComplete
+                ? "Chat session has ended"
+                : isLoading
+                ? "Sending..."
+                : "Type your message..."
             }
             className="w-full py-2 sm:py-3 lg:py-4 pl-2 sm:pl-4 pr-8 sm:pr-12 text-sm sm:text-base text-white bg-white/20 backdrop-blur-md rounded-lg sm:rounded-xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
           />

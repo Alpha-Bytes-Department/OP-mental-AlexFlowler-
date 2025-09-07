@@ -158,7 +158,7 @@ const MindsetChat = () => {
             }
           });
         }
-        console.log("response for complete",response);
+        console.log("response for complete", response);
         if (response?.data.is_complete === true) {
           setCompleted(true);
         }
@@ -254,7 +254,9 @@ const MindsetChat = () => {
                         : "bg-transparent border border-cCard text-white mr-auto"
                     }`}
                   >
-                    {<p>{item.message}</p>}
+                    {item.message.split("\n").map((line, index) => (
+                      <p key={index} className="my-2">{line}</p>
+                    ))}
                     {completed && (
                       <p className="text-red-600">Your session is complete</p>
                     )}

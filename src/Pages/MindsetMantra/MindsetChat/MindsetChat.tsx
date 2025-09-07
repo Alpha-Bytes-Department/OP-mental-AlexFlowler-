@@ -255,7 +255,7 @@ const MindsetChat = () => {
                     }`}
                   >
                     {item.message.split("\n").map((line, index) => (
-                      <p key={index} className="my-2">{line}</p>
+                      <p key={index} className="space-x-1">{line}</p>
                     ))}
                     {completed && (
                       <p className="text-red-600">Your session is complete</p>

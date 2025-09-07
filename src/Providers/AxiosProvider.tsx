@@ -56,11 +56,13 @@ const axiosInstance = axios.create({
   withCredentials: false,
 });
 
+const pathNotNeedToken = window.location.pathname === "/" || window.location.pathname === "/login" || window.location.pathname === "/regenser"
+
 axiosInstance.interceptors.request.use(
   (config) => {
     const token =
       typeof window !== "undefined" ? localStorage.getItem("access") : null;
-    if (token) {
+    if (token && !pathNotNeedToken) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 

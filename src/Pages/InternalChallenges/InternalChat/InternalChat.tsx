@@ -110,6 +110,8 @@ const InternalChat = () => {
       // Fetch all messages after sending
       const res = await axios.get(`/api/internal-challenge/${params.session_id}/`);
 
+      console.log("get response checking.......", res);
+
 
       if (res?.data) {
         setMessages(Array.isArray(res.data) ? res.data : []);

@@ -107,7 +107,7 @@ const JournalOptions = () => {
       <h1>Choose Journal Category</h1>
       {/* --------------- Journal options---------------------- */}
       <Form className="flex flex-col gap-5 w-full overflow-y-auto max-h-[70vh] pb-5">
-        <label className="py-5 bg-[#2D2D2D] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
+        <label className="py-5 bg-[#2D2D2D] border border-[ #DBD0A6] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
           <span>Personal win</span>
           <input
             type="radio"
@@ -118,7 +118,7 @@ const JournalOptions = () => {
             disabled={loading}
           />
         </label>
-        <label className="py-5 bg-[#2D2D2D] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
+        <label className="py-5 bg-[#2D2D2D] border border-[ #DBD0A6] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
           <span>Personal Challenge</span>
           <input
             type="radio"
@@ -129,7 +129,7 @@ const JournalOptions = () => {
             disabled={loading}
           />
         </label>
-        <label className="py-5 bg-[#2D2D2D] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
+        <label className="py-5 bg-[#2D2D2D] border border-[ #DBD0A6] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
           <span>Professional Win</span>
           <input
             type="radio"
@@ -140,7 +140,7 @@ const JournalOptions = () => {
             disabled={loading}
           />
         </label>
-        <label className="py-5 bg-[#2D2D2D] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
+        <label className="py-5 bg-[#2D2D2D] border border-[ #DBD0A6] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
           <span>Professional Challenges</span>
           <input
             type="radio"

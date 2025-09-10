@@ -50,7 +50,7 @@ const UserVerifyContent = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        `/api/users/password/reset/confirm/${uid}/${token}`,
+        `/api/users/pass-reset/${uid}/${token}`,
         { new_password: password, new_password_confirm: confirmPassword }
       );
       if (response.status === 200) {

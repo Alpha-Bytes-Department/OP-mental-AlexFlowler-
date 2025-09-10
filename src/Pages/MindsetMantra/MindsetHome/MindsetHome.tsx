@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import logo from "../../../../public/image.png";
+import logo from "../../../../public/bgLogo.svg";
 import { useAxios } from "../../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
 
@@ -43,7 +43,7 @@ const MindsetHome = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div className="flex flex-col items-center gap-3">
           <img
             src={logo}

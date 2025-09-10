@@ -1,5 +1,5 @@
 import { Form, useNavigate } from "react-router-dom";
-import { FaBook } from "react-icons/fa6";
+import logo from "../../../../public/bgLogo.svg";
 import { useAxios } from "../../../Providers/AxiosProvider";
 import { useState } from "react";
 import Swal from "sweetalert2";
@@ -98,16 +98,25 @@ const JournalOptions = () => {
   }
 
   return (
-    <div className="flex flex-col gap-5 items-center min-h-screen mt-10">
+    <div className="flex flex-col gap-5 items-center min-h-screen mt-20  xl:mt-46">
+      {/*-------- background image--------- */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="flex flex-col items-center gap-3">
+          <img
+            src={logo}
+            alt="Mindset chat background"
+            className=" lg:ms-64 h-[400px] w-[400px] lg:h-[600px] lg:w-[600px]"
+          />
+        </div>
+      </div>
       {/* ---------------- Header with icon----------------- */}
       <div className="flex flex-col justify-center items-center">
-        <FaBook className="text-[#dbd0a6]" fontSize={40} />
-        <span className="text-2xl">Journal</span>
+        <span className="text-6xl">Journal</span>
       </div>
-      <h1>Choose Journal Category</h1>
       {/* --------------- Journal options---------------------- */}
-      <Form className="flex flex-col gap-5 w-full overflow-y-auto max-h-[70vh] pb-5">
-        <label className="py-5 bg-[#2D2D2D] border border-[ #DBD0A6] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
+      <Form className="flex flex-col gap-5  overflow-y-auto max-h-[70vh]">
+        <p className="text-center text-lg">Choose Journal Category</p>
+        <label className="py-5 border border-[#DBD0A6] bg-gradient-to-r from-[#DBD0A6] to-[#756F59] w-xs lg:w-lg rounded text-center  cursor-pointer hover:bg-[#3D3D3D] transition-colors">
           <span>Personal win</span>
           <input
             type="radio"
@@ -118,7 +127,7 @@ const JournalOptions = () => {
             disabled={loading}
           />
         </label>
-        <label className="py-5 bg-[#2D2D2D] border border-[ #DBD0A6] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
+        <label className="py-5 border border-[#DBD0A6] bg-gradient-to-r from-[#DBD0A6] to-[#756F59] w-xs lg:w-lg rounded text-center  cursor-pointer hover:bg-[#3D3D3D] transition-colors">
           <span>Personal Challenge</span>
           <input
             type="radio"
@@ -129,7 +138,7 @@ const JournalOptions = () => {
             disabled={loading}
           />
         </label>
-        <label className="py-5 bg-[#2D2D2D] border border-[ #DBD0A6] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
+        <label className="py-5 border border-[#DBD0A6] bg-gradient-to-r from-[#DBD0A6] to-[#756F59] w-xs lg:w-lg rounded text-center  cursor-pointer hover:bg-[#3D3D3D] transition-colors">
           <span>Professional Win</span>
           <input
             type="radio"
@@ -140,7 +149,7 @@ const JournalOptions = () => {
             disabled={loading}
           />
         </label>
-        <label className="py-5 bg-[#2D2D2D] border border-[ #DBD0A6] rounded text-center mx-20 cursor-pointer hover:bg-[#3D3D3D] transition-colors">
+        <label className="py-5 border border-[#DBD0A6] bg-gradient-to-r from-[#DBD0A6] to-[#756F59] w-xs lg:w-lg rounded text-center  cursor-pointer hover:bg-[#3D3D3D] transition-colors">
           <span>Professional Challenges</span>
           <input
             type="radio"

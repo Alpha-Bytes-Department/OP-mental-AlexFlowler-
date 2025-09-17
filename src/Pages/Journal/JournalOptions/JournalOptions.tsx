@@ -117,7 +117,7 @@ const JournalOptions = () => {
       <Form className="flex flex-col gap-5  overflow-y-auto max-h-[70vh]">
         <p className="text-center text-lg">Choose Journal Category</p>
         <label className="py-5 border border-[#DBD0A6] bg-gradient-to-r from-[#DBD0A6] to-[#756F59] w-xs lg:w-lg rounded text-center  cursor-pointer hover:bg-[#3D3D3D] transition-colors">
-          <span>Personal win</span>
+          <span className="text-black">Personal win</span>
           <input
             type="radio"
             name="category"
@@ -127,7 +127,7 @@ const JournalOptions = () => {
             disabled={loading}
           />
         </label>
-        <label className="py-5 border border-[#DBD0A6] bg-gradient-to-r from-[#DBD0A6] to-[#756F59] w-xs lg:w-lg rounded text-center  cursor-pointer hover:bg-[#3D3D3D] transition-colors">
+        <label className="py-5 border text-black border-[#DBD0A6] bg-gradient-to-r from-[#DBD0A6] to-[#756F59] w-xs lg:w-lg rounded text-center  cursor-pointer hover:bg-[#3D3D3D] transition-colors">
           <span>Personal Challenge</span>
           <input
             type="radio"
@@ -138,7 +138,7 @@ const JournalOptions = () => {
             disabled={loading}
           />
         </label>
-        <label className="py-5 border border-[#DBD0A6] bg-gradient-to-r from-[#DBD0A6] to-[#756F59] w-xs lg:w-lg rounded text-center  cursor-pointer hover:bg-[#3D3D3D] transition-colors">
+        <label className="py-5 text-black border border-[#DBD0A6] bg-gradient-to-r from-[#DBD0A6] to-[#756F59] w-xs lg:w-lg rounded text-center  cursor-pointer hover:bg-[#3D3D3D] transition-colors">
           <span>Professional Win</span>
           <input
             type="radio"
@@ -149,7 +149,7 @@ const JournalOptions = () => {
             disabled={loading}
           />
         </label>
-        <label className="py-5 border border-[#DBD0A6] bg-gradient-to-r from-[#DBD0A6] to-[#756F59] w-xs lg:w-lg rounded text-center  cursor-pointer hover:bg-[#3D3D3D] transition-colors">
+        <label className="py-5 text-black border border-[#DBD0A6] bg-gradient-to-r from-[#DBD0A6] to-[#756F59] w-xs lg:w-lg rounded text-center  cursor-pointer hover:bg-[#3D3D3D] transition-colors">
           <span>Professional Challenges</span>
           <input
             type="radio"

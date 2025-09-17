@@ -20,6 +20,15 @@
   --hCard: #8e7d3f;
 }
 
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+html,body{
+  scrollbar-width: none;
+  -ms-overflow-style: none
+}
 /* Base font styles */
 body {
   font-family: var(--font-inter);

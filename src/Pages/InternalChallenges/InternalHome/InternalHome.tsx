@@ -46,7 +46,7 @@ const InternalHome = () => {
           />
         </div>
       </div>
-      <div className="flex flex-col justify-center items-center min-h-screen gap-3 z-50">
+      <div className="flex flex-col justify-center items-center min-h-screen gap-3 z-30">
         <h1 className="text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-league-gothic">
           Internal Challenge
         </h1>

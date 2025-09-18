@@ -19,7 +19,7 @@ import InternalChat from "../Pages/InternalChallenges/InternalChat/InternalChat"
 import Payment from "../Pages/Payment/Payment";
 import PrivateRoute from "../Pages/Chat/PrivateRoute";
 import JournalDetails from "../Pages/Journal/JournalDetails/JournalDetails";
-// import UserVerify from "../Pages/MailVerifiy/UserVerify";
+import UserVerify from "../Pages/MailVerifiy/UserVerify";
 
 const Router = createBrowserRouter([
   {
@@ -35,6 +35,10 @@ const Router = createBrowserRouter([
         path: "/verify",
         element: <Verify />,
       },
+      {
+        path:"/api/users/pass-reset",
+        element:<UserVerify />
+      }
     ],
   },
   {

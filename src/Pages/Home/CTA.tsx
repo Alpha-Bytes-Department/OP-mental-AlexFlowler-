@@ -32,7 +32,7 @@ const CTA = () => {
           </h1>
           <div className="flex justify-center ">
               <button 
-                className="mt-10  px-20 py-2 bg-cCard text-black rounded-lg"
+                className="mt-10  px-14 py-2 bg-cCard text-black rounded-lg"
                 onClick={scrollToPricing}
               >
                 Start Subscription

@@ -2,7 +2,8 @@ import { IoCheckmarkCircleOutline } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import { useAxios } from "../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
-import {  useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../Providers/AuthProvider";
 
 // type declaration
 interface Feature {
@@ -34,11 +35,12 @@ const Pricing = () => {
   const [planDuration, setPlanDuration] = useState<"monthly" | "yearly">(
     "monthly"
   );
-
+  const { user } = useAuth();
 
   const [subscriptionData, setSubscriptionData] = useState<Feature[]>([]);
   const [displayPlan, setDisplayPlan] = useState<PlanData | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const getPriceCardData = async () => {
@@ -116,10 +118,34 @@ const Pricing = () => {
     plansToRender.push(displayPlan);
   }
 
-  const handlePlanClick = async(plan: PlanData) => {
-    // Handle plan click event (e.g., navigate to checkout)
-    console.log("Selected plan:", plan);
-
+  const handlePlanClick = async (plan: PlanData) => {
+    // Swal.fire
+    if (!user) {
+      console.log("user is not finding",user);
+       Swal.fire({
+        title: "Authentication Required",
+        text: "You must be logged in to access this page.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Go to Login",
+        cancelButtonText: "Go to Home",
+        background: "rgba(255, 255, 255, 0.1)",
+        backdrop: "rgba(0, 0, 0, 0.4)",
+        customClass: {
+          popup: "glassmorphic-popup",
+          title: "glassmorphic-title",
+          htmlContainer: "glassmorphic-text",
+          confirmButton: "glassmorphic-button",
+          cancelButton: "glassmorphic-button",
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/login", { state: { from: location }, replace: true });
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          navigate("/", { replace: true });
+        }
+      });
+    }
     // Navigate to checkout or perform any other action
     console.log(plan.title)
     if (plan.title !== "Corporate") {
@@ -188,21 +214,19 @@ const Pricing = () => {
       <div id="pricing" className="flex justify-center">
         <div className="flex rounded-xl p-1 backdrop:blur-2xl border gap-2 justify-center mb-12">
           <button
-            className={`px-8 py-3 bg-gradient-to-t  rounded-xl text-sm transition-colors duration-300 ${
-              planDuration === "monthly"
-                ? "from-[#8E7D3F] to-[#DBD0A6] text-black font-semibold "
-                : " text-gray-100 font-normal from-[#0706061a] to-[#FFFFFF1A]"
-            }`}
+            className={`px-8 py-3 bg-gradient-to-t  rounded-xl text-sm transition-colors duration-300 ${planDuration === "monthly"
+              ? "from-[#8E7D3F] to-[#DBD0A6] text-black font-semibold "
+              : " text-gray-100 font-normal from-[#0706061a] to-[#FFFFFF1A]"
+              }`}
             onClick={() => setPlanDuration("monthly")}
           >
             Monthly
           </button>
           <button
-            className={`px-8 py-3 bg-gradient-to-t   rounded-xl text-sm transition-colors duration-200 ${
-              planDuration === "yearly"
-                ? "from-[#8E7D3F] to-[#DBD0A6] text-black font-semibold "
-                : " text-gray-100 font-normal from-[#0706061a] to-[#FFFFFF1A]"
-            }`}
+            className={`px-8 py-3 bg-gradient-to-t   rounded-xl text-sm transition-colors duration-200 ${planDuration === "yearly"
+              ? "from-[#8E7D3F] to-[#DBD0A6] text-black font-semibold "
+              : " text-gray-100 font-normal from-[#0706061a] to-[#FFFFFF1A]"
+              }`}
             onClick={() => setPlanDuration("yearly")}
           >
             Yearly
@@ -214,9 +238,8 @@ const Pricing = () => {
         {plansToRender.map((plan, idx) => (
           <div
             key={idx}
-            className={`card-gradient group mx-6 w-96 rounded-3xl shadow-2xl transition-all duration-300 relative overflow-hidden ${
-              plan.recommended ? "recommended-card" : ""
-            }`}
+            className={`card-gradient  group mx-6 w-80 lg:w-96 rounded-3xl shadow-2xl transition-all duration-300 relative overflow-hidden ${plan.recommended ? "recommended-card" : ""
+              }`}
           >
             <div className="relative z-10 p-8">
               <div className="flex justify-start mb-6">
@@ -230,7 +253,18 @@ const Pricing = () => {
               <h1 className="text-3xl font-bold text-start text-white mb-2">
                 {plan.title}
               </h1>
-              <p className="text-start text-gray-300 mb-6">{plan.subtitle}</p>
+              <p className="text-start text-gray-300 mb-6 max-h-32 overflow-scroll scrollbar-hide">{plan.subtitle}</p>
+              <style>
+                {`
+                  .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                  }
+                  .scrollbar-hide {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                  }
+                `}
+              </style>
 
               <div className="text-start mb-8">
                 <span className="text-5xl font-bold text-white">
@@ -246,7 +280,7 @@ const Pricing = () => {
               <div className="flex justify-center mb-8">
                 <button
                   onClick={() => handlePlanClick(plan)}
-                 
+
                   className="w-full text-center py-3 rounded-full bg-gradient-to-t from-[#0706061a] to-[#FFFFFF1A] border-[1px] group-hover:from-[#8E7D3F] group-hover:to-[#DBD0A6] text-white group-hover:text-black font-semibold shadow-lg transition-all duration-500 transform hover:scale-105"
                 >
                   Get Started

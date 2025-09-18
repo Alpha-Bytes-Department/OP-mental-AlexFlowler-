@@ -28,7 +28,7 @@ const Header = () => {
           src="/image.png"
           alt="Logo"
         />
-        <div className="flex sm:gap-9 gap-8 items-center">
+        <div className="flex  gap-5 md:gap-8 items-center">
           <Link to="https://optimalperformancesystem.com/">Home</Link>
           <Link to="/chat/general">Coach</Link>
           <button className="btn bg-cCard text-black" onClick={scrollToPricing}>

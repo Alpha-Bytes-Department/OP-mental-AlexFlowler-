@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAxios } from "../../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
-import logo from "../../../../public/image.png"
+import logo from "../../../../public/bgLogo.svg";
 
 const InternalHome = () => {
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ const InternalHome = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      <div className="absolute inset-0 flex items-center justify-center opacity-15 pointer-events-none">
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div className="flex flex-col items-center gap-3">
           <img
             src={logo}
@@ -46,7 +46,7 @@ const InternalHome = () => {
           />
         </div>
       </div>
-      <div className="flex flex-col justify-center items-center min-h-screen gap-3 z-50">
+      <div className="flex flex-col justify-center items-center min-h-screen gap-3 z-30">
         <h1 className="text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-league-gothic">
           Internal Challenge
         </h1>

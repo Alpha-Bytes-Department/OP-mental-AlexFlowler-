@@ -10,8 +10,8 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            const user = localStorage.getItem("user");
-            if (!user) {
+            const access = localStorage.getItem("access");
+            if (!access) {
                 Swal.fire({
                     title: "Authentication Required",
                     text: "You must be logged in to access this page.",

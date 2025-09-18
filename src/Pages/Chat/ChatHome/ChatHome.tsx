@@ -21,6 +21,7 @@ const ChatHome = () => {
   const [messageData, setMessageData] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [sessionId, setSessionId] = useState<number | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const axios = useAxios();
@@ -41,11 +42,46 @@ const ChatHome = () => {
     scrollToBottom();
   }, [messageData]);
 
+  useEffect(() => {
+    
+      Swal.fire({
+        title: "Do you want to save chat history?",
+        text: "",
+        icon: "info",
+        confirmButtonText: "YES",
+        showCancelButton: true,
+        cancelButtonText: "NO",
+        background: "rgba(255, 255, 255, 0.1)",
+        backdrop: "rgba(0, 0, 0, 0.4)",
+        customClass: {
+          popup: "glassmorphic-popup",
+          title: "glassmorphic-title",
+          htmlContainer: "glassmorphic-text",
+          confirmButton: "glassmorphic-button",
+        },
+      }).then(async (result) => {
+        console.log("Result..........", result);
+        if (result?.isConfirmed) {
+          const res = await axios.post("/api/chatbot/start/",{
+              "save_history": true
+          });
+          console.log("response is comming......", res);
+          setSessionId(res?.data?.session_id);
+        } else {
+            const res = await axios.post("/api/chatbot/start/",{
+                "save_history": false
+            });
+            console.log("response is comming......", res);
+          setSessionId(res?.data?.session_id);
+        }
+      });
+  }, []);
+
   // Load existing chat data from API
   const LoadData = async () => {
     try {
       setIsInitialLoading(true);
-      const response = await axios.get("/api/chatbot/history/all/");
+      const response = await axios.get(`/api/chatbot/history/${sessionId}/`);
       if (response.status === 200) {
         const transformedMessages: Message[] = [];
 
@@ -119,7 +155,8 @@ const ChatHome = () => {
       setIsLoading(true);
 
       // Send message to API
-      const response = await axios.post("/api/chatbot/", {
+      const response = await axios.post("/api/chatbot/message/", {
+        session_id: sessionId,
         message: data.message,
       });
       // Handle response
@@ -165,8 +202,7 @@ const ChatHome = () => {
           ...filteredMessages,
           {
             id: response?.data?.session_id || Date.now(),
-            message:
-              response?.data?.reply || "I received your message!",
+            message: response?.data?.reply || "I received your message!",
             sender: "bot",
             status: "success",
           },

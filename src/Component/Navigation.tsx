@@ -48,7 +48,6 @@ const Navigation = ({
 
   // logout handler
   const handleLogOut = async () => {
-    console.log("Logging out...");
     try {
       const response = await axios.post("/api/users/logout/");
       console.log("Logout successful:", response.data);

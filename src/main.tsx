@@ -9,12 +9,12 @@ import { StatusProvider } from "./Providers/StatusProvider.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_OAUTH2_CLIENT_ID!}>
-    <StatusProvider>
-      <AxiosProvider>
+    <AxiosProvider>
       <AuthProvider>
-        <RouterProvider router={Router} />
+        <StatusProvider>
+          <RouterProvider router={Router} />
+        </StatusProvider>
       </AuthProvider>
     </AxiosProvider>
-    </StatusProvider>
   </GoogleOAuthProvider>
 );

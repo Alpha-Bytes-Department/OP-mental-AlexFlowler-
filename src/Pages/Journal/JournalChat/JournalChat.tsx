@@ -171,8 +171,6 @@ const JournalChat = () => {
         });
         
 
-        console.log("Response:........", response);
-
         if (response.status === 208) {
           // Remove loading message on limit reached
           setMessages((prev) => prev.filter((msg) => msg.id !== botMessageId));

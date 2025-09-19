@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { FaArrowUp } from "react-icons/fa6";
 import { useAxios } from "../../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../Providers/AuthProvider";
 import { useStatus } from "../../../Providers/StatusProvider";
 
 interface Message {
@@ -23,11 +24,12 @@ const ChatHome = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [sessionId, setSessionId] = useState<number | null>(null);
-  const {setChatGeneralHistory} = useStatus();
+  const { user } = useAuth();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const axios = useAxios();
   const navigate = useNavigate();
+  const {setChatGeneralHistory} = useStatus();
 
   const { register, handleSubmit, reset, watch } = useForm<FormData>({
     defaultValues: { message: "" },
@@ -43,11 +45,12 @@ const ChatHome = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messageData]);
- 
 
   //----------notification for history -----------------
+
   useEffect(() => {
-    
+    const chatHistory = localStorage.getItem("chatHistory")
+    if (user && !chatHistory) {
       Swal.fire({
         title: "Do you want to save chat history?",
         text: "",
@@ -65,19 +68,22 @@ const ChatHome = () => {
         },
       }).then(async (result) => {
         if (result?.isConfirmed) {
-          setChatGeneralHistory(true)
-          const res = await axios.post("/api/chatbot/start/",{
-              "save_history": true
+          localStorage.setItem("chatHistory","true");
+          setChatGeneralHistory("true");
+          const res = await axios.post("/api/chatbot/start/", {
+            save_history: true,
           });
           setSessionId(res?.data?.session_id);
         } else {
-          setChatGeneralHistory(false)
-            const res = await axios.post("/api/chatbot/start/",{
-                "save_history": false
-            });
+          localStorage.setItem("chatHistory","false");
+          setChatGeneralHistory("false");
+          const res = await axios.post("/api/chatbot/start/", {
+            save_history: false,
+          });
           setSessionId(res?.data?.session_id);
         }
       });
+    }
   }, []);
 
   // Load existing chat data from API

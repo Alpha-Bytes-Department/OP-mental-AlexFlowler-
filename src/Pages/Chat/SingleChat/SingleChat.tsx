@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { FaArrowUp } from "react-icons/fa6";
 import { useAxios } from "../../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../../Providers/AuthProvider";
 import { useStatus } from "../../../Providers/StatusProvider";
 
@@ -19,17 +19,17 @@ interface FormData {
   message: string;
 }
 
-const ChatHome = () => {
+const SingleChat = () => {
   const [messageData, setMessageData] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const [sessionId, setSessionId] = useState<number | null>(null);
-  const { user } = useAuth();
+
+  const params = useParams();
+
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const axios = useAxios();
   const navigate = useNavigate();
-  const {setChatGeneralHistory, chatGeneralHistory} = useStatus();
 
   const { register, handleSubmit, reset, watch } = useForm<FormData>({
     defaultValues: { message: "" },
@@ -46,50 +46,15 @@ const ChatHome = () => {
     scrollToBottom();
   }, [messageData]);
 
-  //----------notification for history -----------------
 
-  useEffect(() => {
-    if (user && !chatGeneralHistory) {
-      Swal.fire({
-        title: "Do you want to save chat history?",
-        text: "",
-        icon: "info",
-        confirmButtonText: "YES",
-        showCancelButton: true,
-        cancelButtonText: "NO",
-        background: "rgba(255, 255, 255, 0.1)",
-        backdrop: "rgba(0, 0, 0, 0.4)",
-        customClass: {
-          popup: "glassmorphic-popup",
-          title: "glassmorphic-title",
-          htmlContainer: "glassmorphic-text",
-          confirmButton: "glassmorphic-button",
-        },
-      }).then(async (result) => {
-        if (result?.isConfirmed) {
-          localStorage.setItem("chatHistory","true");
-          setChatGeneralHistory("true");
-          const res = await axios.post("/api/chatbot/start/", {
-            save_history: true,
-          });
-          setSessionId(res?.data?.session_id);
-        } else {
-          localStorage.setItem("chatHistory","false");
-          setChatGeneralHistory("false");
-          const res = await axios.post("/api/chatbot/start/", {
-            save_history: false,
-          });
-          setSessionId(res?.data?.session_id);
-        }
-      });
-    }
-  }, []);
+
 
   // Load existing chat data from API
   const LoadData = async () => {
     try {
       setIsInitialLoading(true);
-      const response = await axios.get(`/api/chatbot/history/${sessionId}/`);
+      const response = await axios.get(`/api/chatbot/history/${params?.session_id}/`);
+      console.log("Are you hering........................",response);
       if (response.status === 200) {
         const transformedMessages: Message[] = [];
 
@@ -164,13 +129,11 @@ const ChatHome = () => {
 
       // Send message to API
       const response = await axios.post("/api/chatbot/message/", {
-        session_id: sessionId,
+        session_id: params?.session_id,
         message: data.message,
       });
       // Handle response
       if (response.status === 208) {
-        // console.log("AI Response:", response.data.reply);
-
         Swal.fire({
           title: "Subscribe to chat",
           text: response.data.reply,
@@ -381,4 +344,4 @@ const ChatHome = () => {
   );
 };
 
-export default ChatHome;
+export default SingleChat;

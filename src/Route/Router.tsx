@@ -20,6 +20,7 @@ import Payment from "../Pages/Payment/Payment";
 import PrivateRoute from "../Pages/Chat/PrivateRoute";
 import JournalDetails from "../Pages/Journal/JournalDetails/JournalDetails";
 import UserVerify from "../Pages/MailVerifiy/UserVerify";
+import ChatHistory from "../Pages/Chat/ChatHistory/ChatHistory";
 
 const Router = createBrowserRouter([
   {
@@ -61,6 +62,10 @@ const Router = createBrowserRouter([
       {
         path: "/chat/general",
         element: <ChatHome />,
+      },
+      {
+        path: "/chat/general/history",
+        element: <ChatHistory />,
       },
       {
         path: "/chat/general/test",

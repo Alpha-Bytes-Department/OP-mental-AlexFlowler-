@@ -16,6 +16,7 @@ import { useState } from "react";
 import { useAxios } from "../Providers/AxiosProvider";
 import Swal from "sweetalert2";
 import { TbBrandMessenger } from "react-icons/tb";
+import { useStatus } from "../Providers/StatusProvider";
 interface NavigationProps {
   isMobileMenuOpen: boolean;
   isDesktopCollapsed: boolean;
@@ -33,6 +34,9 @@ const Navigation = ({
   const [isLogOutActive, setLogOutActive] = useState(false);
   const navigate = useNavigate();
   const axios = useAxios();
+  const {chatGeneralHistory} = useStatus()
+
+  console.log("status of chat", chatGeneralHistory);
 
   //getting chat session from localstorage
   const session_id = localStorage.getItem("chat-session");
@@ -48,7 +52,6 @@ const Navigation = ({
 
   // logout handler
   const handleLogOut = async () => {
-    console.log("Logging out...");
     try {
       const response = await axios.post("/api/users/logout/");
       console.log("Logout successful:", response.data);
@@ -172,6 +175,21 @@ const Navigation = ({
                 <span className="text-lg font-montserrat ">Ai chat</span>
               )}
             </NavLink>
+            {chatGeneralHistory && <NavLink
+              to="/chat/general/history"
+              end
+              className={`
+                w-full flex items-center gap-3 p-3 rounded-lg
+                hover:bg-[#2D2A2B] transition-colors
+                ${chatgeneral ? "bg-[#2D2A2B] font-bold" : "hidden"}
+                ${isDesktopCollapsed ? "justify-center" : "justify-start"}
+              `}
+            >
+              <TbBrandMessenger size={24} className=" " />
+              {!isDesktopCollapsed &&  (
+                <span className="text-lg font-montserrat ">Ai chat History</span>
+              )}
+            </NavLink>}
             <NavLink
               to="/chat/mindsetChat/home"
               className={`

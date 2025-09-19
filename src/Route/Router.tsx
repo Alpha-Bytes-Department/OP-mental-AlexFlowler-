@@ -21,6 +21,7 @@ import PrivateRoute from "../Pages/Chat/PrivateRoute";
 import JournalDetails from "../Pages/Journal/JournalDetails/JournalDetails";
 import UserVerify from "../Pages/MailVerifiy/UserVerify";
 import ChatHistory from "../Pages/Chat/ChatHistory/ChatHistory";
+import SingleChat from "../Pages/Chat/SingleChat/SingleChat";
 
 const Router = createBrowserRouter([
   {
@@ -66,6 +67,10 @@ const Router = createBrowserRouter([
       {
         path: "/chat/general/history",
         element: <ChatHistory />,
+      },
+      {
+        path: "/chat/general/history/:session_id",
+        element:<SingleChat/>
       },
       {
         path: "/chat/general/test",

@@ -7,22 +7,24 @@ import {
   HiOutlineUser,
 } from "react-icons/hi2";
 import { SiGoogletasks } from "react-icons/si";
-
 import { FaAngleDown, FaBookJournalWhills, FaBrain } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
 import { NavLink, useMatch, useNavigate } from "react-router-dom";
 import { useState } from "react";
-
 import { useAxios } from "../Providers/AxiosProvider";
 import Swal from "sweetalert2";
 import { TbBrandMessenger } from "react-icons/tb";
 import { useStatus } from "../Providers/StatusProvider";
+
+
+
 interface NavigationProps {
   isMobileMenuOpen: boolean;
   isDesktopCollapsed: boolean;
   toggleMobileMenu: () => void;
   toggleDesktopCollapse: () => void;
 }
+
 
 const Navigation = ({
   isMobileMenuOpen,
@@ -34,12 +36,17 @@ const Navigation = ({
   const [isLogOutActive, setLogOutActive] = useState(false);
   const navigate = useNavigate();
   const axios = useAxios();
-  const {chatGeneralHistory} = useStatus()
+  const {chatGeneralHistory} = useStatus();
 
-  console.log("status of chat", chatGeneralHistory);
+  console.log("chat history", chatGeneralHistory);
+  console.log("type of chat history", typeof(chatGeneralHistory));
+  
+
+
 
   //getting chat session from localstorage
   const session_id = localStorage.getItem("chat-session");
+  
   
 
   //matching active navigation for handle navigation style
@@ -60,6 +67,7 @@ const Navigation = ({
         localStorage.removeItem("access");
         localStorage.removeItem("refresh");
         localStorage.removeItem("chat-session");
+        localStorage.removeItem("chatHistory");
         const modal = document.getElementById(
           "Profile_Modal"
         ) as HTMLDialogElement | null;
@@ -175,7 +183,7 @@ const Navigation = ({
                 <span className="text-lg font-montserrat ">Ai chat</span>
               )}
             </NavLink>
-            {chatGeneralHistory && <NavLink
+            {chatGeneralHistory === "true" && <NavLink
               to="/chat/general/history"
               end
               className={`

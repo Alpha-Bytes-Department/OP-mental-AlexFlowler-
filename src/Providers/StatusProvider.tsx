@@ -1,17 +1,29 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import { useAuth } from "./AuthProvider";
 
 type StatusContextType = {
-  chatGeneralHistory: boolean;
-  setChatGeneralHistory: React.Dispatch<React.SetStateAction<boolean>>;
+  chatGeneralHistory: string | null;
+  setChatGeneralHistory: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
+// context created
 const StatusContext = createContext<StatusContextType | null>(null);
 
+// export context provider
 export const StatusProvider = ({ children }: { children: ReactNode }) => {
-  const [chatGeneralHistory, setChatGeneralHistory] = useState<boolean>(false);
+  const [chatGeneralHistory, setChatGeneralHistory] = useState<string | null>(null);
+  const { user } = useAuth();
+
+ 
+  useEffect(() => {
+    if (!user) return;
+    const stored = localStorage.getItem("chatHistory");
+    setChatGeneralHistory(stored); 
+  }, []);
 
   const statusObject = { chatGeneralHistory, setChatGeneralHistory };
+
   return (
     <StatusContext.Provider value={statusObject}>
       {children}
@@ -19,7 +31,7 @@ export const StatusProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// using the context hooks
+// using the context hook
 export const useStatus = () => {
   const context = useContext(StatusContext);
   if (!context) throw new Error("useStatus must be used within a StatusProvider");

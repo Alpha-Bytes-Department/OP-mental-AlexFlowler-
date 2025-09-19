@@ -66,13 +66,6 @@ axiosInstance.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    // if (
-    //   config.url &&
-    //   !config.url.startsWith("http") &&
-    //   config.url.startsWith("/api")
-    // ) {
-    // }
-
     return config;
   },
   (error) => {
@@ -117,7 +110,7 @@ axiosInstance.interceptors.response.use(
         // Try to refresh the token
         const tokens = getTokens();
         if (tokens.refresh) {
-          console.log("🔄 Attempting to refresh access token...");
+          console.log("Attempting to refresh access token...");
 
           const refreshResponse = await axios.post(
             "http://10.10.12.53:8000/api/users/token/refresh/",
@@ -126,7 +119,7 @@ axiosInstance.interceptors.response.use(
             }
           );
 
-          console.log("✅ Token refresh successful:", refreshResponse.data);
+          console.log("Token refresh successful:", refreshResponse.data);
 
           if (refreshResponse.data.access && refreshResponse.data.refresh) {
             // Update tokens with new access token AND new refresh token

@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { FaArrowUp } from "react-icons/fa6";
 import { useAxios } from "../../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import { useStatus } from "../../../Providers/StatusProvider";
 
 interface Message {
   id: number | string;
@@ -22,6 +23,7 @@ const ChatHome = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [sessionId, setSessionId] = useState<number | null>(null);
+  const {setChatGeneralHistory} = useStatus();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const axios = useAxios();
@@ -41,7 +43,9 @@ const ChatHome = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messageData]);
+ 
 
+  //----------notification for history -----------------
   useEffect(() => {
     
       Swal.fire({
@@ -60,18 +64,17 @@ const ChatHome = () => {
           confirmButton: "glassmorphic-button",
         },
       }).then(async (result) => {
-        console.log("Result..........", result);
         if (result?.isConfirmed) {
+          setChatGeneralHistory(true)
           const res = await axios.post("/api/chatbot/start/",{
               "save_history": true
           });
-          console.log("response is comming......", res);
           setSessionId(res?.data?.session_id);
         } else {
+          setChatGeneralHistory(false)
             const res = await axios.post("/api/chatbot/start/",{
                 "save_history": false
             });
-            console.log("response is comming......", res);
           setSessionId(res?.data?.session_id);
         }
       });

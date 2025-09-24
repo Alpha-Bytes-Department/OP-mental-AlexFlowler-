@@ -2,10 +2,12 @@ import { useNavigate } from "react-router-dom";
 import logo from "../../../../public/bgLogo.svg";
 import { useAxios } from "../../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
+import { useAuth } from "../../../Providers/AuthProvider";
 
 const MindsetHome = () => {
   const navigate = useNavigate();
   const axios = useAxios();
+  const {user} = useAuth();
 
 
   //loading all chat at initial time
@@ -13,6 +15,7 @@ const MindsetHome = () => {
   //triggering mindset mantra ai
   const handleStartChat = async (events: React.MouseEvent<HTMLButtonElement>) => {
     events.preventDefault();
+    if(user?.is_subscribed === true){
       await axios.post("api/mindset/", {
         message: "Start" ,
       })
@@ -36,9 +39,39 @@ const MindsetHome = () => {
             htmlContainer: "glassmorphic-text",
           },
         });
-
-        console.error("Error sending/receiving message:", error);
       });
+    }else{
+      Swal.fire({
+                title: "Subscribe to chat",
+                text: "To access the Mindset Mantra feature, please subscribe to one of our plans.",
+                icon: "info",
+                confirmButtonText: "OK",
+                showCancelButton: true,
+                background: "rgba(255, 255, 255, 0.1)",
+                backdrop: "rgba(0, 0, 0, 0.4)",
+                customClass: {
+                  popup: "glassmorphic-popup",
+                  title: "glassmorphic-title",
+                  htmlContainer: "glassmorphic-text",
+                  confirmButton: "glassmorphic-button",
+                },
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  navigate("/", { replace: false });
+                  setTimeout(() => {
+                    const pricingElement = document.getElementById("pricing");
+                    if (pricingElement) {
+                      pricingElement.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                      });
+                    }
+                  }, 500); // Adjust delay if needed
+                } else {
+                  return;
+                }
+              });
+    }
   };
 
   return (

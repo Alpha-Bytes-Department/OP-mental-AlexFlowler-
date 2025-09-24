@@ -2,14 +2,17 @@ import { useNavigate } from "react-router-dom";
 import { useAxios } from "../../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
 import logo from "../../../../public/bgLogo.svg";
+import { useAuth } from "../../../Providers/AuthProvider";
 
 const InternalHome = () => {
   const navigate = useNavigate();
   const axios = useAxios();
+  const {user} = useAuth()
+
 
   const handleTriggerChat = async () => {
-    axios
-      .post("/api/internal-challenge/", {
+    if(user?.is_subscribed === true){
+      axios.post("/api/internal-challenge/", {
         message: "Start",
       })
       .then((res) => {
@@ -33,6 +36,38 @@ const InternalHome = () => {
         });
         console.log("Failed to hi chat",error);
       });
+    }else{
+      Swal.fire({
+                title: "Subscribe to chat",
+                text: "To access the Internal Challenge feature, please subscribe to one of our plans.",
+                icon: "info",
+                confirmButtonText: "OK",
+                showCancelButton: true,
+                background: "rgba(255, 255, 255, 0.1)",
+                backdrop: "rgba(0, 0, 0, 0.4)",
+                customClass: {
+                  popup: "glassmorphic-popup",
+                  title: "glassmorphic-title",
+                  htmlContainer: "glassmorphic-text",
+                  confirmButton: "glassmorphic-button",
+                },
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  navigate("/", { replace: false });
+                  setTimeout(() => {
+                    const pricingElement = document.getElementById("pricing");
+                    if (pricingElement) {
+                      pricingElement.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                      });
+                    }
+                  }, 500); // Adjust delay if needed
+                } else {
+                  return;
+                }
+              });
+    }
   };
 
   return (

@@ -19,7 +19,9 @@ const MindsetChat = () => {
   const [completed, setCompleted] = useState(false);
   const [inputMessage, setInputMessage] = useState(""); // handles input field text
   const [initialLoading, setinitialLoading] = useState(false);
+  const [isAiThinking, setIsAiThinking] = useState(false); // New state for AI thinking
   const messagesEndRef = useRef<HTMLDivElement>(null); // ref for auto-scroll
+  const textareaRef = useRef<HTMLTextAreaElement>(null); // ref for textarea
   const axios = useAxios();
   const params = useParams();
   const navigate = useNavigate();
@@ -91,9 +93,16 @@ const MindsetChat = () => {
     scrollToBottom();
   }, [messages]);
 
+  //--------- auto-resize textarea function --------
+  const autoResizeTextarea = (textarea: HTMLTextAreaElement) => {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+  };
+
   //--------- input change handler --------
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputMessage(e.target.value);
+    autoResizeTextarea(e.target);
   };
 
   //--------- message send handler --------
@@ -110,23 +119,51 @@ const MindsetChat = () => {
       };
       setMessages((prev) => [...prev, newMessage]);
 
-      // mock bot response
-      // setTimeout(() => {
-      //   const botResponse: Message = {
-      //     id: tempId + 1,
-      //     message: "Thinking...",
-      //     sender: "bot",
-      //     status: "loading",
-      //   };
-      //   setMessages((prev) => [...prev, botResponse]);
-      // }, 1000);
+      // Store the current message before clearing
+      const currentMessage = inputMessage;
       setInputMessage("");
+      
+      // Reset textarea height after clearing input
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+        textareaRef.current.style.height = '60px';
+      }
+
+      // Add thinking message immediately
+      const thinkingMessageId = tempId + 1;
+      const thinkingMessage: Message = {
+        id: thinkingMessageId,
+        message: "",
+        sender: "bot",
+        status: "loading",
+      };
+      setMessages((prev) => [...prev, thinkingMessage]);
+      setIsAiThinking(true);
+
+      // Start minimum thinking time
+      const thinkingStartTime = Date.now();
+      const minThinkingTime = 1000; // 1000ms (1 second) minimum thinking time
+
       try {
         const response = await axios.post("api/mindset/", {
-          message: inputMessage,
+          message: currentMessage,
           session_id: params?.mindset_session,
         });
+        
+        // Calculate remaining thinking time
+        const elapsedTime = Date.now() - thinkingStartTime;
+        const remainingTime = Math.max(0, minThinkingTime - elapsedTime);
+        
+        // Wait for remaining time if needed
+        if (remainingTime > 0) {
+          await new Promise(resolve => setTimeout(resolve, remainingTime));
+        }
+        
         if (response.status === 208) {
+          // Remove thinking message before showing modal
+          setMessages((prev) => prev.filter((msg) => msg.id !== thinkingMessageId));
+          setIsAiThinking(false);
+          
           Swal.fire({
             title: "Subscribe for chat",
             text: response.data.reply,
@@ -157,14 +194,17 @@ const MindsetChat = () => {
               return;
             }
           });
+          return;
         }
+        
         console.log("response for complete", response);
         if (response?.data.is_complete === true) {
           setCompleted(true);
         }
 
+        // Replace thinking message with actual response
         setMessages((prev) => {
-          const filteredMessages = prev.filter((msg) => msg.id !== tempId + 1);
+          const filteredMessages = prev.filter((msg) => msg.id !== thinkingMessageId);
           return [
             ...filteredMessages,
             {
@@ -175,12 +215,23 @@ const MindsetChat = () => {
             },
           ];
         });
+        
       } catch (error) {
         console.error("Error sending message:", error);
-        // Update loading message to show error
+        
+        // Calculate remaining thinking time even for errors
+        const elapsedTime = Date.now() - thinkingStartTime;
+        const remainingTime = Math.max(0, minThinkingTime - elapsedTime);
+        
+        // Wait for remaining time if needed
+        if (remainingTime > 0) {
+          await new Promise(resolve => setTimeout(resolve, remainingTime));
+        }
+        
+        // Replace thinking message with error message
         setMessages((prev) =>
           prev.map((msg) =>
-            msg.id === tempId
+            msg.id === thinkingMessageId
               ? {
                   ...msg,
                   message: "Failed to get response. Please try again.",
@@ -189,15 +240,19 @@ const MindsetChat = () => {
               : msg
           )
         );
+      } finally {
+        setIsAiThinking(false);
       }
     }
   };
 
   //--------- enter key handler --------
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // Prevent new line
       handleSendMessage();
     }
+    // Allow Shift+Enter for new line
   };
 
   //-------------showing loading status-----------
@@ -254,11 +309,30 @@ const MindsetChat = () => {
                         : "bg-transparent border border-cCard text-white mr-auto"
                     }`}
                   >
-                    {item.message.split("\n").map((line, index) => (
-                      <p key={index} className="space-x-1">{line}</p>
-                    ))}
-                    {completed && (
-                      <p className="text-red-600">Your session is complete</p>
+                    {item.status === "loading" ? (
+                      <div className="flex items-center gap-3">
+                        <div className="flex space-x-1">
+                          <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
+                          <div
+                            className="w-2 h-2 bg-white rounded-full animate-bounce"
+                            style={{ animationDelay: "0.1s" }}
+                          ></div>
+                          <div
+                            className="w-2 h-2 bg-white rounded-full animate-bounce"
+                            style={{ animationDelay: "0.2s" }}
+                          ></div>
+                        </div>
+                        <span className="text-sm text-gray-300">AI is thinking...</span>
+                      </div>
+                    ) : (
+                      <>
+                        {item.message.split("\n").map((line, index) => (
+                          <p key={index} className="space-x-1">{line}</p>
+                        ))}
+                        {completed && (
+                          <p className="text-red-600">Your session is complete</p>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -283,22 +357,33 @@ const MindsetChat = () => {
       {/* --------------- Input area ---------------------- */}
       <div className="p-4 mb-15 lg:mb-0">
         <div className="max-w-3xl mx-auto flex gap-4 rounded-lg bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm p-4">
-          <input
-            disabled={completed}
-            type="text"
+          <textarea
+            ref={textareaRef}
+            disabled={completed || isAiThinking}
             value={inputMessage}
             onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
-            placeholder="Type your message..."
-            className="w-full py-2 sm:py-3 lg:py-4 pl-2 sm:pl-4 pr-8 sm:pr-12 text-sm sm:text-base text-white bg-white/20 backdrop-blur-md rounded-lg sm:rounded-xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300"
+            onKeyDown={handleKeyPress}
+            placeholder={isAiThinking ? "AI is thinking..." : "Type your message..."}
+            rows={1}
+            className="w-full py-2 sm:py-3 lg:py-4 pl-2 sm:pl-4 pr-8 sm:pr-12 text-sm sm:text-base text-white bg-white/20 backdrop-blur-md rounded-lg sm:rounded-xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300 resize-none overflow-hidden min-h-[40px] max-h-[200px]"
+            style={{
+              height: '60px',
+              minHeight: '60px'
+            }}
           />
           <button
             type="submit"
             onClick={handleSendMessage}
-            // disabled={isLoading || !watchedMessage?.trim()}
-            className="bg-cCard disabled:bg-cCard/20 disabled:cursor-not-allowed text-white rounded-md sm:rounded-lg p-1.5 sm:p-2 md:p-2.5 lg:p-3 transition-colors"
+            disabled={completed || !inputMessage.trim() || isAiThinking}
+            className="bg-cCard disabled:bg-cCard/20 disabled:cursor-not-allowed text-white rounded-md sm:rounded-lg p-1.5 sm:p-2 md:p-2.5 lg:p-3 transition-colors self-end"
           >
-            <FaArrowUp className="text-black w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+            {isAiThinking ? (
+              <div className="flex items-center justify-center">
+                <div className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : (
+              <FaArrowUp className="text-black w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+            )}
           </button>
         </div>
       </div>

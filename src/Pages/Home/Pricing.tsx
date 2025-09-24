@@ -145,9 +145,10 @@ const Pricing = () => {
           navigate("/", { replace: true });
         }
       });
+    }else{
+      navigate("/login", { state: { from: location }, replace: true });
     }
     // Navigate to checkout or perform any other action
-    console.log(plan.title)
     if (plan.title !== "Corporate") {
       const res = await axios.post(
         `/api/subscriptions/create-checkout-session/`,

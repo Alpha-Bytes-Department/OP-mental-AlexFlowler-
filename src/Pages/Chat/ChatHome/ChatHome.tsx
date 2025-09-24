@@ -27,11 +27,12 @@ const ChatHome = () => {
   const { user } = useAuth();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const axios = useAxios();
   const navigate = useNavigate();
   const {setChatGeneralHistory, chatGeneralHistory} = useStatus();
 
-  const { register, handleSubmit, reset, watch } = useForm<FormData>({
+  const { register, handleSubmit, reset, watch, setValue } = useForm<FormData>({
     defaultValues: { message: "" },
   });
 
@@ -46,44 +47,60 @@ const ChatHome = () => {
     scrollToBottom();
   }, [messageData]);
 
-  //----------notification for history -----------------
+  //--------- auto-resize textarea function --------
+  const autoResizeTextarea = (textarea: HTMLTextAreaElement) => {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+  };
 
-  useEffect(() => {
-    if (user && !chatGeneralHistory) {
-      Swal.fire({
-        title: "Do you want to save chat history?",
-        text: "",
-        icon: "info",
-        confirmButtonText: "YES",
-        showCancelButton: true,
-        cancelButtonText: "NO",
-        background: "rgba(255, 255, 255, 0.1)",
-        backdrop: "rgba(0, 0, 0, 0.4)",
-        customClass: {
-          popup: "glassmorphic-popup",
-          title: "glassmorphic-title",
-          htmlContainer: "glassmorphic-text",
-          confirmButton: "glassmorphic-button",
-        },
-      }).then(async (result) => {
-        if (result?.isConfirmed) {
-          localStorage.setItem("chatHistory","true");
-          setChatGeneralHistory("true");
-          const res = await axios.post("/api/chatbot/start/", {
-            save_history: true,
-          });
-          setSessionId(res?.data?.session_id);
-        } else {
-          localStorage.setItem("chatHistory","false");
-          setChatGeneralHistory("false");
-          const res = await axios.post("/api/chatbot/start/", {
-            save_history: false,
-          });
-          setSessionId(res?.data?.session_id);
-        }
+  //--------- input change handler --------
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setValue("message", e.target.value);
+    autoResizeTextarea(e.target);
+  };
+
+  //----------notification for history -----------------
+  const handleChatInit = async () => {
+  Swal.fire({
+    title: "Do you want to save chat history?",
+    icon: "info",
+    confirmButtonText: "YES",
+    showCancelButton: true,
+    cancelButtonText: "NO",
+    background: "rgba(255, 255, 255, 0.1)",
+    backdrop: "rgba(0, 0, 0, 0.4)",
+    customClass: {
+      popup: "glassmorphic-popup",
+      title: "glassmorphic-title",
+      htmlContainer: "glassmorphic-text",
+      confirmButton: "glassmorphic-button",
+    },
+  }).then(async (result) => {
+    if (result?.isConfirmed) {
+      localStorage.setItem("chatHistory", "true");
+      setChatGeneralHistory("true");
+      const res = await axios.post("/api/chatbot/start/", {
+        save_history: true,
       });
+      setSessionId(res?.data?.session_id);
+    } else {
+      localStorage.setItem("chatHistory", "false");
+      setChatGeneralHistory("false");
+      const res = await axios.post("/api/chatbot/start/", {
+        save_history: false,
+      });
+      setSessionId(res?.data?.session_id);
     }
-  }, []);
+  });
+};
+
+// Run once on page landing
+useEffect(() => {
+  handleChatInit();
+  // if (user && !chatGeneralHistory) {
+  //   handleChatInit();
+  // }
+}, []);
 
   // Load existing chat data from API
   const LoadData = async () => {
@@ -156,12 +173,15 @@ const ChatHome = () => {
 
     setMessageData((prev) => [...prev, loadingBotMessage]);
 
-    // Clear input
+    // Clear input and reset textarea height
     reset();
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = '40px';
+    }
 
     try {
       setIsLoading(true);
-
       // Send message to API
       const response = await axios.post("/api/chatbot/message/", {
         session_id: sessionId,
@@ -236,11 +256,12 @@ const ChatHome = () => {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(onSubmit)();
     }
+    // Allow Shift+Enter for new line
   };
 
   if (isInitialLoading) {
@@ -311,12 +332,12 @@ const ChatHome = () => {
                           <div className="flex space-x-1">
                             <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-bounce"></div>
                             <div
-                              className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-bounce"
+              className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-bounce"
                               style={{ animationDelay: "0.1s" }}
                             ></div>
                             <div
                               className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-bounce"
-                              style={{ animationDelay: "0.2s" }}
+                              style={{ animationDelay: "0.1s" }}
                             ></div>
                           </div>
                           <span className="text-xs sm:text-sm text-gray-300">
@@ -353,13 +374,19 @@ const ChatHome = () => {
               className="w-full max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl mx-auto"
               onSubmit={handleSubmit(onSubmit)}
             >
-              <div className="relative w-full">
-                <input
-                  {...register("message")}
-                  type="text"
+              <div className="relative w-full flex justify-center items-center">
+                <textarea
+                  ref={textareaRef}
+                  value={watchedMessage}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyPress}
                   placeholder="Message ....."
-                  onKeyPress={handleKeyPress}
-                  className="w-full py-1 sm:py-3 lg:py-4 xl:py-4 2xl:py-5 pl-3 sm:pl-4 md:pl-5 lg:pl-6 xl:pl-7 2xl:pl-8 pr-12 sm:pr-14 md:pr-16 lg:pr-18 xl:pr-20 2xl:pr-24 text-sm sm:text-base md:text-lg lg:text-xl text-white bg-white/20 backdrop-blur-md rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300"
+                  rows={1}
+                  className="w-full py-1 sm:py-3 lg:py-4 xl:py-4 2xl:py-5 pl-3 sm:pl-4 md:pl-5 lg:pl-6 xl:pl-7 2xl:pl-8 pr-12 sm:pr-14 md:pr-16 lg:pr-18 xl:pr-20 2xl:pr-24 text-sm sm:text-base md:text-lg lg:text-xl text-white bg-white/20 backdrop-blur-md rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300 resize-none overflow-hidden min-h-[40px] max-h-[200px]"
+                  style={{
+                    height: '60px',
+                    minHeight: '60px'
+                  }}
                   disabled={isLoading}
                   autoComplete="off"
                 />

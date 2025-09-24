@@ -28,10 +28,10 @@ const Header = () => {
           src="/image.png"
           alt="Logo"
         />
-        <div className="flex  gap-5 md:gap-8 items-center">
+        <div className="flex  gap-4 md:gap-8 items-center">
           <Link to="https://optimalperformancesystem.com/">Home</Link>
           <Link to="/chat/general">Coach</Link>
-          <button className="btn bg-cCard text-black" onClick={scrollToPricing}>
+          <button className="btn bg-cCard text-black text-xs px-2 md:px-5 md:text-base" onClick={scrollToPricing}>
             Start Subscription
           </button>
         </div>

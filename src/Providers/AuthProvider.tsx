@@ -6,6 +6,8 @@ interface User {
   id: string;
   email: string;
   username?: string;
+  profile_image?: string;
+  name?: string;
   is_subscribed: boolean;
 }
 

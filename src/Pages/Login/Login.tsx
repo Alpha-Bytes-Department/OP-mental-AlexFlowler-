@@ -1,4 +1,3 @@
-import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
 import { CiMail } from "react-icons/ci";
 import { useState } from "react";

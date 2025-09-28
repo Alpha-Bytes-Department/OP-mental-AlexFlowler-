@@ -3,18 +3,20 @@ import logo from "../../../../public/bgLogo.svg";
 import { useAxios } from "../../../Providers/AxiosProvider";
 import { useState } from "react";
 import Swal from "sweetalert2";
+import { useAuth } from "../../../Providers/AuthProvider";
 
 const JournalOptions = () => {
   //--------states--------
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const axios = useAxios();
+  const { user } = useAuth();
 
   //--------- handler for category selection --------
   const handleCategorySelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedCategory = event.target.value;
     console.log("Selected Category:", selectedCategory);
-    
+
     if (selectedCategory === "Personal Win") {
       handleTrigger("1");
     } else if (selectedCategory === "Personal Challenge") {
@@ -30,18 +32,40 @@ const JournalOptions = () => {
 
   //post request to the api
   const handleTrigger = async (option: string) => {
-    try {
-      setLoading(true);
-      const res = await axios.post("api/journaling/chat/", { message: option });
-      console.log("response for post api", res);
-      if (res.status === 200) {
-        navigate(`/chat/journal/journal-chat/${res?.data?.session_id}`);
-      } else {
-        console.log("Failed to trigger journal", res);
+    //checking subscription
+    if (user && user?.is_subscribed === true) {
+      try {
+        setLoading(true);
+        const res = await axios.post("api/journaling/chat/", {
+          message: option,
+        });
+        console.log("response for post api", res);
+        if (res.status === 200) {
+          navigate(`/chat/journal/journal-chat/${res?.data?.session_id}`);
+        } else {
+          console.log("Failed to trigger journal", res);
+          // Show error message
+          Swal.fire({
+            title: "Error!",
+            text: "Failed to start journal session. Please try again.",
+            icon: "error",
+            background: "rgba(255, 255, 255, 0.1)",
+            backdrop: "rgba(0, 0, 0, 0.4)",
+            timer: 3000,
+            showConfirmButton: false,
+            customClass: {
+              popup: "glassmorphic-popup",
+              title: "glassmorphic-title",
+              htmlContainer: "glassmorphic-text",
+            },
+          });
+        }
+      } catch (error) {
+        console.error("Error starting journal session:", error);
         // Show error message
         Swal.fire({
           title: "Error!",
-          text: "Failed to start journal session. Please try again.",
+          text: "Something went wrong. Please try again.",
           icon: "error",
           background: "rgba(255, 255, 255, 0.1)",
           backdrop: "rgba(0, 0, 0, 0.4)",
@@ -53,28 +77,44 @@ const JournalOptions = () => {
             htmlContainer: "glassmorphic-text",
           },
         });
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error starting journal session:", error);
-      // Show error message
+    } else {
       Swal.fire({
-        title: "Error!",
-        text: "Something went wrong. Please try again.",
-        icon: "error",
+        title: "Subscribe to chat",
+        text: "To access the Mindset Mantra feature, please subscribe to one of our plans.",
+        icon: "info",
+        confirmButtonText: "OK",
+        showCancelButton: true,
         background: "rgba(255, 255, 255, 0.1)",
         backdrop: "rgba(0, 0, 0, 0.4)",
-        timer: 3000,
-        showConfirmButton: false,
         customClass: {
           popup: "glassmorphic-popup",
           title: "glassmorphic-title",
           htmlContainer: "glassmorphic-text",
+          confirmButton: "glassmorphic-button",
         },
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/", { replace: false });
+          setTimeout(() => {
+            const pricingElement = document.getElementById("pricing");
+            if (pricingElement) {
+              pricingElement.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+            }
+          }, 500); // Adjust delay if needed
+        } else {
+          return;
+        }
       });
-    } finally {
-      setLoading(false);
     }
   };
+
+  
 
   if (loading) {
     return (

@@ -15,6 +15,7 @@ import { useAxios } from "../Providers/AxiosProvider";
 import Swal from "sweetalert2";
 import { TbBrandMessenger } from "react-icons/tb";
 import { useStatus } from "../Providers/StatusProvider";
+import { useAuth } from "../Providers/AuthProvider";
 
 
 
@@ -37,9 +38,10 @@ const Navigation = ({
   const navigate = useNavigate();
   const axios = useAxios();
   const {chatGeneralHistory} = useStatus();
+  const {user} = useAuth();
 
-  console.log("chat history", chatGeneralHistory);
-  console.log("type of chat history", typeof(chatGeneralHistory));
+  // console.log("chat history", chatGeneralHistory);
+  // console.log("type of chat history", typeof(chatGeneralHistory));
   
 
 
@@ -93,7 +95,7 @@ const Navigation = ({
     }
   };
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  // const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   return (
     <>
@@ -183,7 +185,7 @@ const Navigation = ({
                 <span className="text-lg font-montserrat ">Ai chat</span>
               )}
             </NavLink>
-            {chatGeneralHistory === "true" && <NavLink
+            {chatGeneralHistory === "true" && user?.is_subscribed === true && <NavLink
               to="/chat/general/history"
               end
               className={`
@@ -230,7 +232,7 @@ const Navigation = ({
                   </span>
                 )}
               </NavLink>
-              <NavLink
+              { user && user?.is_subscribed === true && <NavLink
                 to="/chat/journal/list"
                 className={({ isActive }) => `
                     w-full flex items-center gap-3 p-3 rounded-lg
@@ -241,12 +243,12 @@ const Navigation = ({
                 `}
               >
                 <FaBookJournalWhills size={24} className=" " />
-                {!isDesktopCollapsed && (
+                {!isDesktopCollapsed &&  (
                   <span className="text-lg font-montserrat ">
                     Journal History
                   </span>
                 )}
-              </NavLink>
+              </NavLink>}
             </div>
             <NavLink
               to={`/chat/internalChat/${session_id}`}
@@ -426,14 +428,14 @@ const Navigation = ({
               >
                 <div className="flex items-center gap-2 w-full">
                   <div className="border rounded-full p-1 flex-shrink-0">
-                    {user.profile_image &&
-                    typeof user.profile_image === "string" &&
-                    user.profile_image.length > 0 ? (
+                    {user?.profile_image &&
+                    typeof user?.profile_image === "string" &&
+                    user?.profile_image.length > 0 ? (
                       <img
                         src={
-                          user.profile_image.startsWith("/media")
-                            ? `http://10.10.12.53:8000${user.profile_image}`
-                            : user.profile_image
+                          user?.profile_image.startsWith("/media")
+                            ? `http://13.62.134.108/${user?.profile_image}`
+                            : user?.profile_image
                         }
                         alt="Profile"
                         className="w-8 h-8 rounded-full"
@@ -444,9 +446,9 @@ const Navigation = ({
                   </div>
                   {!isDesktopCollapsed && (
                     <div className="text-base sm:text-lg md:text-xl flex flex-col font-bold text-white truncate">
-                      {user.name ? user.name : "Unknown User"}
+                      {user?.name ? user?.name : "Unknown User"}
                       <span className="text-sm font-medium text-gray-400">
-                        {user.is_subscribed
+                        {user?.is_subscribed
                           ? "Enterprise Package"
                           : "Free Package "}
                       </span>

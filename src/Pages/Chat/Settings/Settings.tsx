@@ -18,7 +18,7 @@ const Settings = () => {
     return JSON.parse(localStorage.getItem("user") || "{}");
   });
   const axios = useAxios();
-  const baseUrl = "http://10.10.12.53:8000"; // Uncomment and use your base URL
+  const baseUrl = "http://13.62.134.108/"; // Uncomment and use your base URL
 
   const {
     register,
@@ -200,7 +200,7 @@ const Settings = () => {
           src={previewImage}
           alt="Profile"
           className="w-full h-full object-cover rounded-full"
-          onError={(e) => {
+          onError={() => {
             console.error("Error loading image:", previewImage);
             setPreviewImage(null);
           }}

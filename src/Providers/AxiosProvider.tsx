@@ -47,7 +47,7 @@ const processQueue = (error: any, token: string | null = null) => {
 };
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:8000/",
+  baseURL: "http://13.62.134.108/",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
@@ -113,7 +113,7 @@ axiosInstance.interceptors.response.use(
           console.log("Attempting to refresh access token...");
 
           const refreshResponse = await axios.post(
-            "http://localhost:8000/api/users/token/refresh/",
+            "http://13.62.134.108/api/users/token/refresh/",
             {
               refresh: tokens.refresh,
             }

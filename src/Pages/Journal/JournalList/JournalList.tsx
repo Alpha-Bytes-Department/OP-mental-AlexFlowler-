@@ -14,10 +14,6 @@ interface JournalEntry {
   created_at: string;
 }
 
-interface Entry {
-  id: string;
-  // other fields if needed
-}
 
 interface CategoryStats {
   [key: string]: number;

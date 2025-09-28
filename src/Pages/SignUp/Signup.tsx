@@ -1,5 +1,5 @@
-import { FcGoogle } from "react-icons/fc";
-import { Link, useNavigate } from "react-router-dom";
+
+import { Link } from "react-router-dom";
 import { CiMail } from "react-icons/ci";
 import { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
@@ -17,7 +17,6 @@ type Inputs = {
 
 const Signup = () => {
   const axios = useAxios();
-  const navigate = useNavigate();
   const [isLoading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] =

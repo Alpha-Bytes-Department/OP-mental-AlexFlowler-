@@ -276,3 +276,22 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+
+/* Mobile viewport height fix */
+
+.mobile-scroll-container {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.mobile-height {
+  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
+}
+
+@media screen and (max-width: 768px) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}

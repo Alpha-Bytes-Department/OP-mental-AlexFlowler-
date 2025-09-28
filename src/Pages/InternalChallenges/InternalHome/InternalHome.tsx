@@ -11,7 +11,7 @@ const InternalHome = () => {
 
 
   const handleTriggerChat = async () => {
-    if(user?.is_subscribed === true){
+    if(user && user?.is_subscribed === true){
       axios.post("/api/internal-challenge/", {
         message: "Start",
       })

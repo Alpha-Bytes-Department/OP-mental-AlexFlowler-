@@ -35,7 +35,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
                         navigate("/", { replace: true });
                     }
                 });
-            } else {
+            }else {
                 setLoading(false);
             }
         }, 500); // simulate loading

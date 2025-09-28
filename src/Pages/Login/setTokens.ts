@@ -1,6 +1,6 @@
 // Utility functions for token management with both localStorage and cookies
 
-export const setTokens = (accessToken, refreshToken) => {
+export const setTokens = (accessToken:string, refreshToken:string) => {
   // Store in localStorage for client-side access
   if (typeof window !== 'undefined') {
     localStorage.setItem('access', accessToken);

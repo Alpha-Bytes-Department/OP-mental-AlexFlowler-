@@ -4,8 +4,6 @@ import { FaArrowUp } from "react-icons/fa6";
 import { useAxios } from "../../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../../../Providers/AuthProvider";
-import { useStatus } from "../../../Providers/StatusProvider";
 
 interface Message {
   id: number | string;
@@ -23,6 +21,7 @@ const SingleChat = () => {
   const [messageData, setMessageData] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const textareaRef = useRef<HTMLTextAreaElement>(null); // Ref for the textarea
 
   const params = useParams();
 
@@ -31,9 +30,9 @@ const SingleChat = () => {
   const axios = useAxios();
   const navigate = useNavigate();
 
-  const { register, handleSubmit, reset, watch } = useForm<FormData>({
-    defaultValues: { message: "" },
-  });
+  const { handleSubmit, reset, watch, setValue } = useForm<FormData>({
+      defaultValues: { message: "" },
+    });
 
   const watchedMessage = watch("message");
 
@@ -46,7 +45,17 @@ const SingleChat = () => {
     scrollToBottom();
   }, [messageData]);
 
+    //--------- auto-resize textarea function --------
+  const autoResizeTextarea = (textarea: HTMLTextAreaElement) => {
+    textarea.style.height = "auto";
+    textarea.style.height = Math.min(textarea.scrollHeight, 200) + "px";
+  };
 
+  //--------- input change handler --------
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setValue("message", e.target.value);
+    autoResizeTextarea(e.target);
+  };
 
 
   // Load existing chat data from API
@@ -249,7 +258,7 @@ const SingleChat = () => {
 
       <div className="h-screen flex flex-col text-white">
         {/* Chat Messages Area */}
-        <div className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 pb-24">
+        <div className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 pb-24 mb-10">
           <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto min-h-full">
             {messageData.length > 0 ? (
               <>
@@ -316,13 +325,20 @@ const SingleChat = () => {
               className="w-full max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl mx-auto"
               onSubmit={handleSubmit(onSubmit)}
             >
-              <div className="relative w-full">
-                <input
-                  {...register("message")}
-                  type="text"
-                  placeholder="Message ....."
-                  onKeyPress={handleKeyPress}
-                  className="w-full py-1 sm:py-3 lg:py-4 xl:py-4 2xl:py-5 pl-3 sm:pl-4 md:pl-5 lg:pl-6 xl:pl-7 2xl:pl-8 pr-12 sm:pr-14 md:pr-16 lg:pr-18 xl:pr-20 2xl:pr-24 text-sm sm:text-base md:text-lg lg:text-xl text-white bg-white/20 backdrop-blur-md rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300"
+              <div className="relative w-full flex justify-center items-center">
+                <textarea
+                  ref={textareaRef}
+                  value={watchedMessage}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyPress}
+                  placeholder="Message .....6
+                  "
+                  rows={1}
+                  className="w-full py-2 sm:py-4 lg:py-4 xl:py-4 2xl:py-3 pl-3 sm:pl-4 md:pl-5 lg:pl-6 xl:pl-7 2xl:pl-8 pr-12 sm:pr-14 md:pr-16 lg:pr-18 xl:pr-20 2xl:pr-24 text-sm sm:text-base md:text-lg lg:text-xl text-white bg-white/20 backdrop-blur-md rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300 resize-none overflow-hidden min-h-[40px] max-h-[200px]"
+                  style={{
+                    height: "60px",
+                    minHeight: "60px",
+                  }}
                   disabled={isLoading}
                   autoComplete="off"
                 />

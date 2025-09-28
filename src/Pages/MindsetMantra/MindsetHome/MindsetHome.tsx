@@ -15,7 +15,7 @@ const MindsetHome = () => {
   //triggering mindset mantra ai
   const handleStartChat = async (events: React.MouseEvent<HTMLButtonElement>) => {
     events.preventDefault();
-    if(user?.is_subscribed === true){
+    if(user && user?.is_subscribed === true){
       await axios.post("api/mindset/", {
         message: "Start" ,
       })
@@ -24,7 +24,7 @@ const MindsetHome = () => {
           navigate(`/chat/mindsetChat/${res.data.session_id}`);
         }
       })
-      .catch((error) => {
+      .catch(() => {
         Swal.fire({
           title: "Error!",
           text: "Something went wrong. Please try again.",

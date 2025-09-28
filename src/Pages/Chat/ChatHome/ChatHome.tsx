@@ -30,9 +30,9 @@ const ChatHome = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const axios = useAxios();
   const navigate = useNavigate();
-  const {setChatGeneralHistory, chatGeneralHistory} = useStatus();
+  const { setChatGeneralHistory } = useStatus();
 
-  const { register, handleSubmit, reset, watch, setValue } = useForm<FormData>({
+  const { handleSubmit, reset, watch, setValue } = useForm<FormData>({
     defaultValues: { message: "" },
   });
 
@@ -40,7 +40,7 @@ const ChatHome = () => {
 
   // Auto scroll to bottom when new messages are added
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
   useEffect(() => {
@@ -49,8 +49,8 @@ const ChatHome = () => {
 
   //--------- auto-resize textarea function --------
   const autoResizeTextarea = (textarea: HTMLTextAreaElement) => {
-    textarea.style.height = 'auto';
-    textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+    textarea.style.height = "auto";
+    textarea.style.height = Math.min(textarea.scrollHeight, 200) + "px";
   };
 
   //--------- input change handler --------
@@ -61,46 +61,115 @@ const ChatHome = () => {
 
   //----------notification for history -----------------
   const handleChatInit = async () => {
-  Swal.fire({
-    title: "Do you want to save chat history?",
-    icon: "info",
-    confirmButtonText: "YES",
-    showCancelButton: true,
-    cancelButtonText: "NO",
-    background: "rgba(255, 255, 255, 0.1)",
-    backdrop: "rgba(0, 0, 0, 0.4)",
-    customClass: {
-      popup: "glassmorphic-popup",
-      title: "glassmorphic-title",
-      htmlContainer: "glassmorphic-text",
-      confirmButton: "glassmorphic-button",
-    },
-  }).then(async (result) => {
-    if (result?.isConfirmed) {
-      localStorage.setItem("chatHistory", "true");
-      setChatGeneralHistory("true");
-      const res = await axios.post("/api/chatbot/start/", {
-        save_history: true,
-      });
-      setSessionId(res?.data?.session_id);
-    } else {
-      localStorage.setItem("chatHistory", "false");
-      setChatGeneralHistory("false");
-      const res = await axios.post("/api/chatbot/start/", {
-        save_history: false,
-      });
-      setSessionId(res?.data?.session_id);
-    }
-  });
-};
+    Swal.fire({
+      title: "Do you want to save chat history?",
+      icon: "info",
+      confirmButtonText: "YES",
+      showCancelButton: true,
+      cancelButtonText: "NO",
+      background: "rgba(255, 255, 255, 0.1)",
+      backdrop: "rgba(0, 0, 0, 0.4)",
+      customClass: {
+        popup: "glassmorphic-popup",
+        title: "glassmorphic-title",
+        htmlContainer: "glassmorphic-text",
+        confirmButton: "glassmorphic-button",
+      },
+    }).then(async (result) => {
+      if (result?.isConfirmed) {
+        localStorage.setItem("chatHistory", "true");
+        setChatGeneralHistory("true");
 
-// Run once on page landing
-useEffect(() => {
-  handleChatInit();
-  // if (user && !chatGeneralHistory) {
-  //   handleChatInit();
-  // }
-}, []);
+        // checking subscription
+        if (user && user?.is_subscribed !== true) {
+          Swal.fire({
+            title: "Subscribe to chat",
+            text: "To continue, please subscribe to one of our plans.",
+            icon: "info",
+            confirmButtonText: "OK",
+            showCancelButton: true,
+            background: "rgba(255, 255, 255, 0.1)",
+            backdrop: "rgba(0, 0, 0, 0.4)",
+            customClass: {
+              popup: "glassmorphic-popup",
+              title: "glassmorphic-title",
+              htmlContainer: "glassmorphic-text",
+              confirmButton: "glassmorphic-button",
+            },
+          }).then((result) => {
+            if (result.isConfirmed) {
+              navigate("/", { replace: false });
+              setTimeout(() => {
+                const pricingElement = document.getElementById("pricing");
+                if (pricingElement) {
+                  pricingElement.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  });
+                }
+              }, 500); // Adjust delay if needed
+            } else {
+              return;
+            }
+          });
+        }
+
+        const res = await axios.post("/api/chatbot/start/", {
+          save_history: true,
+        });
+        setSessionId(res?.data?.session_id);
+      } else {
+        localStorage.setItem("chatHistory", "false");
+        setChatGeneralHistory("false");
+
+        // checking subscription
+        if (user?.is_subscribed !== true) {
+          Swal.fire({
+            title: "Subscribe to chat",
+            text: "To continue, please subscribe to one of our plans.",
+            icon: "info",
+            confirmButtonText: "OK",
+            showCancelButton: true,
+            background: "rgba(255, 255, 255, 0.1)",
+            backdrop: "rgba(0, 0, 0, 0.4)",
+            customClass: {
+              popup: "glassmorphic-popup",
+              title: "glassmorphic-title",
+              htmlContainer: "glassmorphic-text",
+              confirmButton: "glassmorphic-button",
+            },
+          }).then((result) => {
+            if (result.isConfirmed) {
+              navigate("/", { replace: false });
+              setTimeout(() => {
+                const pricingElement = document.getElementById("pricing");
+                if (pricingElement) {
+                  pricingElement.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  });
+                }
+              }, 500); // Adjust delay if needed
+            } else {
+              return;
+            }
+          });
+        }
+        const res = await axios.post("/api/chatbot/start/", {
+          save_history: false,
+        });
+        setSessionId(res?.data?.session_id);
+      }
+    });
+  };
+
+  // Run once on page landing
+  useEffect(() => {
+    handleChatInit();
+    // if (user && !chatGeneralHistory) {
+    //   handleChatInit();
+    // }
+  }, []);
 
   // Load existing chat data from API
   const LoadData = async () => {
@@ -148,6 +217,8 @@ useEffect(() => {
     LoadData();
   }, []);
 
+  
+
   const onSubmit = async (data: FormData) => {
     if (!data.message.trim()) return;
 
@@ -176,8 +247,8 @@ useEffect(() => {
     // Clear input and reset textarea height
     reset();
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = '40px';
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = "40px";
     }
 
     try {
@@ -256,6 +327,7 @@ useEffect(() => {
     }
   };
 
+
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -307,11 +379,11 @@ useEffect(() => {
 
       <div className="h-screen flex flex-col text-white">
         {/* Chat Messages Area */}
-        <div className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 pb-24">
-          <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto min-h-full">
-            {messageData.length > 0 ? (
+        <div className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 pb-24 mb-10">
+          <div className="flex flex-col gap-3 sm:gap-4 md:gap-5 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto">
+            {messageData?.length > 0 ? (
               <>
-                {messageData.map((item) => (
+                {messageData?.map((item) => (
                   <div
                     key={item.id}
                     className={`flex animate-fadeInUp ${
@@ -332,7 +404,7 @@ useEffect(() => {
                           <div className="flex space-x-1">
                             <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-bounce"></div>
                             <div
-              className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-bounce"
+                              className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-bounce"
                               style={{ animationDelay: "0.1s" }}
                             ></div>
                             <div
@@ -348,9 +420,10 @@ useEffect(() => {
                         <p>{item.message}</p>
                       )}
                     </div>
+                    
                   </div>
                 ))}
-                <div ref={messagesEndRef} />
+                
               </>
             ) : (
               <div className="flex flex-col justify-center items-center h-full text-center space-y-8">
@@ -366,6 +439,7 @@ useEffect(() => {
             )}
           </div>
         </div>
+        <div ref={messagesEndRef}/>
 
         {/* Chat Input - Fixed at Bottom */}
         <div className="fixed bottom-0 left-0 right-0 px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-4 lg:ml-[280px] z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm">
@@ -380,12 +454,12 @@ useEffect(() => {
                   value={watchedMessage}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyPress}
-                  placeholder="Message ....."
+                  placeholder="Message .....7"
                   rows={1}
-                  className="w-full py-1 sm:py-3 lg:py-4 xl:py-4 2xl:py-5 pl-3 sm:pl-4 md:pl-5 lg:pl-6 xl:pl-7 2xl:pl-8 pr-12 sm:pr-14 md:pr-16 lg:pr-18 xl:pr-20 2xl:pr-24 text-sm sm:text-base md:text-lg lg:text-xl text-white bg-white/20 backdrop-blur-md rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300 resize-none overflow-hidden min-h-[40px] max-h-[200px]"
+                  className="w-full py-2 sm:py-4 lg:py-4 xl:py-4 2xl:py-3 pl-3 sm:pl-4 md:pl-5 lg:pl-6 xl:pl-7 2xl:pl-8 pr-12 sm:pr-14 md:pr-16 lg:pr-18 xl:pr-20 2xl:pr-24 text-sm sm:text-base md:text-lg lg:text-xl text-white bg-white/20 backdrop-blur-md rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300 resize-none overflow-hidden min-h-[40px] max-h-[200px]"
                   style={{
-                    height: '60px',
-                    minHeight: '60px'
+                    height: "60px",
+                    minHeight: "60px",
                   }}
                   disabled={isLoading}
                   autoComplete="off"

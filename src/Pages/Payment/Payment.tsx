@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { FaCheckCircle } from "react-icons/fa";
 import { useAxios } from "../../Providers/AxiosProvider";

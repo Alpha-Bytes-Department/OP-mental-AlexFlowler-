@@ -290,7 +290,7 @@ const MindsetChat = () => {
       </div>
       {/* --------------- Messages area ---------------------- */}
       <div className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 pb-24">
-        <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto min-h-full">
+        <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto ">
           {messages.length > 0 ? (
             <>
               {messages.map((item) => (
@@ -355,7 +355,7 @@ const MindsetChat = () => {
       </div>
 
       {/* --------------- Input area ---------------------- */}
-      <div className="p-4 mb-15 lg:mb-0">
+      <div className="p-4 mb-40 md:mb-15 lg:mb-0">
         <div className="max-w-3xl mx-auto flex gap-4 rounded-lg bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm p-4">
           <textarea
             ref={textareaRef}

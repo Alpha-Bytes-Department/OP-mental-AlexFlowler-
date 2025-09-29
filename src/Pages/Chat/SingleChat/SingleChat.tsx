@@ -245,7 +245,7 @@ const SingleChat = () => {
         <div
           className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16"
           style={{
-            paddingBottom: "200px", // ✅ enough space for input bar
+            paddingBottom: "250px", // ✅ enough space for input bar
             WebkitOverflowScrolling: "touch", // ✅ smooth scrolling
           }}
         >

@@ -379,8 +379,8 @@ const ChatHome = () => {
 
       <div className="h-screen flex flex-col text-white">
         {/* Chat Messages Area */}
-        <div className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 pb-24 mb-10">
-          <div className="flex flex-col gap-3 sm:gap-4 md:gap-5 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto">
+        <div className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 pb-36">
+          <div className="flex flex-col gap-3 sm:gap-4 md:gap-5 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto relative">
             {messageData?.length > 0 ? (
               <>
                 {messageData?.map((item) => (
@@ -423,7 +423,7 @@ const ChatHome = () => {
                     
                   </div>
                 ))}
-                
+                <div ref={messagesEndRef} className="h-4" /> {/* Add height to ensure proper spacing */}
               </>
             ) : (
               <div className="flex flex-col justify-center items-center h-full text-center space-y-8">
@@ -439,10 +439,9 @@ const ChatHome = () => {
             )}
           </div>
         </div>
-        <div ref={messagesEndRef}/>
 
         {/* Chat Input - Fixed at Bottom */}
-        <div className="fixed bottom-0 left-0 right-0 px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-4 lg:ml-[280px] z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm">
+        <div className="fixed bottom-0 left-0 right-0 px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-4 lg:ml-[280px] z-10 bg-gradient-to-t from-black via-black/80 to-transparent backdrop-blur-md border-t border-white/10">
           <div className="max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto">
             <form
               className="w-full max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl mx-auto"

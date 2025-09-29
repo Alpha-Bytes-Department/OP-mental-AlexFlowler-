@@ -1,30 +1,46 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FaArrowUp } from "react-icons/fa6";
 import logo from "../../../../public/bgLogo.svg";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useAxios } from "../../../Providers/AxiosProvider";
-import Swal from "sweetalert2";
+import { useForm } from "react-hook-form";
 
 // ----type declaration---------
 interface Message {
-  id: string | number;
+  id: number | string;
   message: string;
   sender: "user" | "bot";
   status: "success" | "loading" | "error";
+  timestamp?: string;
+}
+
+interface FormData {
+  message: string;
+}
+
+// Define proper type for response data
+interface ChatResponse {
+  id?: number;
+  message: string;
+  role: "user" | "assistant";
+  timestamp?: string;
 }
 
 const MindsetChat = () => {
   //--------states--------
   const [messages, setMessages] = useState<Message[]>([]); // stores chat messages
-  const [completed, setCompleted] = useState(false);
-  const [inputMessage, setInputMessage] = useState(""); // handles input field text
   const [initialLoading, setinitialLoading] = useState(false);
-  const [isAiThinking, setIsAiThinking] = useState(false); // New state for AI thinking
+  const [isLoading] = useState(false); // Retained isLoading for potential future use
   const messagesEndRef = useRef<HTMLDivElement>(null); // ref for auto-scroll
   const textareaRef = useRef<HTMLTextAreaElement>(null); // ref for textarea
   const axios = useAxios();
   const params = useParams();
-  const navigate = useNavigate();
+
+  // Replace inputMessage with useForm
+  const { handleSubmit, reset, watch, setValue } = useForm<FormData>({
+    defaultValues: { message: "" },
+  });
+  const watchedMessage = watch("message");
 
   //--------- auto-scroll function --------
   const scrollToBottom = () => {
@@ -32,61 +48,32 @@ const MindsetChat = () => {
   };
 
   //---------------getting chat at initial loading---------
-  const initialLoadingMessage = async () => {
-    try {
-      setinitialLoading(true);
-      const response = await axios.get(
-        `api/mindset/history/${params?.mindset_session}/`
-      );
-      console.log("debugging", response);
-      if (response.status === 200) {
-        const transformedMessage: Message[] = []; // array for storing message
-        if (Array.isArray(response.data) && response.data.length > 0) {
-          response?.data?.forEach((item: any, index: number) => {
-            if (item?.author === "bot") {
-              transformedMessage.push({
-                id: `bot-${index}`,
-                message: item?.message,
-                sender: "bot",
-                status: "success",
-              });
-            }
-            if (item?.author === "user") {
-              transformedMessage.push({
-                id: `user-${index}`,
-                message: item?.message,
-                sender: "user",
-                status: "success",
-              });
-            }
-          });
-        }
-        setMessages(transformedMessage);
-      }
-      setinitialLoading(false);
-    } catch (error) {
-      Swal.fire({
-        title: "Error!",
-        text: "Something went wrong. Please try again.",
-        icon: "error",
-        background: "rgba(255, 255, 255, 0.1)",
-        backdrop: "rgba(0, 0, 0, 0.4)",
-        timer: 3000, // auto close after 3 seconds
-        showConfirmButton: false,
-        customClass: {
-          popup: "glassmorphic-popup",
-          title: "glassmorphic-title",
-          htmlContainer: "glassmorphic-text",
-        },
-      });
-
-      console.error("Error sending/receiving message:", error);
-    }
-  };
-
   useEffect(() => {
+    const initialLoadingMessage = async () => {
+      try {
+        setinitialLoading(true);
+        const response = await axios.get<ChatResponse[]>(
+          `api/mindset/history/${params?.mindset_session}/`
+        );
+        if (response.status === 200) {
+          const transformedMessages: Message[] = response.data.map((item, idx) => ({
+            id: `${item.role}-${item.id ?? idx}`,
+            message: item.message,
+            sender: item.role === "user" ? "user" : "bot",
+            status: "success",
+            timestamp: item.timestamp,
+          }));
+          setMessages(transformedMessages);
+        }
+      } catch (error) {
+        console.error("Error loading chat data:", error);
+      } finally {
+        setinitialLoading(false);
+      }
+    };
+
     initialLoadingMessage();
-  }, []);
+  }, [params?.mindset_session, axios]);
 
   //--------- scroll effect on new message --------
   useEffect(() => {
@@ -95,162 +82,85 @@ const MindsetChat = () => {
 
   //--------- auto-resize textarea function --------
   const autoResizeTextarea = (textarea: HTMLTextAreaElement) => {
-    textarea.style.height = 'auto';
-    textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+    textarea.style.height = "auto";
+    textarea.style.height = Math.min(textarea.scrollHeight, 200) + "px";
   };
 
   //--------- input change handler --------
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInputMessage(e.target.value);
+    setValue("message", e.target.value);
     autoResizeTextarea(e.target);
   };
 
   //--------- message send handler --------
-  const handleSendMessage = async () => {
-    //generating an id according to time
-    const tempId = Date.now();
-    if (inputMessage.trim()) {
-      // add user message
-      const newMessage: Message = {
-        id: tempId,
-        message: inputMessage,
-        sender: "user",
-        status: "success",
-      };
-      setMessages((prev) => [...prev, newMessage]);
+  const handleSendMessage = async (data: FormData) => {
+    if (!data.message.trim()) return;
 
-      // Store the current message before clearing
-      const currentMessage = inputMessage;
-      setInputMessage("");
-      
-      // Reset textarea height after clearing input
-      if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto';
-        textareaRef.current.style.height = '60px';
-      }
+    const userMessageId = Date.now();
+    const newUserMessage: Message = {
+      id: userMessageId,
+      message: data.message,
+      sender: "user",
+      status: "success",
+    };
 
-      // Add thinking message immediately
-      const thinkingMessageId = tempId + 1;
-      const thinkingMessage: Message = {
-        id: thinkingMessageId,
-        message: "",
-        sender: "bot",
-        status: "loading",
-      };
-      setMessages((prev) => [...prev, thinkingMessage]);
-      setIsAiThinking(true);
+    setMessages((prev) => [...prev, newUserMessage]);
 
-      // Start minimum thinking time
-      const thinkingStartTime = Date.now();
-      const minThinkingTime = 1000; // 1000ms (1 second) minimum thinking time
+    const botMessageId = userMessageId + 1;
+    const loadingBotMessage: Message = {
+      id: botMessageId,
+      message: "",
+      sender: "bot",
+      status: "loading",
+    };
 
-      try {
-        const response = await axios.post("api/mindset/", {
-          message: currentMessage,
-          session_id: params?.mindset_session,
-        });
-        
-        // Calculate remaining thinking time
-        const elapsedTime = Date.now() - thinkingStartTime;
-        const remainingTime = Math.max(0, minThinkingTime - elapsedTime);
-        
-        // Wait for remaining time if needed
-        if (remainingTime > 0) {
-          await new Promise(resolve => setTimeout(resolve, remainingTime));
-        }
-        
-        if (response.status === 208) {
-          // Remove thinking message before showing modal
-          setMessages((prev) => prev.filter((msg) => msg.id !== thinkingMessageId));
-          setIsAiThinking(false);
-          
-          Swal.fire({
-            title: "Subscribe for chat",
-            text: response.data.reply,
-            icon: "info",
-            confirmButtonText: "OK",
-            showCancelButton: true,
-            background: "rgba(255, 255, 255, 0.1)",
-            backdrop: "rgba(0, 0, 0, 0.4)",
-            customClass: {
-              popup: "glassmorphic-popup",
-              title: "glassmorphic-title",
-              htmlContainer: "glassmorphic-text",
-              confirmButton: "glassmorphic-button",
-            },
-          }).then((result) => {
-            if (result.isConfirmed) {
-              navigate("/", { replace: false });
-              setTimeout(() => {
-                const pricingElement = document.getElementById("pricing");
-                if (pricingElement) {
-                  pricingElement.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                  });
-                }
-              }, 500); // Adjust delay if needed
-            } else {
-              return;
-            }
-          });
-          return;
-        }
-        
-        console.log("response for complete", response);
-        if (response?.data.is_complete === true) {
-          setCompleted(true);
-        }
+    setMessages((prev) => [...prev, loadingBotMessage]);
 
-        // Replace thinking message with actual response
-        setMessages((prev) => {
-          const filteredMessages = prev.filter((msg) => msg.id !== thinkingMessageId);
-          return [
-            ...filteredMessages,
-            {
-              id: Date.now(),
-              message: response?.data?.reply || "I received your message!",
-              sender: "bot",
-              status: "success",
-            },
-          ];
-        });
-        
-      } catch (error) {
-        console.error("Error sending message:", error);
-        
-        // Calculate remaining thinking time even for errors
-        const elapsedTime = Date.now() - thinkingStartTime;
-        const remainingTime = Math.max(0, minThinkingTime - elapsedTime);
-        
-        // Wait for remaining time if needed
-        if (remainingTime > 0) {
-          await new Promise(resolve => setTimeout(resolve, remainingTime));
-        }
-        
-        // Replace thinking message with error message
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === thinkingMessageId
-              ? {
-                  ...msg,
-                  message: "Failed to get response. Please try again.",
-                  status: "error" as const,
-                }
-              : msg
-          )
-        );
-      } finally {
-        setIsAiThinking(false);
-      }
+    reset();
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = "40px";
+    }
+
+    try {
+      const response = await axios.post("api/mindset/", {
+        session_id: null,
+        message: data.message,
+      });
+
+      setMessages((prev) => {
+        const filteredMessages = prev.filter((msg) => msg.id !== botMessageId);
+        return [
+          ...filteredMessages,
+          {
+            id: response?.data?.session_id || Date.now(),
+            message: response?.data?.reply || "I received your message!",
+            sender: "bot",
+            status: "success",
+          },
+        ];
+      });
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === botMessageId
+            ? {
+                ...msg,
+                message: "Failed to get response. Please try again.",
+                status: "error" as const,
+              }
+            : msg
+        )
+      );
     }
   };
 
   //--------- enter key handler --------
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault(); // Prevent new line
-      handleSendMessage();
+      e.preventDefault();
+      handleSubmit(handleSendMessage)();
     }
     // Allow Shift+Enter for new line
   };
@@ -322,16 +232,15 @@ const MindsetChat = () => {
                             style={{ animationDelay: "0.2s" }}
                           ></div>
                         </div>
-                        <span className="text-sm text-gray-300">AI is thinking...</span>
+                        <span className="text-sm text-gray-300">
+                          AI is thinking...
+                        </span>
                       </div>
                     ) : (
                       <>
                         {item.message.split("\n").map((line, index) => (
                           <p key={index} className="space-x-1">{line}</p>
                         ))}
-                        {completed && (
-                          <p className="text-red-600">Your session is complete</p>
-                        )}
                       </>
                     )}
                   </div>
@@ -355,36 +264,34 @@ const MindsetChat = () => {
       </div>
 
       {/* --------------- Input area ---------------------- */}
-      <div className="p-4 mb-40 md:mb-15 lg:mb-0">
-        <div className="max-w-3xl mx-auto flex gap-4 rounded-lg bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm p-4">
-          <textarea
-            ref={textareaRef}
-            disabled={completed || isAiThinking}
-            value={inputMessage}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyPress}
-            placeholder={isAiThinking ? "AI is thinking..." : "Type your message..."}
-            rows={1}
-            className="w-full py-2 sm:py-3 lg:py-4 pl-2 sm:pl-4 pr-8 sm:pr-12 text-sm sm:text-base text-white bg-white/20 backdrop-blur-md rounded-lg sm:rounded-xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300 resize-none overflow-hidden min-h-[40px] max-h-[200px]"
-            style={{
-              height: '60px',
-              minHeight: '60px'
-            }}
-          />
-          <button
-            type="submit"
-            onClick={handleSendMessage}
-            disabled={completed || !inputMessage.trim() || isAiThinking}
-            className="bg-cCard disabled:bg-cCard/20 disabled:cursor-not-allowed text-white rounded-md sm:rounded-lg p-1.5 sm:p-2 md:p-2.5 lg:p-3 transition-colors self-end"
+      <div className="fixed bottom-0 left-0 right-0 px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-4 lg:ml-[280px] z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm">
+        <div className="max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto">
+          <form
+            className="w-full max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl mx-auto"
+            onSubmit={handleSubmit(handleSendMessage)}
           >
-            {isAiThinking ? (
-              <div className="flex items-center justify-center">
-                <div className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-              </div>
-            ) : (
-              <FaArrowUp className="text-black w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-            )}
-          </button>
+            <div className="relative w-full flex justify-center items-center">
+              <textarea
+                ref={textareaRef}
+                value={watchedMessage}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyPress}
+                placeholder="Message ....."
+                rows={1}
+                className="w-full py-2 sm:py-4 lg:py-4 xl:py-4 2xl:py-3 pl-3 sm:pl-4 md:pl-5 lg:pl-6 xl:pl-7 2xl:pl-8 pr-12 sm:pr-14 md:pr-16 lg:pr-18 xl:pr-20 2xl:pr-24 text-sm sm:text-base md:text-lg lg:text-xl text-white bg-white/20 backdrop-blur-md rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300 resize-none overflow-hidden min-h-[40px] max-h-[200px]"
+                style={{ height: "60px", minHeight: "60px" }}
+                disabled={isLoading}
+                autoComplete="off"
+              />
+              <button
+                type="submit"
+                disabled={isLoading || !watchedMessage?.trim()}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full px-4 py-2 text-white shadow-md transition-all duration-200 ease-in-out bg-cCard disabled:bg-cCard/20 disabled:cursor-not-allowed"
+              >
+                <FaArrowUp className="h-5 w-5" />
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

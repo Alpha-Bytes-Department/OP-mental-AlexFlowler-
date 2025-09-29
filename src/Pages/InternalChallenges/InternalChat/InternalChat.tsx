@@ -4,7 +4,7 @@ import { useAxios } from "../../../Providers/AxiosProvider";
 import { useParams } from "react-router-dom";
 import logo from "../../../../public/bgLogo.svg";
 import Swal from "sweetalert2";
-
+ 
 // ----type declaration---------
 interface Message {
   error_message?: string; // Changed from number to string for better error handling
@@ -15,7 +15,7 @@ interface Message {
   summary?: string;
   is_session_complete?: boolean;
 }
-
+ 
 const InternalChat = () => {
   //--------states--------
   const [messages, setMessages] = useState<Message[]>([]); // stores chat messages
@@ -26,29 +26,29 @@ const InternalChat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null); // ref for auto-scroll
   const axios = useAxios();
   const params = useParams();
-
+ 
   // Store session_id in localStorage only once when component mounts
   useEffect(() => {
     if (params?.session_id) {
       localStorage.setItem("chat-session", params.session_id);
     }
   }, [params?.session_id]);
-
+ 
   //--------- auto-scroll function --------
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
-
+ 
   //--------- scroll effect on new message --------
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
+ 
   //--------- input change handler --------
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputMessage(e.target.value);
   };
-
+ 
   // Initial data fetch
   useEffect(() => {
     const fetchInitialMessages = async () => {
@@ -56,14 +56,14 @@ const InternalChat = () => {
         setIsInitialLoading(false);
         return;
       }
-
+ 
       try {
         setIsInitialLoading(true);
         const res = await axios.get(
           `/api/internal-challenge/${params.session_id}/`
         );
         console.log("response when initial loading", res);
-
+ 
         if (res?.data) {
           setMessages(Array.isArray(res.data) ? res.data : []);
         }
@@ -87,49 +87,49 @@ const InternalChat = () => {
         setIsInitialLoading(false);
       }
     };
-
+ 
     fetchInitialMessages();
   }, [params?.session_id, axios]);
-
+ 
   //--------- message send handler --------
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading || !params?.session_id) {
       return;
     }
-
+ 
     const messageToSend = inputMessage.trim();
     setInputMessage(""); // Clear input immediately for better UX
     setIsLoading(true);
-
+ 
     try {
       // Send the message to the API
       const response = await axios.post("/api/internal-challenge/", {
         message: messageToSend,
         session_id: params.session_id,
       });
-
+ 
       console.log("debuging internal challenge....", response);
-
+ 
       // Fetch all messages after sending
       const res = await axios.get(
         `/api/internal-challenge/${params.session_id}/`
       );
-
+ 
       console.log("get response checking.......", res);
-
+ 
       if (res?.data) {
         setMessages(Array.isArray(res.data) ? res.data : []);
       }
-
+ 
       const length = messages.length;
-
+ 
       if (length > 0 && messages[length - 1].is_session_complete === true) {
         setIsSessionComplete(true);
       }
     } catch (error) {
       // Restore the message in input on error
       setInputMessage(messageToSend);
-
+ 
       Swal.fire({
         title: "Error!",
         text: "Something went wrong. Please try again.",
@@ -144,27 +144,27 @@ const InternalChat = () => {
           htmlContainer: "glassmorphic-text",
         },
       });
-
+ 
       console.error("Error sending/receiving message:", error);
     } finally {
       setIsLoading(false);
     }
   };
-
+ 
   //--------- enter key handler --------
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !isLoading) {
       handleSendMessage();
     }
   };
-
+ 
   // Loading spinner component
   const LoadingSpinner = () => (
     <div className="flex justify-center items-center p-4">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#DBD0A6]"></div>
     </div>
   );
-
+ 
   // Initial loading state
   if (isInitialLoading) {
     return (
@@ -187,7 +187,7 @@ const InternalChat = () => {
       </div>
     );
   }
-
+ 
   return (
     <div className="flex flex-col h-screen">
       <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
@@ -199,7 +199,7 @@ const InternalChat = () => {
           />
         </div>
       </div>
-
+ 
       {/* --------------- Messages area ---------------------- */}
       <div className="flex-1 p-4 overflow-y-auto">
         <div className="max-w-3xl mx-auto space-y-4">
@@ -211,7 +211,7 @@ const InternalChat = () => {
             messages.map((message, index: number) => {
               const showPhase =
                 index === 0 || message?.phase !== messages[index - 1]?.phase;
-
+ 
               return (
                 <React.Fragment key={`message-${index}`}>
                   {/* ---------- Showing message after trigger start --------------*/}
@@ -222,14 +222,14 @@ const InternalChat = () => {
                       ))}
                     </div>
                   )}
-
+ 
                   {/* ------- Showing phase only once for similar items ------------------*/}
                   {showPhase && message?.phase && (
                     <h1 className="border border-[#DBD0A6] bg-[#2d2d2d] px-20 py-3 rounded text-[#DBD0A6] text-center">
                       {message.phase}
                     </h1>
                   )}
-
+ 
                   {/* --------------------- showing ai response---------------- */}
                   {message?.question && (
                     <div className="flex flex-col justify-start">
@@ -249,7 +249,7 @@ const InternalChat = () => {
                       {message.phase}
                     </h1>
                   )}
-
+ 
                   {/* ---------------- Showing user response--------------- */}
                   {message?.response && (
                     <div className="flex justify-end">
@@ -262,7 +262,7 @@ const InternalChat = () => {
               );
             })
           )}
-
+ 
           {/* Show loading indicator when sending message */}
           {isLoading && (
             <div className="flex justify-center">
@@ -271,11 +271,11 @@ const InternalChat = () => {
               </div>
             </div>
           )}
-
+ 
           <div ref={messagesEndRef} />
         </div>
       </div>
-
+ 
       {/* --------------- Input area ---------------------- */}
       <div className="p-4 mb-40 md:mb-15 lg:mb-0">
         <div className="max-w-3xl mx-auto flex gap-4 rounded-lg bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm p-4">
@@ -311,5 +311,5 @@ const InternalChat = () => {
     </div>
   );
 };
-
+ 
 export default InternalChat;

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { FaArrowUp } from "react-icons/fa6";
 import { useAxios } from "../../../Providers/AxiosProvider";
@@ -59,7 +59,7 @@ const ChatHome = () => {
   };
 
   // Notification for history
-  const handleChatInit = async () => {
+  const handleChatInit = useCallback(async () => {
     Swal.fire({
       title: "Do you want to save chat history?",
       icon: "info",
@@ -154,14 +154,14 @@ const ChatHome = () => {
         setSessionId(res?.data?.session_id);
       }
     });
-  };
+  }, [axios, navigate, setChatGeneralHistory, user]);
 
   useEffect(() => {
     handleChatInit();
-  }, []);
+  }, [handleChatInit]); // Added 'handleChatInit' to the dependency array
 
   // Load existing chat data
-  const LoadData = async () => {
+  const LoadData = useCallback(async () => {
     try {
       setIsInitialLoading(true);
       const response = await axios.get(`/api/chatbot/history/${sessionId}/`);
@@ -169,26 +169,34 @@ const ChatHome = () => {
         const transformedMessages: Message[] = [];
 
         if (Array.isArray(response.data)) {
-          response.data.forEach((item: any, idx: number) => {
-            if (item.role === "user") {
-              transformedMessages.push({
-                id: `user-${item.id ?? idx}`,
-                message: item.message,
-                sender: "user",
-                status: "success",
-                timestamp: item.timestamp,
-              });
+          response.data.forEach(
+            (item: {
+              role: string;
+              id?: number;
+              message: string;
+              timestamp?: string;
+            },
+            idx: number) => {
+              if (item.role === "user") {
+                transformedMessages.push({
+                  id: `user-${item.id ?? idx}`,
+                  message: item.message,
+                  sender: "user",
+                  status: "success",
+                  timestamp: item.timestamp,
+                });
+              }
+              if (item.role === "assistant") {
+                transformedMessages.push({
+                  id: `bot-${item.id ?? idx}`,
+                  message: item.message,
+                  sender: "bot",
+                  status: "success",
+                  timestamp: item.timestamp,
+                });
+              }
             }
-            if (item.role === "assistant") {
-              transformedMessages.push({
-                id: `bot-${item.id ?? idx}`,
-                message: item.message,
-                sender: "bot",
-                status: "success",
-                timestamp: item.timestamp,
-              });
-            }
-          });
+          );
         }
         setMessageData(transformedMessages);
       }
@@ -197,11 +205,11 @@ const ChatHome = () => {
     } finally {
       setIsInitialLoading(false);
     }
-  };
+  }, [axios, sessionId]); // Added 'LoadData' to the dependency array
 
   useEffect(() => {
     LoadData();
-  }, []);
+  }, [LoadData]); // Added 'LoadData' to the dependency array
 
   const onSubmit = async (data: FormData) => {
     if (!data.message.trim()) return;
@@ -444,9 +452,13 @@ const ChatHome = () => {
                   <button
                     type="submit"
                     disabled={isLoading || !watchedMessage?.trim()}
-                    className="bg-cCard disabled:bg-cCard/20 disabled:cursor-not-allowed text-white rounded-md sm:rounded-lg p-1.5 sm:p-2 md:p-2.5 lg:p-3 transition-colors"
+                    className="bg-cCard disabled:bg-cCard/20 disabled:cursor-not-allowed text-white rounded-md sm:rounded-lg p-2 sm:p-3 md:p-3 lg:p-4 transition-colors flex items-center justify-center"
+                    style={{
+                      minWidth: "40px", // Ensure button has a minimum width
+                      height: "40px", // Ensure consistent height
+                    }}
                   >
-                    <FaArrowUp className="text-black w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                    <FaArrowUp className="text-black w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
                   </button>
                 </div>
               </div>

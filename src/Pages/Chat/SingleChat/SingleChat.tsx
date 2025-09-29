@@ -21,10 +21,9 @@ const SingleChat = () => {
   const [messageData, setMessageData] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const textareaRef = useRef<HTMLTextAreaElement>(null); // Ref for the textarea
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const params = useParams();
-
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const axios = useAxios();
   const navigate = useNavigate();
@@ -44,32 +43,29 @@ const SingleChat = () => {
     scrollToBottom();
   }, [messageData]);
 
-  //--------- auto-resize textarea function --------
+  // Auto-resize textarea
   const autoResizeTextarea = (textarea: HTMLTextAreaElement) => {
     textarea.style.height = "auto";
     textarea.style.height = Math.min(textarea.scrollHeight, 200) + "px";
   };
 
-  //--------- input change handler --------
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setValue("message", e.target.value);
     autoResizeTextarea(e.target);
   };
 
-  // Load existing chat data from API
+  // Load existing chat data
   const LoadData = async () => {
     try {
       setIsInitialLoading(true);
       const response = await axios.get(
         `/api/chatbot/history/${params?.session_id}/`
       );
-      console.log("Are you hering........................", response);
       if (response.status === 200) {
         const transformedMessages: Message[] = [];
 
         if (Array.isArray(response.data)) {
           response.data.forEach((item: any, idx: number) => {
-            // Add user message if present
             if (item.role === "user") {
               transformedMessages.push({
                 id: `user-${item.id ?? idx}`,
@@ -79,7 +75,6 @@ const SingleChat = () => {
                 timestamp: item.timestamp,
               });
             }
-            // Add assistant (bot) message if present
             if (item.role === "assistant") {
               transformedMessages.push({
                 id: `bot-${item.id ?? idx}`,
@@ -91,7 +86,6 @@ const SingleChat = () => {
             }
           });
         }
-
         setMessageData(transformedMessages);
       }
     } catch (error) {
@@ -108,7 +102,6 @@ const SingleChat = () => {
   const onSubmit = async (data: FormData) => {
     if (!data.message.trim()) return;
 
-    // Add user message instantly
     const userMessageId = Date.now();
     const newUserMessage: Message = {
       id: userMessageId,
@@ -119,7 +112,6 @@ const SingleChat = () => {
 
     setMessageData((prev) => [...prev, newUserMessage]);
 
-    // Add loading bot message
     const botMessageId = userMessageId + 1;
     const loadingBotMessage: Message = {
       id: botMessageId,
@@ -129,19 +121,16 @@ const SingleChat = () => {
     };
 
     setMessageData((prev) => [...prev, loadingBotMessage]);
-
-    // Clear input
     reset();
 
     try {
       setIsLoading(true);
 
-      // Send message to API
       const response = await axios.post("/api/chatbot/message/", {
         session_id: params?.session_id,
         message: data.message,
       });
-      // Handle response
+
       if (response.status === 208) {
         Swal.fire({
           title: "Subscribe to chat",
@@ -168,14 +157,11 @@ const SingleChat = () => {
                   block: "start",
                 });
               }
-            }, 500); // Adjust delay if needed
-          } else {
-            return;
+            }, 500);
           }
         });
       }
 
-      // Remove loading message and add actual response
       setMessageData((prev) => {
         const filteredMessages = prev.filter((msg) => msg.id !== botMessageId);
         return [
@@ -190,8 +176,6 @@ const SingleChat = () => {
       });
     } catch (error) {
       console.error("Error sending message:", error);
-
-      // Update loading message to show error
       setMessageData((prev) =>
         prev.map((msg) =>
           msg.id === botMessageId
@@ -258,8 +242,14 @@ const SingleChat = () => {
 
       <div className="h-screen flex flex-col text-white">
         {/* Chat Messages Area */}
-        <div className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 pb-32 sm:pb-28">
-          <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto">
+        <div
+          className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16"
+          style={{
+            paddingBottom: "200px", // ✅ enough space for input bar
+            WebkitOverflowScrolling: "touch", // ✅ smooth scrolling
+          }}
+        >
+          <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto min-h-full">
             {messageData.length > 0 ? (
               <>
                 {messageData.map((item) => (
@@ -318,8 +308,8 @@ const SingleChat = () => {
           </div>
         </div>
 
-        {/* Chat Input - Fixed at Bottom */}
-        <div className="fixed bottom-0 left-0 right-0 px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-4 lg:ml-[280px] z-10 bg-gradient-to-t from-black/90 via-black/60 to-black/20 backdrop-blur">
+        {/* Chat Input */}
+        <div className="fixed bottom-0 left-0 right-0 px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-4 lg:ml-[280px] z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm">
           <div className="max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto">
             <form
               className="w-full max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl mx-auto"
@@ -331,8 +321,7 @@ const SingleChat = () => {
                   value={watchedMessage}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyPress}
-                  placeholder="Message .....7
-                  "
+                  placeholder="Message ....."
                   rows={1}
                   className="w-full py-2 sm:py-4 lg:py-4 xl:py-4 2xl:py-3 pl-3 sm:pl-4 md:pl-5 lg:pl-6 xl:pl-7 2xl:pl-8 pr-12 sm:pr-14 md:pr-16 lg:pr-18 xl:pr-20 2xl:pr-24 text-sm sm:text-base md:text-lg lg:text-xl text-white bg-white/20 backdrop-blur-md rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300 resize-none overflow-hidden min-h-[40px] max-h-[200px]"
                   style={{

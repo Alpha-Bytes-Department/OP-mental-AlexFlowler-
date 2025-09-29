@@ -40,26 +40,25 @@ const ChatHome = () => {
 
   // Auto scroll to bottom when new messages are added
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
     scrollToBottom();
   }, [messageData]);
 
-  //--------- auto-resize textarea function --------
+  // Auto-resize textarea
   const autoResizeTextarea = (textarea: HTMLTextAreaElement) => {
     textarea.style.height = "auto";
     textarea.style.height = Math.min(textarea.scrollHeight, 200) + "px";
   };
 
-  //--------- input change handler --------
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setValue("message", e.target.value);
     autoResizeTextarea(e.target);
   };
 
-  //----------notification for history -----------------
+  // Notification for history
   const handleChatInit = async () => {
     Swal.fire({
       title: "Do you want to save chat history?",
@@ -80,7 +79,6 @@ const ChatHome = () => {
         localStorage.setItem("chatHistory", "true");
         setChatGeneralHistory("true");
 
-        // checking subscription
         if (user && user?.is_subscribed !== true) {
           Swal.fire({
             title: "Subscribe to chat",
@@ -107,9 +105,7 @@ const ChatHome = () => {
                     block: "start",
                   });
                 }
-              }, 500); // Adjust delay if needed
-            } else {
-              return;
+              }, 500);
             }
           });
         }
@@ -122,7 +118,6 @@ const ChatHome = () => {
         localStorage.setItem("chatHistory", "false");
         setChatGeneralHistory("false");
 
-        // checking subscription
         if (user?.is_subscribed !== true) {
           Swal.fire({
             title: "Subscribe to chat",
@@ -149,9 +144,7 @@ const ChatHome = () => {
                     block: "start",
                   });
                 }
-              }, 500); // Adjust delay if needed
-            } else {
-              return;
+              }, 500);
             }
           });
         }
@@ -163,15 +156,11 @@ const ChatHome = () => {
     });
   };
 
-  // Run once on page landing
   useEffect(() => {
     handleChatInit();
-    // if (user && !chatGeneralHistory) {
-    //   handleChatInit();
-    // }
   }, []);
 
-  // Load existing chat data from API
+  // Load existing chat data
   const LoadData = async () => {
     try {
       setIsInitialLoading(true);
@@ -181,7 +170,6 @@ const ChatHome = () => {
 
         if (Array.isArray(response.data)) {
           response.data.forEach((item: any, idx: number) => {
-            // Add user message if present
             if (item.role === "user") {
               transformedMessages.push({
                 id: `user-${item.id ?? idx}`,
@@ -191,7 +179,6 @@ const ChatHome = () => {
                 timestamp: item.timestamp,
               });
             }
-            // Add assistant (bot) message if present
             if (item.role === "assistant") {
               transformedMessages.push({
                 id: `bot-${item.id ?? idx}`,
@@ -203,7 +190,6 @@ const ChatHome = () => {
             }
           });
         }
-
         setMessageData(transformedMessages);
       }
     } catch (error) {
@@ -217,12 +203,9 @@ const ChatHome = () => {
     LoadData();
   }, []);
 
-  
-
   const onSubmit = async (data: FormData) => {
     if (!data.message.trim()) return;
 
-    // Add user message instantly
     const userMessageId = Date.now();
     const newUserMessage: Message = {
       id: userMessageId,
@@ -233,7 +216,6 @@ const ChatHome = () => {
 
     setMessageData((prev) => [...prev, newUserMessage]);
 
-    // Add loading bot message
     const botMessageId = userMessageId + 1;
     const loadingBotMessage: Message = {
       id: botMessageId,
@@ -244,7 +226,6 @@ const ChatHome = () => {
 
     setMessageData((prev) => [...prev, loadingBotMessage]);
 
-    // Clear input and reset textarea height
     reset();
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
@@ -253,15 +234,12 @@ const ChatHome = () => {
 
     try {
       setIsLoading(true);
-      // Send message to API
       const response = await axios.post("/api/chatbot/message/", {
         session_id: sessionId,
         message: data.message,
       });
-      // Handle response
-      if (response.status === 208) {
-        // console.log("AI Response:", response.data.reply);
 
+      if (response.status === 208) {
         Swal.fire({
           title: "Subscribe to chat",
           text: response.data.reply,
@@ -287,14 +265,11 @@ const ChatHome = () => {
                   block: "start",
                 });
               }
-            }, 500); // Adjust delay if needed
-          } else {
-            return;
+            }, 500);
           }
         });
       }
 
-      // Remove loading message and add actual response
       setMessageData((prev) => {
         const filteredMessages = prev.filter((msg) => msg.id !== botMessageId);
         return [
@@ -309,8 +284,6 @@ const ChatHome = () => {
       });
     } catch (error) {
       console.error("Error sending message:", error);
-
-      // Update loading message to show error
       setMessageData((prev) =>
         prev.map((msg) =>
           msg.id === botMessageId
@@ -327,13 +300,11 @@ const ChatHome = () => {
     }
   };
 
-
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(onSubmit)();
     }
-    // Allow Shift+Enter for new line
   };
 
   if (isInitialLoading) {
@@ -379,7 +350,13 @@ const ChatHome = () => {
 
       <div className="h-screen flex flex-col text-white">
         {/* Chat Messages Area */}
-        <div className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 pb-24 mb-10">
+        <div
+          className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16"
+          style={{
+            paddingBottom: "200px", // ✅ ensures messages not hidden by input
+            WebkitOverflowScrolling: "touch", // ✅ smooth scrolling on mobile
+          }}
+        >
           <div className="flex flex-col gap-3 sm:gap-4 md:gap-5 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto">
             {messageData?.length > 0 ? (
               <>
@@ -409,7 +386,7 @@ const ChatHome = () => {
                             ></div>
                             <div
                               className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-bounce"
-                              style={{ animationDelay: "0.1s" }}
+                              style={{ animationDelay: "0.2s" }}
                             ></div>
                           </div>
                           <span className="text-xs sm:text-sm text-gray-300">
@@ -420,10 +397,9 @@ const ChatHome = () => {
                         <p>{item.message}</p>
                       )}
                     </div>
-                    
                   </div>
                 ))}
-                
+                <div ref={messagesEndRef} />
               </>
             ) : (
               <div className="flex flex-col justify-center items-center h-full text-center space-y-8">
@@ -439,9 +415,8 @@ const ChatHome = () => {
             )}
           </div>
         </div>
-        <div ref={messagesEndRef}/>
 
-        {/* Chat Input - Fixed at Bottom */}
+        {/* Chat Input */}
         <div className="fixed bottom-0 left-0 right-0 px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-4 lg:ml-[280px] z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm">
           <div className="max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto">
             <form
@@ -454,7 +429,7 @@ const ChatHome = () => {
                   value={watchedMessage}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyPress}
-                  placeholder="Message .....7"
+                  placeholder="Message ....."
                   rows={1}
                   className="w-full py-2 sm:py-4 lg:py-4 xl:py-4 2xl:py-3 pl-3 sm:pl-4 md:pl-5 lg:pl-6 xl:pl-7 2xl:pl-8 pr-12 sm:pr-14 md:pr-16 lg:pr-18 xl:pr-20 2xl:pr-24 text-sm sm:text-base md:text-lg lg:text-xl text-white bg-white/20 backdrop-blur-md rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300 resize-none overflow-hidden min-h-[40px] max-h-[200px]"
                   style={{

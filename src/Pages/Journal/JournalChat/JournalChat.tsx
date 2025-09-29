@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { FaArrowUp } from "react-icons/fa6";
 import logo from "../../../../public/bgLogo.svg";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useAxios } from "../../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
+import { useForm } from "react-hook-form";
 
 // ----type declaration---------
 interface Message {
@@ -18,17 +19,24 @@ interface JournalEntry {
   message: string;
 }
 
+// Corrected FormData type
+interface FormData {
+  message: string;
+}
+
 const JournalChat = () => {
   //--------states--------
   const [messages, setMessages] = useState<Message[]>([]); // stores chat messages
-  const [completed, setCompleted] = useState(false);
-  const [inputMessage, setInputMessage] = useState<string>(""); // handles input field text
   const [initialLoading, setInitialLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false); // Add loading state for sending messages
   const messagesEndRef = useRef<HTMLDivElement>(null); // ref for auto-scroll
   const axios = useAxios();
   const params = useParams();
-  const navigate = useNavigate();
+  const { handleSubmit, reset, watch, setValue } = useForm<FormData>({
+    defaultValues: { message: "" },
+  });
+  const watchedMessage = watch("message", "");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   //--------- auto-scroll function --------
   const scrollToBottom = useCallback(() => {
@@ -127,130 +135,89 @@ const JournalChat = () => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  //--------- input change handler --------
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputMessage(e.target.value);
+  // Replace handleInputChange with auto-resize logic
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setValue("message", e.target.value);
+    autoResizeTextarea(e.target);
+  };
+
+  const autoResizeTextarea = (textarea: HTMLTextAreaElement) => {
+    textarea.style.height = "auto";
+    textarea.style.height = Math.min(textarea.scrollHeight, 200) + "px";
   };
 
   //--------- message send handler --------
-  const handleSendMessage = async () => {
-    const trimmedMessage = inputMessage.trim();
-    if (!trimmedMessage || isLoading) return;
+  const onSubmit = async (data: FormData) => {
+    if (!data.message.trim()) return;
 
-    // Prevent sending if already loading
-    setIsLoading(true);
-
-    // Generate unique ID for user message
-    const userMessageId = `user-${Date.now()}`;
-    const botMessageId = `bot-${Date.now() + 1}`;
-
-    // Add user message
-    const userMessage: Message = {
+    const userMessageId = Date.now();
+    const newUserMessage: Message = {
       id: userMessageId,
-      message: trimmedMessage,
+      message: data.message,
       sender: "user",
       status: "success",
     };
 
-    // Add loading bot message
+    setMessages((prev) => [...prev, newUserMessage]);
+
+    const botMessageId = userMessageId + 1;
     const loadingBotMessage: Message = {
       id: botMessageId,
-      message: "Thinking",
+      message: "thinking",
       sender: "bot",
       status: "loading",
     };
 
-    setMessages((prev) => [...prev, userMessage, loadingBotMessage]);
-    setInputMessage("");
+    setMessages((prev) => [...prev, loadingBotMessage]);
 
-    if (params.session_id) {
-      try {
-        const response = await axios.post("api/journaling/chat/", {
-          message: trimmedMessage,
-          session_id: parseInt(params.session_id),
-        });
-        
+    reset();
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = "40px";
+    }
 
-        if (response.status === 208) {
-          // Remove loading message on limit reached
-          setMessages((prev) => prev.filter((msg) => msg.id !== botMessageId));
+    try {
+      setIsLoading(true);
+      const response = await axios.post("api/journaling/chat/", {
+        session_id: params?.session_id,
+        message: data.message,
+      });
 
-          const result = await Swal.fire({
-            title: "Subscribe for chat",
-            text: response.data.reply,
-            icon: "info",
-            confirmButtonText: "OK",
-            showCancelButton: true,
-            background: "rgba(255, 255, 255, 0.1)",
-            backdrop: "rgba(0, 0, 0, 0.4)",
-            customClass: {
-              popup: "glassmorphic-popup",
-              title: "glassmorphic-title",
-              htmlContainer: "glassmorphic-text",
-              confirmButton: "glassmorphic-button",
-            },
-          });
-
-          if (result.isConfirmed) {
-            navigate("/", { replace: false });
-            setTimeout(() => {
-              const pricingElement = document.getElementById("pricing");
-              if (pricingElement) {
-                pricingElement.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                });
+      setMessages((prev) => {
+        const filteredMessages = prev.filter((msg) => msg.id !== botMessageId);
+        return [
+          ...filteredMessages,
+          {
+            id: response?.data?.session_id || Date.now(),
+            message: response?.data?.reply || "I received your message!",
+            sender: "bot",
+            status: "success",
+          },
+        ];
+      });
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === botMessageId
+            ? {
+                ...msg,
+                message: "Failed to get response. Please try again.",
+                status: "error" as const,
               }
-            }, 500);
-          }
-          return;
-        }
-
-        // Check if session is complete
-        if (response.data?.is_complete === true) {
-          setCompleted(true);
-        }
-
-        // Update the loading message with the actual response
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === botMessageId
-              ? {
-                  ...msg,
-                  message: response.data?.reply || "I received your message!",
-                  status: "success" as const,
-                }
-              : msg
-          )
-        );
-      } catch (error) {
-        console.error("Error sending message:", error);
-
-        // Update loading message to show error
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === botMessageId
-              ? {
-                  ...msg,
-                  message: "Failed to get response. Please try again.",
-                  status: "error" as const,
-                }
-              : msg
-          )
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
-      return;
+            : msg
+        )
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
   //--------- enter key handler --------
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      handleSubmit(onSubmit)();
     }
   };
 
@@ -327,11 +294,11 @@ const JournalChat = () => {
                         item.message
                       )}
                     </p>
-                    {completed && item.sender === "bot" && (
+                    {/* {completed && item.sender === "bot" && (
                       <p className="text-red-600 text-xs mt-2">
                         Your session is complete
                       </p>
-                    )}
+                    )} */}
                   </div>
                 </div>
               ))}
@@ -353,27 +320,45 @@ const JournalChat = () => {
       </div>
 
       {/* --------------- Input area ---------------------- */}
-      <div className="p-4 mb-40 md:mb-15 lg:mb-0">
-        <div className="max-w-3xl mx-auto flex gap-4 rounded-lg bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm p-4">
-          <input
-            type="text"
-            value={inputMessage}
-            onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
-            placeholder="Type your message..."
-            disabled={isLoading}
-            className="w-full py-2 sm:py-3 lg:py-4 pl-2 sm:pl-4 pr-8 sm:pr-12 text-sm sm:text-base text-white bg-white/20 backdrop-blur-md rounded-lg sm:rounded-xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300 disabled:opacity-50"
-          />
-          <button
-            type="submit"
-            onClick={handleSendMessage}
-            disabled={isLoading || !inputMessage.trim()}
-            className="bg-cCard disabled:bg-cCard/20 disabled:cursor-not-allowed text-white rounded-md sm:rounded-lg p-1.5 sm:p-2 md:p-2.5 lg:p-3 transition-colors"
-          >
-            <FaArrowUp className="text-black w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-          </button>
+      <div className="fixed bottom-0 left-0 right-0 px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 py-4 lg:ml-[280px] z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm">
+          <div className="max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto">
+            <form
+              className="w-full max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl mx-auto"
+              onSubmit={handleSubmit(onSubmit)}
+            >
+              <div className="relative w-full flex justify-center items-center">
+                <textarea
+                  ref={textareaRef}
+                  value={watchedMessage}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyPress}
+                  placeholder="Message ....."
+                  rows={1}
+                  className="w-full py-2 sm:py-4 lg:py-4 xl:py-4 2xl:py-3 pl-3 sm:pl-4 md:pl-5 lg:pl-6 xl:pl-7 2xl:pl-8 pr-12 sm:pr-14 md:pr-16 lg:pr-18 xl:pr-20 2xl:pr-24 text-sm sm:text-base md:text-lg lg:text-xl text-white bg-white/20 backdrop-blur-md rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300 resize-none overflow-hidden min-h-[40px] max-h-[200px]"
+                  style={{
+                    height: "60px",
+                    minHeight: "60px",
+                  }}
+                  disabled={isLoading}
+                  autoComplete="off"
+                />
+                <div className="absolute right-2 sm:right-3 md:right-4 top-1/2 -translate-y-1/2 flex items-center">
+                  <button
+                    type="submit"
+                    disabled={isLoading || !watchedMessage?.trim()}
+                    className="bg-cCard disabled:bg-cCard/20 disabled:cursor-not-allowed text-white rounded-md sm:rounded-lg p-2 sm:p-3 md:p-3 lg:p-4 transition-colors flex items-center justify-center"
+                    style={{
+                      minWidth: "40px", // Ensure button has a minimum width
+                      height: "40px", // Ensure consistent height
+                    }}
+                  >
+                    <FaArrowUp className="text-black w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
     </div>
   );
 };

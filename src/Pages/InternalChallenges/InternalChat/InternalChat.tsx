@@ -277,7 +277,7 @@ const InternalChat = () => {
       </div>
 
       {/* --------------- Input area ---------------------- */}
-      <div className="p-4 mb-15 lg:mb-0">
+      <div className="p-4 mb-40 md:mb-15 lg:mb-0">
         <div className="max-w-3xl mx-auto flex gap-4 rounded-lg bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm p-4">
           <input
             type="text"

@@ -25,14 +25,13 @@ const SingleChat = () => {
 
   const params = useParams();
 
-
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const axios = useAxios();
   const navigate = useNavigate();
 
   const { handleSubmit, reset, watch, setValue } = useForm<FormData>({
-      defaultValues: { message: "" },
-    });
+    defaultValues: { message: "" },
+  });
 
   const watchedMessage = watch("message");
 
@@ -45,7 +44,7 @@ const SingleChat = () => {
     scrollToBottom();
   }, [messageData]);
 
-    //--------- auto-resize textarea function --------
+  //--------- auto-resize textarea function --------
   const autoResizeTextarea = (textarea: HTMLTextAreaElement) => {
     textarea.style.height = "auto";
     textarea.style.height = Math.min(textarea.scrollHeight, 200) + "px";
@@ -57,13 +56,14 @@ const SingleChat = () => {
     autoResizeTextarea(e.target);
   };
 
-
   // Load existing chat data from API
   const LoadData = async () => {
     try {
       setIsInitialLoading(true);
-      const response = await axios.get(`/api/chatbot/history/${params?.session_id}/`);
-      console.log("Are you hering........................",response);
+      const response = await axios.get(
+        `/api/chatbot/history/${params?.session_id}/`
+      );
+      console.log("Are you hering........................", response);
       if (response.status === 200) {
         const transformedMessages: Message[] = [];
 
@@ -259,7 +259,7 @@ const SingleChat = () => {
       <div className="h-screen flex flex-col text-white">
         {/* Chat Messages Area */}
         <div className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 pb-24 mb-10">
-          <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto min-h-full">
+          <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto">
             {messageData.length > 0 ? (
               <>
                 {messageData.map((item) => (

@@ -331,7 +331,7 @@ const SingleChat = () => {
                   value={watchedMessage}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyPress}
-                  placeholder="Message .....6
+                  placeholder="Message .....7
                   "
                   rows={1}
                   className="w-full py-2 sm:py-4 lg:py-4 xl:py-4 2xl:py-3 pl-3 sm:pl-4 md:pl-5 lg:pl-6 xl:pl-7 2xl:pl-8 pr-12 sm:pr-14 md:pr-16 lg:pr-18 xl:pr-20 2xl:pr-24 text-sm sm:text-base md:text-lg lg:text-xl text-white bg-white/20 backdrop-blur-md rounded-xl sm:rounded-2xl outline-none focus:ring-2 focus:ring-cCard/50 transition-all placeholder-gray-300 resize-none overflow-hidden min-h-[40px] max-h-[200px]"

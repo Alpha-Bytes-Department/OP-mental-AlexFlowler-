@@ -55,16 +55,33 @@ const MindsetChat = () => {
         const response = await axios.get<ChatResponse[]>(
           `api/mindset/history/${params?.mindset_session}/`
         );
-        if (response.status === 200) {
-          const transformedMessages: Message[] = response.data.map((item, idx) => ({
-            id: `${item.role}-${item.id ?? idx}`,
-            message: item.message,
-            sender: item.role === "user" ? "user" : "bot",
-            status: "success",
-            timestamp: item.timestamp,
-          }));
-          setMessages(transformedMessages);
+      
+        if (response?.status === 200) {
+        const transformedMessages: Message[] = [];
+        if (Array.isArray(response?.data)) {
+          response?.data?.forEach((item: any, idx: number) => {
+            if (item.author === "user") {
+              transformedMessages.push({
+                id: `user-${item.id ?? idx}`,
+                message: item.message,
+                sender: "user",
+                status: "success",
+                timestamp: item.timestamp,
+              });
+            }
+            if (item.author === "bot") {
+              transformedMessages.push({
+                id: `bot-${item.id ?? idx}`,
+                message: item.message,
+                sender: "bot",
+                status: "success",
+                timestamp: item.timestamp,
+              });
+            }
+          });
         }
+        setMessages(transformedMessages);
+      }
       } catch (error) {
         console.error("Error loading chat data:", error);
       } finally {
@@ -124,7 +141,7 @@ const MindsetChat = () => {
 
     try {
       const response = await axios.post("api/mindset/", {
-        session_id: null,
+        session_id: params?.mindset_session,
         message: data.message,
       });
 
@@ -168,7 +185,7 @@ const MindsetChat = () => {
   //-------------showing loading status-----------
   if (initialLoading) {
     return (
-      <div className="h-screen flex items-center justify-center text-white">
+      <div  className="h-screen flex items-center justify-center text-white">
         <div className="flex flex-col items-center space-y-4">
           <div className="flex space-x-2">
             <div className="w-3 h-3 bg-white rounded-full animate-bounce"></div>
@@ -187,6 +204,7 @@ const MindsetChat = () => {
     );
   }
 
+
   return (
     <div className="flex flex-col h-screen">
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -199,7 +217,9 @@ const MindsetChat = () => {
         </div>
       </div>
       {/* --------------- Messages area ---------------------- */}
-      <div className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 pb-24">
+      <div  className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16 pb-24" style={{
+            WebkitOverflowScrolling: "touch", //  smooth scrolling on mobile
+          }}>
         <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto ">
           {messages.length > 0 ? (
             <>

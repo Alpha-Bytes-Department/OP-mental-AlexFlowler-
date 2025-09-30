@@ -361,8 +361,8 @@ const ChatHome = () => {
         <div
           className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16"
           style={{
-            paddingBottom: "200px", // ✅ ensures messages not hidden by input
-            WebkitOverflowScrolling: "touch", // ✅ smooth scrolling on mobile
+            paddingBottom: "200px", //  ensures messages not hidden by input
+            WebkitOverflowScrolling: "touch", //  smooth scrolling on mobile
           }}
         >
           <div className="flex flex-col gap-3 sm:gap-4 md:gap-5 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto">

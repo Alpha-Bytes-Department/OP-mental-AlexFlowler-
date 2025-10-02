@@ -47,7 +47,7 @@ const processQueue = (error: any, token: string | null = null) => {
 };
 
 const axiosInstance = axios.create({
-  baseURL: "http://13.62.134.108/",
+  baseURL: "https://optimalperformanceai.com/",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
@@ -113,7 +113,7 @@ axiosInstance.interceptors.response.use(
           console.log("Attempting to refresh access token...");
 
           const refreshResponse = await axios.post(
-            "http://13.62.134.108/api/users/token/refresh/",
+            "https://optimalperformanceai.com/api/users/token/refresh/",
             {
               refresh: tokens.refresh,
             }

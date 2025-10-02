@@ -12,7 +12,7 @@ export const GoogleBtnBackend = () => {
       // 3. We send the access_token to our backend
       try {
         const res = await fetch(
-          "http://13.62.134.108//api/users/auth/google/",
+          "https://optimalperformanceai.com/api/users/auth/google/",
           {
             method: "POST",
             headers: {

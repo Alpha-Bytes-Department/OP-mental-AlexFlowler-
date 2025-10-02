@@ -434,7 +434,7 @@ const Navigation = ({
                       <img
                         src={
                           user?.profile_image.startsWith("/media")
-                            ? `http://13.62.134.108/${user?.profile_image}`
+                            ? `https://optimalperformanceai.com/${user?.profile_image}`
                             : user?.profile_image
                         }
                         alt="Profile"

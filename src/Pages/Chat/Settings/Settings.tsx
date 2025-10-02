@@ -18,7 +18,7 @@ const Settings = () => {
     return JSON.parse(localStorage.getItem("user") || "{}");
   });
   const axios = useAxios();
-  const baseUrl = "http://13.62.134.108/"; // Uncomment and use your base URL
+  const baseUrl = "https://optimalperformanceai.com/"; // Uncomment and use your base URL
 
   const {
     register,

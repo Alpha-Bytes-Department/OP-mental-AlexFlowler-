@@ -1,6 +1,6 @@
 import CTA from "./CTA"
 import Faq from "./Faq"
-import Feature from "./Feature"
+// import Feature from "./Feature"
 import Footer from "./Footer"
 import Header from "./Header"
 import Pricing from "./Pricing"
@@ -10,7 +10,7 @@ const Home = () => {
   return (
     <div className="bg-black">      
         <Header />
-        <Feature />
+        {/* <Feature /> */}
         <Pricing />
         <Testimonial />
         <Faq/>

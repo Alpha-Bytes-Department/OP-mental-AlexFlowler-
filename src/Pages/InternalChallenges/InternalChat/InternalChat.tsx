@@ -201,7 +201,7 @@ const InternalChat = () => {
       </div>
  
       {/* --------------- Messages area ---------------------- */}
-      <div className="flex-1 p-4 overflow-y-auto">
+      <div className="flex-1 p-4 overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" }}>
         <div className="max-w-3xl mx-auto space-y-4">
           {messages.length === 0 && !isInitialLoading ? (
             <div className="text-center text-[#DBD0A6] opacity-60 mt-20">

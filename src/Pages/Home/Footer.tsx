@@ -1,23 +1,70 @@
 import { Link } from "react-router-dom";
 
 const Footer = () => {
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const scrollToPricing = () => {
+    const pricingElement = document.getElementById("pricing");
+    if (pricingElement) {
+      pricingElement.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
+
   return (
     <footer className="bg-[#2D2A2B] text-white py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="flex flex-col justify-between sm:flex-row gap-8 lg:gap-12 ">
-          {/* Company Description */}
-          <div className=" max-w-md">
-            <h3 className="text-xl font-bold mb-4">Optimal Performance</h3>
-            <p className="text-gray-300 leading-relaxed mb-6">
-              Optimal Performance delivers evidence-based, expert-driven
-              strategies that empower high performers and organizations to
-              achieve performance and wellness results, while providing a
-              trusted platform for qualified professionals to share their
-              expertise and scale their impact.
-            </p>
+          {/* Quick Links */}
+          <div>
+            <h3 className="text-xl font-bold mb-4">Quick Links</h3>
+            <ul className="flex flex-col gap-7">
+              <li>
+                <Link
+                  to="/"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollToTop();
+                  }}
+                  className="text-gray-300 hover:text-white transition-colors flex items-center"
+                >
+                  <span className="mr-2">›</span>
+                  Home
+                </Link>
+              </li>
+              <li>
+                <p
+                  onClick={scrollToPricing}
+                  className="text-gray-300 hover:text-white transition-colors flex items-center cursor-pointer"
+                >
+                  <span className="mr-2">›</span>
+                  Pricing
+                </p>
+              </li>
+            </ul>
+          </div>
 
-            {/* Social Media Icons */}
+          {/* Legal */}
+          <div>
+            <h3 className="text-xl font-bold mb-4">Legal</h3>
+            <ul className="flex flex-col gap-7">
+              <Link to="https://optimalperformancesystem.com/privacy-policy/">
+                <span className="text-gray-300">Privacy & Policy</span>
+              </Link>
+            </ul>
+          </div>
+
+          {/* Social Icons */}
+          <div>
+            <h3 className="text-xl  font-bold mb-4">Social Icons</h3>
             <div className="flex space-x-4">
               <Link
                 to="#"
@@ -76,120 +123,17 @@ const Footer = () => {
               </Link>
             </div>
           </div>
-
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-xl font-bold mb-4">Quick Links</h3>
-            <ul className="flex flex-col gap-7">
-              <li>
-                <Link
-                  to="/"
-                  className="text-gray-300 hover:text-white transition-colors flex items-center"
-                >
-                  <span className="mr-2">›</span>
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/about"
-                  className="text-gray-300 hover:text-white transition-colors flex items-center"
-                >
-                  <span className="mr-2">›</span>
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/contact"
-                  className="text-gray-300 hover:text-white transition-colors flex items-center"
-                >
-                  <span className="mr-2">›</span>
-                  Contact
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Legal */}
-          <div>
-            <h3 className="text-xl font-bold mb-4">Legal</h3>
-            <ul className="flex flex-col gap-7">
-              <li>
-                <span className="text-gray-300">Privacy</span>
-              </li>
-              <li>
-                <span className="text-gray-300">Policy</span>
-              </li>
-              <li>
-                <span className="text-gray-300">Terms</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Social Icons */}
-          <div>
-            <h3 className="text-xl  font-bold mb-4">Social Icons</h3>
-            <ul className="flex flex-col gap-5">
-              <li>
-                <Link
-                  to="/instagram"
-                  className="text-gray-300 hover:text-white transition-colors flex items-center"
-                >
-                  <span className="mr-2">›</span>
-                  Instagram
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/facebook"
-                  className="text-gray-300 hover:text-white transition-colors flex items-center"
-                >
-                  <span className="mr-2">›</span>
-                  Facebook
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/linkedin"
-                  className="text-gray-300 hover:text-white transition-colors flex items-center"
-                >
-                  <span className="mr-2">›</span>
-                  LinkedIn
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/twitter"
-                  className="text-gray-300 hover:text-white transition-colors flex items-center"
-                >
-                  <span className="mr-2">›</span>
-                  Twitter (X)
-                </Link>
-              </li>
-            </ul>
-          </div>
         </div>
 
         {/* Footer Bottom */}
       </div>{" "}
-      <hr className=" border-[#FAFAFD] mt-20 border-t-2 max-w-7xl mx-auto"/>
+      <hr className=" border-[#FAFAFD] mt-10 border-t-2 max-w-7xl mx-auto" />
       <div className=" mt-2 max-w-4xl mx-auto">
-        <div className="">
-          
-          <div className="flex flex-wrap flex-col px-5 sm:flex-row justify-between  space-x-6 text-sm text-gray-400"><div className="text-gray-400 text-sm">
-            Copyright 2025 fenyx femme
+        <div className="flex flex-col text-sm text-gray-400 text-center">
+          <div className="text-gray-400 text-sm">
+            Copyright 2025 © Optimal Performance. All rights reserved.
           </div>
-            <Link to="/terms" className="hover:text-white transition-colors">
-              Inc Terms of Service
-            </Link>
-            <Link to="/privacy" className="hover:text-white transition-colors">
-              Privacy
-            </Link>
-            <Link to="/legal" className="hover:text-white transition-colors">
-              Legal
-            </Link>
-          </div>
+          <p>Developed by Qbit Coder</p>
         </div>
       </div>
     </footer>

@@ -12,7 +12,7 @@ const Faq = () => {
             1. How is my data protected?
           </div>
           <div className="collapse-content font-montserrat text-sm font-semibold bg-gradient-to-r from-[#8E7D3F] to-[#DBD0A6] bg-clip-text text-transparent">
-            Your privacy is very important. Be aware that you data and chat history are private. The OP Mental Performance Ai Coach does not store any of your data in the cloud. Additionally, the app was desinged to only store minimal data necessary to help you gain the most value from the app. All data stored is done so locally on your device.Click the "Sign Up" button in the top right corner and follow the registration process.
+            Your data is secured with end-to-end encryption, ensuring conversations are private. Our system is designed with a no-storage policy. Chat sessions have a 24-hr expiry, and are never written to a database or server. In addition, we deploy on HIPAA-eligible AWS infrastructure, protected by enterprise-grade firewalls, monitoring, and compliance controls to meet corporate security standards.
           </div>
         </div>
 
@@ -22,27 +22,27 @@ const Faq = () => {
             2. Can I cancel anytime?
           </div>
           <div className="collapse-content font-montserrat text-sm font-semibold bg-gradient-to-r from-[#8E7D3F] to-[#DBD0A6] bg-clip-text text-transparent">
-            Yes, you can cancel your subscription at any time. Simply go to your account settings and follow the cancellation process. If you have any issues, feel free to contact our support team for assistance.
+            Yes, you can cancel your subscription at any time through your account settings. Your access will remain active until the end of your current monthly billing period, after which the subscription will not renew.
           </div>
         </div>
 
         <div className="collapse collapse-plus bg-white/10 backdrop-blur-sm border border-hCard rounded-xl shadow-lg">
           <input type="radio" name="my-accordion-3" />
           <div className="collapse-title text-2xl font-montserrat font-semibold bg-gradient-to-r from-[#8E7D3F] to-[#DBD0A6] bg-clip-text text-transparent">
-            3. Does the AI Coach Replace human coaching?
+            3. Does the Al Coach replace clinical therapy?
           </div>
           <div className="collapse-content font-montserrat text-sm font-semibold bg-gradient-to-r from-[#8E7D3F] to-[#DBD0A6] bg-clip-text text-transparent">
-            The OP Mental Performance Ai Coach is designed to complement human coaching, not replace it. While the AI Coach can provide valuable insights and support, human coaches bring empathy, understanding, and personal experience that an AI cannot replicate. We recommend using the AI Coach as a tool alongside traditional coaching methods for the best results.
+          No, the Al Coach is not a replacement for clinical treatment or mental health care. It is designed to support performance and overall wellbeing. It can not assess, diagnose, or treat medical or psychological conditions. For clinical concerns, we recommend seeking care from a licensed mental health professional.
           </div>
         </div>
 
         <div className="collapse collapse-plus bg-white/10 backdrop-blur-sm border border-hCard rounded-xl shadow-lg">
           <input type="radio" name="my-accordion-3" />
           <div className="collapse-title text-2xl font-montserrat font-semibold bg-gradient-to-r from-[#8E7D3F] to-[#DBD0A6] bg-clip-text text-transparent">
-            4. What genres or styles does it support?
+            4. Can my organization gain access to my chat history?
           </div>
           <div className="collapse-content font-montserrat text-sm font-semibold bg-gradient-to-r from-[#8E7D3F] to-[#DBD0A6] bg-clip-text text-transparent">
-            The OP Mental Performance Ai Coach is designed to support a wide range of genres and styles. Whether you're into sports, music, art, or any other field, the AI Coach can provide tailored guidance and insights to help you improve your performance. Simply let the AI know your specific interests and goals, and it will adapt its coaching approach accordingly.
+            No, your organization cannot access your chat history. Our platform is designed with a strict no-storage policy. Conversations are processed in real time, never saved to a database, and cannot be retrieved by employers or third parties.
           </div>
         </div>
       </div>

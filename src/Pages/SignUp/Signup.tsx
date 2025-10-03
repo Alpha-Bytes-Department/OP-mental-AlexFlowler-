@@ -67,6 +67,7 @@ const Signup = () => {
           title: "Verification Email Sent!",
           text: "Please check your inbox to verify your account.",
           icon: "info",
+          iconColor: "#DBD0A6",
           confirmButtonText: "OK",
           background: "rgba(255, 255, 255, 0.1)",
           backdrop: "rgba(0, 0, 0, 0.4)",

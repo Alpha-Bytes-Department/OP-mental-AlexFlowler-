@@ -131,11 +131,12 @@ const SingleChat = () => {
         message: data.message,
       });
 
-      if (response.status === 208) {
+      if (response && response?.status === 208) {
         Swal.fire({
           title: "Subscribe to chat",
           text: response.data.reply,
           icon: "info",
+          iconColor: "#DBD0A6",
           confirmButtonText: "OK",
           showCancelButton: true,
           background: "rgba(255, 255, 255, 0.1)",

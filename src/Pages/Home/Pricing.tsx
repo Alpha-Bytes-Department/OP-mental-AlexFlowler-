@@ -126,6 +126,7 @@ const Pricing = () => {
         title: "Authentication Required",
         text: "You must be logged in to access this page.",
         icon: "warning",
+        iconColor: "#DBD0A6",
         showCancelButton: true,
         confirmButtonText: "Go to Login",
         cancelButtonText: "Go to Home",
@@ -200,17 +201,17 @@ const Pricing = () => {
           z-index: 20;
         }`}
       </style>
-      <h2 className="py-2 px-3 rounded-r-full text-center w-80 mx-auto rounded-l-full bg-transparent backdrop-blur-lg text-white border-2 border-gray-200/20 ">
+      {/* <h2 className="py-2 px-3 rounded-r-full text-center w-80 mx-auto rounded-l-full bg-transparent backdrop-blur-lg text-white border-2 border-gray-200/20 ">
         Bring your business to the best scale
-      </h2>
+      </h2> */}
 
-      <h1 className="sm:text-[86px] text-5xl  py-5 font-normal font-league-gothic text-center text-white bg-gradient-to-t from-black to-white bg-clip-text">
+      {/* <h1 className="sm:text-[86px] text-5xl  py-5 font-normal font-league-gothic text-center text-white bg-gradient-to-t from-black to-white bg-clip-text">
         Discover Products With <br /> the Best Pricing
       </h1>
       <p className="text-center pb-16 text-xl text-white font-montserrat">
         Select from best plan, ensuring a perfect match. Need more <br /> or
         less? Customize your subscription for a seamless fit!
-      </p>
+      </p> */}
 
       <div id="pricing" className="flex justify-center">
         <div className="flex rounded-xl p-1 backdrop:blur-2xl border gap-2 justify-center mb-12">

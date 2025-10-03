@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { IoCamera, IoPencil, IoSave, IoClose } from "react-icons/io5";
+import { IoPencil, IoSave, IoClose } from "react-icons/io5";
 import { FaUserCircle } from "react-icons/fa";
 import { useAxios } from "../../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
@@ -24,7 +24,7 @@ const Settings = () => {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
+    // setValue,
     reset,
   } = useForm<SettingsFormData>({
     defaultValues: {
@@ -73,8 +73,8 @@ const Settings = () => {
 
           // Update profile image preview
           setPreviewImage(
-            updatedUser.profile_image
-              ? `${baseUrl}${updatedUser.profile_image}`
+            updatedUser?.profile_image
+              ? `${baseUrl}${updatedUser?.profile_image}`
               : null
           );
 
@@ -125,10 +125,10 @@ const Settings = () => {
     });
 
     // Fix profile image URL construction
-    if (userData.profile_image) {
-      const imageUrl = userData.profile_image.startsWith("http")
-        ? userData.profile_image
-        : `${baseUrl}${userData.profile_image}`;
+    if (userData?.profile_image) {
+      const imageUrl = userData?.profile_image.startsWith("http")
+        ? userData?.profile_image
+        : `${baseUrl}${userData?.profile_image}`;
       setPreviewImage(imageUrl);
     } else {
       setPreviewImage(null);
@@ -137,40 +137,40 @@ const Settings = () => {
 
 
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!isEditing) return;
-    const file = event.target.files?.[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith("image/")) {
-        Swal.fire({
-          title: "Invalid File!",
-          text: "Please select an image file.",
-          icon: "error",
-          confirmButtonText: "OK",
-        });
-        return;
-      }
+  // const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (!isEditing) return;
+  //   const file = event.target.files?.[0];
+  //   if (file) {
+  //     // Validate file type
+  //     if (!file.type.startsWith("image/")) {
+  //       Swal.fire({
+  //         title: "Invalid File!",
+  //         text: "Please select an image file.",
+  //         icon: "error",
+  //         confirmButtonText: "OK",
+  //       });
+  //       return;
+  //     }
 
-      // Validate file size (e.g., max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        Swal.fire({
-          title: "File Too Large!",
-          text: "Please select an image smaller than 5MB.",
-          icon: "error",
-          confirmButtonText: "OK",
-        });
-        return;
-      }
+  //     // Validate file size (e.g., max 5MB)
+  //     if (file.size > 5 * 1024 * 1024) {
+  //       Swal.fire({
+  //         title: "File Too Large!",
+  //         text: "Please select an image smaller than 5MB.",
+  //         icon: "error",
+  //         confirmButtonText: "OK",
+  //       });
+  //       return;
+  //     }
 
-      // Create preview URL
-      const previewUrl = URL.createObjectURL(file);
-      setPreviewImage(previewUrl);
+  //     // Create preview URL
+  //     const previewUrl = URL.createObjectURL(file);
+  //     setPreviewImage(previewUrl);
 
-      // Update form value
-      setValue("logo", event.target.files as FileList);
-    }
-  };
+  //     // Update form value
+  //     setValue("logo", event.target.files as FileList);
+  //   }
+  // };
 
   const toggleEdit = () => {
     if (isEditing) {
@@ -181,10 +181,10 @@ const Settings = () => {
       });
 
       // Reset preview image
-      if (userData.profile_image) {
-        const imageUrl = userData.profile_image.startsWith("http")
-          ? userData.profile_image
-          : `${baseUrl}${userData.profile_image}`;
+      if (userData?.profile_image) {
+        const imageUrl = userData?.profile_image.startsWith("http")
+          ? userData?.profile_image
+          : `${baseUrl}${userData?.profile_image}`;
         setPreviewImage(imageUrl);
       } else {
         setPreviewImage(null);
@@ -234,11 +234,11 @@ const Settings = () => {
             >
               <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mb-3 border border-white/30 p-1 rounded-full flex items-center justify-center transition overflow-hidden bg-gray-800/50">
                 {getProfileImage()}
-                {isEditing && (
+                {/* {isEditing && (
                   <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                     <IoCamera size={24} className="text-white" />
                   </div>
-                )}
+                )} */}
               </div>
               {isEditing && (
                 <input
@@ -246,15 +246,16 @@ const Settings = () => {
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  onChange={handleFileUpload}
+                  disabled
+                  // onChange={handleFileUpload}
                 />
               )}
             </label>
-            <p className="text-base sm:text-lg font-medium text-center">
+            {/* <p className="text-base sm:text-lg font-medium text-center">
               {isEditing
                 ? "Click to Upload Profile Picture"
                 : "Profile Picture"}
-            </p>
+            </p> */}
           </div>
 
           {/* Form Fields Container */}
@@ -262,10 +263,10 @@ const Settings = () => {
             {/* Left Column */}
             <div className="w-full flex flex-col md:flex-row gap-10 max-w-md mx-auto lg:mx-0">
               {/* Name Field */}
-              <div className="space-y-2">
+              <div className="space-y-2 mx-auto">
                 <label
                   htmlFor="name"
-                  className="block text-base sm:text-lg font-medium"
+                  className="block text-base sm:text-lg font-medium text-center"
                 >
                   Name
                 </label>
@@ -275,7 +276,7 @@ const Settings = () => {
                   id="name"
                   placeholder="your name"
                   disabled={!isEditing}
-                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-transparent border border-cCard rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/60 transition-colors text-sm sm:text-base ${
+                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-transparent border border-cCard text-center rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/60 transition-colors text-sm sm:text-base ${
                     !isEditing ? "opacity-70 cursor-not-allowed" : ""
                   }`}
                 />
@@ -287,10 +288,10 @@ const Settings = () => {
               </div>
 
               {/* Username Field */}
-              <div className="space-y-2">
+              {/* <div className="space-y-2 mx-auto">
                 <label
                   htmlFor="username"
-                  className="block text-base sm:text-lg font-medium"
+                  className="block text-base sm:text-lg font-medium text-center"
                 >
                   Username
                 </label>
@@ -302,7 +303,7 @@ const Settings = () => {
                   id="username"
                   placeholder="your username"
                   disabled={!isEditing}
-                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-transparent border border-cCard rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/60 transition-colors text-sm sm:text-base ${
+                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-transparent border border-cCard text-center rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/60 transition-colors text-sm sm:text-base ${
                     !isEditing ? "opacity-70 cursor-not-allowed" : ""
                   }`}
                 />
@@ -311,7 +312,7 @@ const Settings = () => {
                     {errors.username.message}
                   </p>
                 )}
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -344,7 +345,7 @@ const Settings = () => {
             ) : (
               <>
                 <IoPencil size={20} />
-                <span className="hidden sm:inline">Edit Profile</span>
+                <span className="hidden sm:inline">Edit Username</span>
               </>
             )}
           </button>

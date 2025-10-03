@@ -63,6 +63,7 @@ const ChatHome = () => {
     Swal.fire({
       title: "Do you want to save chat history?",
       icon: "info",
+      iconColor: "#DBD0A6",
       confirmButtonText: "YES",
       showCancelButton: true,
       cancelButtonText: "NO",
@@ -79,11 +80,12 @@ const ChatHome = () => {
         localStorage.setItem("chatHistory", "true");
         setChatGeneralHistory("true");
 
-        if (user && user?.is_subscribed !== true) {
+        if (user && user?.is_subscribed === false) {
           Swal.fire({
             title: "Subscribe to chat",
             text: "To continue, please subscribe to one of our plans.",
             icon: "info",
+            iconColor: "#DBD0A6",
             confirmButtonText: "OK",
             showCancelButton: true,
             background: "rgba(255, 255, 255, 0.1)",
@@ -118,11 +120,12 @@ const ChatHome = () => {
         localStorage.setItem("chatHistory", "false");
         setChatGeneralHistory("false");
 
-        if (user?.is_subscribed !== true) {
+        if (user && user?.is_subscribed === false) {
           Swal.fire({
             title: "Subscribe to chat",
             text: "To continue, please subscribe to one of our plans.",
             icon: "info",
+            iconColor: "#DBD0A6",
             confirmButtonText: "OK",
             showCancelButton: true,
             background: "rgba(255, 255, 255, 0.1)",
@@ -247,11 +250,12 @@ const ChatHome = () => {
         message: data.message,
       });
 
-      if (response.status === 208) {
+      if (response && response.status === 208) {
         Swal.fire({
           title: "Subscribe to chat",
           text: response.data.reply,
           icon: "info",
+          iconColor: "#DBD0A6",
           confirmButtonText: "OK",
           showCancelButton: true,
           background: "rgba(255, 255, 255, 0.1)",

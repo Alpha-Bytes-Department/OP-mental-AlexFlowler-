@@ -55,6 +55,7 @@ const JournalList: React.FC = () => {
       title: "Are you sure?",
       text: "This action cannot be undone.",
       icon: "warning",
+      iconColor: "#DBD0A6",
       showCancelButton: true,
       confirmButtonText: "Yes, delete it!",
       cancelButtonText: "Cancel",

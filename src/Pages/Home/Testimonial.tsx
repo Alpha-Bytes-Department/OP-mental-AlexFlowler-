@@ -9,6 +9,7 @@ import {
 } from "react-icons/hi2";
 import { useAxios } from "../../Providers/AxiosProvider";
 import { FaUserAlt } from "react-icons/fa";
+// import { ClimbingBoxLoader } from "react-spinners";
 
 const Testimonial = () => {
   const axios = useAxios();
@@ -79,8 +80,10 @@ const Testimonial = () => {
   //   }
   // ];
 
+  console.log("")
+
   return (
-    <div className=" py-16">
+    <div className=" py-16 bg-[url('/background.png')] bg-cover bg-center">
       <div className="flex justify-center mb-12">
         <div className="flex items-center gap-3.5 px-4 py-3 mx-auto rounded-lg border border-hCard bg-[#00000080]">
           <div className="h-2 w-2 rounded-full bg-hCard"></div>
@@ -152,10 +155,10 @@ const Testimonial = () => {
                     <div className="flex items-center justify-between mt-auto">
                       <div className="flex items-center">
                         <div className=" rounded-full border border-hCard p-1 size-14 flex flex-col justify-center mr-3">
-                          {testimonial.user.profile_image ? (
+                          {testimonial?.profile_image ? (
                             <img
-                              src={testimonial.user.profile_image}
-                              alt={testimonial.user.name}
+                              src={testimonial?.profile_image}
+                              alt={testimonial?.reviewer_name}
                               className="size-12 rounded-full object-cover"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
@@ -172,10 +175,10 @@ const Testimonial = () => {
                         
                         <div className="min-w-0 ">
                           <h3 className="text-hCard text-sm sm:text-lg font-montserrat font-semibold truncate">
-                            {testimonial.user.name}
+                            {testimonial?.reviewer_name}
                           </h3>
                           <p className="font-montserrat font-semibold text-hCard text-left text-xs sm:text-sm truncate">
-                            {testimonial.role}
+                            {testimonial?.role}
                           </p>
                         </div>
                       </div>
@@ -230,17 +233,17 @@ const Testimonial = () => {
 
             {/* Header */}
             <div className="flex items-center mb-6 pr-8">
-              <img
-                src={selectedTestimonial.user.profile_image}
-                alt={selectedTestimonial.user.name}
+              {/* <img
+                src={selectedTestimonial?.user?.profile_image}
+                alt={selectedTestimonial?.user?.reviewer_name}
                 className="w-16 h-16 rounded-full mr-4 object-cover"
-              />
+              /> */}
               <div>
                 <h3 className="text-hCard text-xl font-montserrat font-semibold">
-                  {selectedTestimonial.user.name}
+                  {selectedTestimonial?.reviewer_name}
                 </h3>
                 <p className="font-montserrat font-semibold text-hCard text-base">
-                  {selectedTestimonial.role}
+                  {selectedTestimonial?.role}
                 </p>
               </div>
             </div>
@@ -248,7 +251,7 @@ const Testimonial = () => {
             {/* Full testimonial text */}
             <div className="mb-6">
               <p className="text-gray-300 leading-relaxed text-base">
-                {selectedTestimonial.description}
+                {selectedTestimonial?.description}
               </p>
             </div>
 

@@ -48,6 +48,7 @@ const ChatHistory = () => {
       title: "Delete Conversation?",
       text: `Are you sure you want to delete "${title}"? This action cannot be undone.`,
       icon: "warning",
+      iconColor: "#DBD0A6",
       showCancelButton: true,
       confirmButtonColor: "#dc2626",
       cancelButtonColor: "#6b7280",

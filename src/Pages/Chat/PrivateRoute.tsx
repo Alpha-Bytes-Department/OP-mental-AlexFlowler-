@@ -16,6 +16,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
                     title: "Authentication Required",
                     text: "You must be logged in to access this page.",
                     icon: "warning",
+                    iconColor: "#DBD0A6",
                     showCancelButton: true,
                     confirmButtonText: "Go to Login",
                     cancelButtonText: "Go to Home",

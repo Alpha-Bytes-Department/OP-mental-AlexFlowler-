@@ -4,13 +4,13 @@ import {
   HiOutlineXMark,
   HiOutlineCog6Tooth,
   HiOutlineChevronLeft,
-  HiOutlineUser,
+  // HiOutlineUser,
 } from "react-icons/hi2";
 import { SiGoogletasks } from "react-icons/si";
 import { FaAngleDown, FaBookJournalWhills, FaBrain } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
 import { NavLink, useMatch, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import {  useState } from "react";
 import { useAxios } from "../Providers/AxiosProvider";
 import Swal from "sweetalert2";
 import { TbBrandMessenger } from "react-icons/tb";
@@ -25,6 +25,8 @@ interface NavigationProps {
   toggleMobileMenu: () => void;
   toggleDesktopCollapse: () => void;
 }
+
+
 
 
 const Navigation = ({
@@ -427,7 +429,7 @@ const Navigation = ({
                 onClick={() => setLogOutActive((prev) => !prev)}
               >
                 <div className="flex items-center gap-2 w-full">
-                  <div className="border rounded-full p-1 flex-shrink-0">
+                  {/* <div className="border rounded-full p-1 flex-shrink-0">
                     {user?.profile_image &&
                     typeof user?.profile_image === "string" &&
                     user?.profile_image.length > 0 ? (
@@ -443,9 +445,10 @@ const Navigation = ({
                     ) : (
                       <HiOutlineUser size={24} />
                     )}
-                  </div>
+                  </div> */}
+                  
                   {!isDesktopCollapsed && (
-                    <div className="text-base sm:text-lg md:text-xl flex flex-col font-bold text-white truncate">
+                    <div className="text-base sm:text-lg md:text-xl flex flex-col font-bold text-white truncate mx-3">
                       {user?.name ? user?.name : "Unknown User"}
                       <span className="text-sm font-medium text-gray-400">
                         {user?.is_subscribed

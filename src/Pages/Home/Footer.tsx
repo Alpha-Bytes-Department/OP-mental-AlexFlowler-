@@ -67,7 +67,7 @@ const Footer = () => {
             <h3 className="text-xl  font-bold mb-4">Social Icons</h3>
             <div className="flex space-x-4">
               <Link
-                to="#"
+                to="https://www.facebook.com/profile.php?id=61573809313470"
                 className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors"
                 aria-label="Facebook"
               >
@@ -81,7 +81,7 @@ const Footer = () => {
               </Link>
 
               <Link
-                to="#"
+                to="https://www.instagram.com/optimalperformancesystem/#"
                 className="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center hover:bg-pink-700 transition-colors"
                 aria-label="Instagram"
               >
@@ -95,7 +95,7 @@ const Footer = () => {
               </Link>
 
               <Link
-                to="#"
+                to="https://www.linkedin.com/company/optimal-performance-system/"
                 className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors"
                 aria-label="LinkedIn"
               >
@@ -109,7 +109,7 @@ const Footer = () => {
               </Link>
 
               <Link
-                to="#"
+                to="https://x.com/theOPsystem"
                 className="w-10 h-10 bg-black rounded-full flex items-center justify-center hover:bg-gray-800 transition-colors"
                 aria-label="Twitter"
               >

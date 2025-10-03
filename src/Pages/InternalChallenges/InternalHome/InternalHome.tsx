@@ -37,10 +37,11 @@ const InternalHome = () => {
         console.log("Failed to hi chat",error);
       });
     }else{
-      Swal.fire({
+      user && Swal.fire({
                 title: "Subscribe to chat",
                 text: "To access the Internal Challenge feature, please subscribe to one of our plans.",
                 icon: "info",
+                iconColor: "#DBD0A6",
                 confirmButtonText: "OK",
                 showCancelButton: true,
                 background: "rgba(255, 255, 255, 0.1)",

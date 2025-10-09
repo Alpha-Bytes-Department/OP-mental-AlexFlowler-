@@ -24,6 +24,7 @@ const ChatHome = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [sessionId, setSessionId] = useState<number | null>(null);
+  const [adminApproval, setAdminApproval] = useState<boolean | null>(null);
   const { user } = useAuth();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -58,110 +59,176 @@ const ChatHome = () => {
     autoResizeTextarea(e.target);
   };
 
+  // check admin approval for history
+  const handleAdminApproval = useCallback(async () => {
+    try {
+      const response = await axios.get("/api/chatbot/settings/");
+      if (response.status === 200) {
+        const { allow_chat_history } = response.data;
+        if (allow_chat_history) {
+          setAdminApproval(true);
+        } else {
+          setAdminApproval(false);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching admin settings:", error);
+      setAdminApproval(false); // safe fallback
+    }
+  }, [axios]);
+
   // Notification for history
   const handleChatInit = useCallback(async () => {
-    Swal.fire({
-      title: "Do you want to save chat history?",
-      icon: "info",
-      iconColor: "#DBD0A6",
-      confirmButtonText: "YES",
-      showCancelButton: true,
-      cancelButtonText: "NO",
-      background: "rgba(255, 255, 255, 0.1)",
-      backdrop: "rgba(0, 0, 0, 0.4)",
-      customClass: {
-        popup: "glassmorphic-popup",
-        title: "glassmorphic-title",
-        htmlContainer: "glassmorphic-text",
-        confirmButton: "glassmorphic-button",
-      },
-    }).then(async (result) => {
-      if (result?.isConfirmed) {
-        localStorage.setItem("chatHistory", "true");
-        setChatGeneralHistory("true");
+    if (adminApproval && adminApproval === true) {
+      Swal.fire({
+        title: "Do you want to save chat history?",
+        icon: "info",
+        iconColor: "#DBD0A6",
+        confirmButtonText: "YES",
+        showCancelButton: true,
+        cancelButtonText: "NO",
+        background: "rgba(255, 255, 255, 0.1)",
+        backdrop: "rgba(0, 0, 0, 0.4)",
+        customClass: {
+          popup: "glassmorphic-popup",
+          title: "glassmorphic-title",
+          htmlContainer: "glassmorphic-text",
+          confirmButton: "glassmorphic-button",
+        },
+      }).then(async (result) => {
+        if (result?.isConfirmed) {
+          localStorage.setItem("chatHistory", "true");
+          setChatGeneralHistory("true");
 
-        if (user && user?.is_subscribed === false) {
-          Swal.fire({
-            title: "Subscribe to chat",
-            text: "To continue, please subscribe to one of our plans.",
-            icon: "info",
-            iconColor: "#DBD0A6",
-            confirmButtonText: "OK",
-            showCancelButton: true,
-            background: "rgba(255, 255, 255, 0.1)",
-            backdrop: "rgba(0, 0, 0, 0.4)",
-            customClass: {
-              popup: "glassmorphic-popup",
-              title: "glassmorphic-title",
-              htmlContainer: "glassmorphic-text",
-              confirmButton: "glassmorphic-button",
-            },
-          }).then((result) => {
-            if (result.isConfirmed) {
-              navigate("/", { replace: false });
-              setTimeout(() => {
-                const pricingElement = document.getElementById("pricing");
-                if (pricingElement) {
-                  pricingElement.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                  });
-                }
-              }, 500);
-            }
+          if (user && user?.is_subscribed === false) {
+            Swal.fire({
+              title: "Subscribe to chat",
+              text: "To continue, please subscribe to one of our plans.",
+              icon: "info",
+              iconColor: "#DBD0A6",
+              confirmButtonText: "OK",
+              showCancelButton: true,
+              background: "rgba(255, 255, 255, 0.1)",
+              backdrop: "rgba(0, 0, 0, 0.4)",
+              customClass: {
+                popup: "glassmorphic-popup",
+                title: "glassmorphic-title",
+                htmlContainer: "glassmorphic-text",
+                confirmButton: "glassmorphic-button",
+              },
+            }).then((result) => {
+              if (result.isConfirmed) {
+                navigate("/", { replace: false });
+                setTimeout(() => {
+                  const pricingElement = document.getElementById("pricing");
+                  if (pricingElement) {
+                    pricingElement.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  }
+                }, 500);
+              }
+            });
+          }
+
+          const res = await axios.post("/api/chatbot/start/", {
+            save_history: true,
           });
-        }
+          setSessionId(res?.data?.session_id);
+        } else {
+          localStorage.setItem("chatHistory", "false");
+          setChatGeneralHistory("false");
 
-        const res = await axios.post("/api/chatbot/start/", {
-          save_history: true,
-        });
-        setSessionId(res?.data?.session_id);
-      } else {
-        localStorage.setItem("chatHistory", "false");
-        setChatGeneralHistory("false");
-
-        if (user && user?.is_subscribed === false) {
-          Swal.fire({
-            title: "Subscribe to chat",
-            text: "To continue, please subscribe to one of our plans.",
-            icon: "info",
-            iconColor: "#DBD0A6",
-            confirmButtonText: "OK",
-            showCancelButton: true,
-            background: "rgba(255, 255, 255, 0.1)",
-            backdrop: "rgba(0, 0, 0, 0.4)",
-            customClass: {
-              popup: "glassmorphic-popup",
-              title: "glassmorphic-title",
-              htmlContainer: "glassmorphic-text",
-              confirmButton: "glassmorphic-button",
-            },
-          }).then((result) => {
-            if (result.isConfirmed) {
-              navigate("/", { replace: false });
-              setTimeout(() => {
-                const pricingElement = document.getElementById("pricing");
-                if (pricingElement) {
-                  pricingElement.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                  });
-                }
-              }, 500);
-            }
+          if (user && user?.is_subscribed === false) {
+            Swal.fire({
+              title: "Subscribe to chat",
+              text: "To continue, please subscribe to one of our plans.",
+              icon: "info",
+              iconColor: "#DBD0A6",
+              confirmButtonText: "OK",
+              showCancelButton: true,
+              background: "rgba(255, 255, 255, 0.1)",
+              backdrop: "rgba(0, 0, 0, 0.4)",
+              customClass: {
+                popup: "glassmorphic-popup",
+                title: "glassmorphic-title",
+                htmlContainer: "glassmorphic-text",
+                confirmButton: "glassmorphic-button",
+              },
+            }).then((result) => {
+              if (result.isConfirmed) {
+                navigate("/", { replace: false });
+                setTimeout(() => {
+                  const pricingElement = document.getElementById("pricing");
+                  if (pricingElement) {
+                    pricingElement.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  }
+                }, 500);
+              }
+            });
+          }
+          const res = await axios.post("/api/chatbot/start/", {
+            save_history: false,
           });
+          setSessionId(res?.data?.session_id);
         }
-        const res = await axios.post("/api/chatbot/start/", {
-          save_history: false,
+      });
+    } else {
+      localStorage.setItem("chatHistory", "false");
+      setChatGeneralHistory("false");
+
+      if (user && user?.is_subscribed === false) {
+        Swal.fire({
+          title: "Subscribe to chat",
+          text: "To continue, please subscribe to one of our plans.",
+          icon: "info",
+          iconColor: "#DBD0A6",
+          confirmButtonText: "OK",
+          showCancelButton: true,
+          background: "rgba(255, 255, 255, 0.1)",
+          backdrop: "rgba(0, 0, 0, 0.4)",
+          customClass: {
+            popup: "glassmorphic-popup",
+            title: "glassmorphic-title",
+            htmlContainer: "glassmorphic-text",
+            confirmButton: "glassmorphic-button",
+          },
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate("/", { replace: false });
+            setTimeout(() => {
+              const pricingElement = document.getElementById("pricing");
+              if (pricingElement) {
+                pricingElement.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }
+            }, 500);
+          }
         });
-        setSessionId(res?.data?.session_id);
       }
-    });
-  }, [axios, navigate, setChatGeneralHistory, user]);
+      const res = await axios.post("/api/chatbot/start/", {
+        save_history: false,
+      });
+      setSessionId(res?.data?.session_id);
+    }
+  }, [axios, navigate, setChatGeneralHistory, user, adminApproval]);
+
+  // ✅ Fix: run in sequence
+  useEffect(() => {
+    handleAdminApproval();
+  }, [handleAdminApproval]);
 
   useEffect(() => {
-    handleChatInit();
-  }, [handleChatInit]); // Added 'handleChatInit' to the dependency array
+    if (adminApproval !== null) {
+      handleChatInit();
+    }
+  }, [adminApproval, handleChatInit]);
 
   // Load existing chat data
   const LoadData = useCallback(async () => {
@@ -173,13 +240,15 @@ const ChatHome = () => {
 
         if (Array.isArray(response.data)) {
           response.data.forEach(
-            (item: {
-              role: string;
-              id?: number;
-              message: string;
-              timestamp?: string;
-            },
-            idx: number) => {
+            (
+              item: {
+                role: string;
+                id?: number;
+                message: string;
+                timestamp?: string;
+              },
+              idx: number
+            ) => {
               if (item.role === "user") {
                 transformedMessages.push({
                   id: `user-${item.id ?? idx}`,
@@ -208,11 +277,11 @@ const ChatHome = () => {
     } finally {
       setIsInitialLoading(false);
     }
-  }, [axios, sessionId]); // Added 'LoadData' to the dependency array
+  }, [axios, sessionId]);
 
   useEffect(() => {
     LoadData();
-  }, [LoadData]); // Added 'LoadData' to the dependency array
+  }, [LoadData]);
 
   const onSubmit = async (data: FormData) => {
     if (!data.message.trim()) return;

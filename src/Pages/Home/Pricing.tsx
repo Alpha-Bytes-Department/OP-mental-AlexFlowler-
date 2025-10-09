@@ -119,9 +119,10 @@ const Pricing = () => {
   }
 
   const handlePlanClick = async (plan: PlanData) => {
+
+    console.log("user is not finding",user);
     // Swal.fire
     if (!user) {
-      console.log("user is not finding",user);
        Swal.fire({
         title: "Authentication Required",
         text: "You must be logged in to access this page.",
@@ -147,10 +148,7 @@ const Pricing = () => {
         }
       });
     }else{
-      navigate("/login", { state: { from: location }, replace: true });
-    }
-    // Navigate to checkout or perform any other action
-    if (plan.title !== "Corporate") {
+      if (plan.title !== "Corporate") {
       const res = await axios.post(
         `/api/subscriptions/create-checkout-session/`,
         { plan_id: plan?.stripe_price_id }
@@ -162,6 +160,9 @@ const Pricing = () => {
     } else {
       navigate('/chat/general')
     }
+    }
+    // Navigate to checkout or perform any other action
+    
   };
 
 

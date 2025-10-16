@@ -54,7 +54,7 @@ export const GoogleBtnBackend = () => {
       <button className="flex items-center text-black text-sm font-medium justify-center gap-2 bg-cCard rounded-[6px] py-5 ">
               {/* =========================== Google Login ================================ */}
               <FcGoogle />
-              <span className="font-inter">Continue with Google</span>
+              <span className="font-inter cursor-pointer">Continue with Google</span>
     </button>
     </button>
   );

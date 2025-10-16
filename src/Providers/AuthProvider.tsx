@@ -11,11 +11,22 @@ interface User {
   is_subscribed: boolean;
 }
 
+
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   refreshUser: () => Promise<void>;
+  logout: () => Promise<void>;
 }
+
+
+
+interface AuthContextType {
+  isLoading: boolean;
+  refreshUser: () => Promise<void>;
+  logout: () => Promise<void>; // 
+}
+
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -24,6 +35,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isLoading, setIsLoading] = useState(true);
   const axios = useAxios();
 
+    const logout = async () => {
+    try {
+      await axios.post("/api/users/logout/"); 
+    } catch {
+    } finally {
+      setUser(null);
+      localStorage.removeItem("access");
+      localStorage.removeItem("refresh");
+      localStorage.removeItem("user");
+    }
+  };
   
 
   const fetchUser = async () => {
@@ -43,7 +65,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, refreshUser: fetchUser }}>
+    <AuthContext.Provider value={{ user, isLoading, refreshUser: fetchUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

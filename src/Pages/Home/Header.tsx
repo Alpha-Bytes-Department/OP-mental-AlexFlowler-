@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
-
+import { useAuth } from "../../Providers/AuthProvider";
+import { RiLogoutCircleRLine } from "react-icons/ri";
+import { motion } from "framer-motion";
 
 const Header = () => {
   const scrollToPricing = () => {
-    
     const pricingElement = document.getElementById("pricing");
     if (pricingElement) {
       pricingElement.scrollIntoView({
@@ -12,6 +13,9 @@ const Header = () => {
       });
     }
   };
+
+  const { user, logout, isLoading } = useAuth();
+  console.log("user", user);
 
   return (
     <div
@@ -29,11 +33,54 @@ const Header = () => {
           alt="Logo"
         />
         <div className="flex  gap-4 md:gap-8 items-center">
-          <Link to="https://optimalperformancesystem.com/">Home</Link>
-          <Link to="/chat/general">Coach</Link>
-          <button className="btn bg-cCard text-black text-xs px-2 md:px-5 md:text-base" onClick={scrollToPricing}>
-            Start Subscription
-          </button>
+          {!user?.is_subscribed && (
+            <button
+              className="btn text-black bg-cCard font-bold py-3 px-5"
+              onClick={scrollToPricing}
+            >
+              Start Subscription
+            </button>
+          )}
+
+          {/* <div>
+            <Link to={'login'}>
+            <button
+              className="cursor-pointer border border-gray-300 rounded-lg px-4 py-2 flex items-center gap-2 
+             bg-gradient-to-r bg-cCard text-black font-bold 
+             shadow-md transition-all duration-300 ease-in-out
+             hover:scale-105 hover:shadow-[0_0_20px_rgba(79,70,229,0.6)]"
+            >
+              Subscription Plan
+            </button>
+            </Link>
+          </div> */}
+
+          {isLoading ? (
+            <div className="text-gray-400"></div>
+          ) : user ? (
+            <button
+              className="cursor-pointer border border-gray-300 rounded-lg px-2 py-2 flex items-center gap-2 w-28
+        bg-gradient-to-r bg-cCard text-black font-bold 
+        shadow-md transition-all duration-300 ease-in-out
+        hover:scale-105 hover:shadow-[0_0_20px_rgba(79,70,229,0.6)]"
+              onClick={logout}
+            >
+              <RiLogoutCircleRLine size={20} />
+              Logout
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              className="cursor-pointer border border-gray-300 rounded-lg px-4 py-2 flex items-center gap-2 
+        bg-gradient-to-r bg-cCard text-black font-bold 
+        shadow-md transition-all duration-300 ease-in-out
+        hover:scale-105 hover:shadow-[0_0_20px_rgba(79,70,229,0.6)]"
+            >
+              Login
+            </Link>
+          )}
+
+          
         </div>
       </nav>
 
@@ -49,18 +96,36 @@ const Header = () => {
           at your fingertips.
         </p>
         <div className=" flex items-center flex-col sm:flex-row gap-4">
-          <button
-            className="btn text-black bg-cCard font-bold py-3 px-5"
-            onClick={scrollToPricing}
-          >
-            Start Subscription
-          </button>
-          <Link
-            to={"/chat/general"}
-            className="btn rounded-lg bg-transparent text-white border-cCard py-3 px-5"
-          >
-            Chat with OP Coach Now
-          </Link>
+          {user?.is_subscribed === false && (
+            <button
+              className="btn text-black bg-cCard lg:font-bold py-3 lg:px-5"
+              onClick={scrollToPricing}
+            >
+              Start Subscription
+            </button>
+          )}
+
+          <div className="flex justify-center">
+            <motion.div
+              className="flex justify-center"
+              animate={{ scale: [1, 1.1, 1] }} // zoom in to 1.1 then back to 1
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            >
+              <Link
+                to={"/chat/general"}
+                className="btn rounded-full bg-gradient-to-r bg-cCard text-black
+            border-none lg:py-4 lg:px-8 lg:w-88 lg:h-16 font-semibold text-sm lg:text-xl 
+           shadow-md hover:scale-105 hover:shadow-[0_0_30px_rgba(99,102,241,0.8)] 
+           transition-all duration-300 mt-15"
+              >
+                Chat with OP Coach Now
+              </Link>
+            </motion.div>
+          </div>
         </div>
       </div>
     </div>

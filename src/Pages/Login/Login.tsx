@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { useAxios } from "../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
 import { GoogleBtnBackend } from "./Google";
+import { useAuth } from "../../Providers/AuthProvider";
 
 type Inputs = {
   email: string;
@@ -20,6 +21,7 @@ const Login = () => {
   const [isSubmitted, setSubmitted] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const axios = useAxios();
+  const {refreshUser} = useAuth();
   const navigate = useNavigate();
   const {
     register,
@@ -36,7 +38,7 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await axios.post("/api/users/login/", data);
-      console.log("Login Response:", response.data);
+      refreshUser();
       if (response.status === 200 || response.status === 201) {
         Swal.fire({
           title: "Success!",
@@ -84,10 +86,10 @@ const Login = () => {
 
 
   return (
-    <div className=" bg-[url('/background.png')] min-h-screen font-inter">
-      <div className="flex items-center justify-center px-5  py-24  text-white">
-        <div className="border px-5 md:px-10 border-hCard rounded-[10px] bg-[#00000080] w-full max-w-lg">
-          <h1 className=" text-center text-4xl font-inter font-semibold pt-14">
+    <div className=" bg-[url('/background.png')] min-h-screen font-inter ">
+      <div className="flex items-center justify-center px-5  lg:py-24  text-white">
+        <div className="border px-5 md:px-10 border-hCard rounded-[10px] bg-[#00000080] w-full max-w-lg mt-20">
+          <h1 className=" text-center text-xl lg:text-4xl font-inter font-semibold pt-2 lg:pt-14">
             Login
           </h1>
           <p className="text-center text-base font-inter pt-3 text-white">
@@ -96,10 +98,10 @@ const Login = () => {
               Create account
             </Link>
           </p>
-          <div className="flex flex-col gap-4 mt-8">
+          <div className="flex flex-col gap-4 lg:mt-8 cursor-pointer">
             <GoogleBtnBackend/>
           </div>
-          <div className="divider divider-accent py-7 px-10">OR</div>
+          <div className="divider divider-accent lg:py-7 px-10">OR</div>
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col  gap-5"
@@ -154,7 +156,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className=" text-black text-sm my-11 disabled:opacity-40 font-medium justify-center gap-2 bg-cCard rounded-[6px] py-5"
+              className=" text-black text-sm mb-2 lg:my-11 disabled:opacity-40 justify-center gap-2 bg-cCard rounded-[6px] py-5 cursor-pointer font-bold"
             >
               {isLoading ? "Logging in..." : "Login"}
             </button>

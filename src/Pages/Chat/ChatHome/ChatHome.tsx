@@ -4,8 +4,9 @@ import { FaArrowUp } from "react-icons/fa6";
 import { useAxios } from "../../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../../Providers/AuthProvider";
+// import { useAuth } from "../../../Providers/AuthProvider";
 import { useStatus } from "../../../Providers/StatusProvider";
+import { useAuth } from "../../../Providers/AuthProvider";
 
 interface Message {
   id: number | string;
@@ -174,6 +175,7 @@ const ChatHome = () => {
           const res = await axios.post("/api/chatbot/start/", {
             save_history: false,
           });
+          console.log("Session created at :" , res.data.session_id)
           setSessionId(res?.data?.session_id);
         }
       });
@@ -439,7 +441,6 @@ const ChatHome = () => {
           }}
         >
           <div className="flex flex-col gap-3 sm:gap-4 md:gap-5 py-4 max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto">
-
             {messageData?.length > 0 ? (
               <>
                 {messageData?.map((item) => (
@@ -476,7 +477,23 @@ const ChatHome = () => {
                           </span>
                         </div>
                       ) : (
-                        <p>{item.message}</p>
+                        <div
+                          className="prose prose-invert max-w-none"
+                          dangerouslySetInnerHTML={{
+                            __html: item.message
+                              .replace(/\n/g, "<br/>") // keep line breaks
+                              .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // bold text
+                              .replace(/\*(.*?)\*/g, "<em>$1</em>") // italic text
+                              .replace(/^### (.*$)/gim, "<h3>$1</h3>") // h3 headers
+                              .replace(/^## (.*$)/gim, "<h2>$1</h2>") // h2 headers
+                              .replace(/^# (.*$)/gim, "<h1>$1</h1>") // h1 headers
+                              .replace(/^- (.*$)/gim, "<li>$1</li>") // bullet points
+                              .replace(
+                                /<li>([\s\S]*?)<\/li>/gim,
+                                "<ul>$&</ul>"
+                              ), // wrap bullets in list
+                          }}
+                        ></div>
                       )}
                     </div>
                   </div>

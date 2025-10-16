@@ -4,6 +4,7 @@ import { useAxios } from "../../Providers/AxiosProvider";
 import Swal from "sweetalert2";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../Providers/AuthProvider";
+// import { useAuth } from "../../Providers/AuthProvider";
 
 // type declaration
 interface Feature {
@@ -35,7 +36,9 @@ const Pricing = () => {
   const [planDuration, setPlanDuration] = useState<"monthly" | "yearly">(
     "monthly"
   );
+  
   const { user } = useAuth();
+  console.log("User information:", user)
 
   const [subscriptionData, setSubscriptionData] = useState<Feature[]>([]);
   const [displayPlan, setDisplayPlan] = useState<PlanData | null>(null);
@@ -86,7 +89,7 @@ const Pricing = () => {
           .filter((feature) => feature.length > 0);
 
         setDisplayPlan({
-          title: "EnterPrise",
+          title: "Premium",
           subtitle: currentPlan.description,
           price: `$${currentPlan.price}`,
           services: cleanFeatures,
@@ -98,29 +101,26 @@ const Pricing = () => {
   }, [subscriptionData, planDuration]);
 
   // Static free plan
-  const freePlan: PlanData = {
-    title: "Corporate",
-    subtitle: "For large teams & corporations.",
-    price: "Free",
-    services: [
-      "Advanced employee directory",
-      "Project management",
-      "Resource scheduling",
-      "Version control",
-      "Team collaboration",
-      "Advanced analytics",
-    ],
-  };
+  // const freePlan: PlanData = {
+  //   title: "Corporate",
+  //   subtitle: "For large teams & corporations.",
+  //   price: "Free",
+  //   services: [
+  //     "Advanced employee directory",
+    
+  //   ],
+  // };
 
   // Combine plans for rendering
-  const plansToRender = [freePlan];
+  const plansToRender = [];
   if (displayPlan) {
     plansToRender.push(displayPlan);
   }
 
   const handlePlanClick = async (plan: PlanData) => {
 
-    console.log("user is not finding",user);
+   console.log("user is not finding",user);
+   
     // Swal.fire
     if (!user) {
        Swal.fire({
@@ -153,7 +153,6 @@ const Pricing = () => {
         `/api/subscriptions/create-checkout-session/`,
         { plan_id: plan?.stripe_price_id }
       );
-
       if (res.status === 200) {
         window.location.href = res.data.url;
       }
@@ -161,7 +160,7 @@ const Pricing = () => {
       navigate('/chat/general')
     }
     }
-    // Navigate to checkout or perform any other action
+   
     
   };
 

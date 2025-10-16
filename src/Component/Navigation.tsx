@@ -1,4 +1,6 @@
 import { FiPlusCircle } from "react-icons/fi";
+
+
 import {
   HiOutlineBars3,
   HiOutlineXMark,
@@ -11,11 +13,12 @@ import { FaAngleDown, FaBookJournalWhills, FaBrain } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
 import { NavLink, useMatch, useNavigate } from "react-router-dom";
 import {  useState } from "react";
-import { useAxios } from "../Providers/AxiosProvider";
+import axiosInstance, { useAxios } from "../Providers/AxiosProvider";
 import Swal from "sweetalert2";
 import { TbBrandMessenger } from "react-icons/tb";
 import { useStatus } from "../Providers/StatusProvider";
 import { useAuth } from "../Providers/AuthProvider";
+
 
 
 
@@ -50,6 +53,8 @@ const Navigation = ({
 
   //getting chat session from localstorage
   const session_id = localStorage.getItem("chat-session");
+
+    
   
   
 
@@ -60,26 +65,73 @@ const Navigation = ({
   const internalChallengeMatch = useMatch("/chat/internalChat/*");
   
 
+  
 
   // logout handler
-  const handleLogOut = async () => {
-    try {
-      const response = await axios.post("/api/users/logout/");
-      console.log("Logout successful:", response.data);
-      if (response.status === 200 || response.status === 201) {
-        localStorage.removeItem("user");
-        localStorage.removeItem("access");
-        localStorage.removeItem("refresh");
-        localStorage.removeItem("chat-session");
-        localStorage.removeItem("chatHistory");
-        const modal = document.getElementById(
-          "Profile_Modal"
-        ) as HTMLDialogElement | null;
-        if (modal) modal.close();
-      }
+  // const handleLogOut = async () => {
+    
+  // const {user} = useAuth();
+  // console.log("User information:", user)
+
+  
+  //   try {
+  //     const response = await axios.post("/api/users/logout/");
+  //     console.log("Logout successful:", response.data);
+  //     if (response.status === 200 || response.status === 201) {
+  //       localStorage.removeItem("user");
+  //       localStorage.removeItem("access");
+  //       localStorage.removeItem("refresh");
+  //       localStorage.removeItem("chat-session");
+  //       localStorage.removeItem("chatHistory");
+  //       axiosInstance.defaults.headers.common["Authorization"] = "";
+  //       refreshUser();
+  //       const modal = document.getElementById(
+  //         "Profile_Modal"
+  //       ) as HTMLDialogElement | null;
+  //       if (modal) modal.close();
+  //     }
+  //     Swal.fire({
+  //       title: "Success!",
+  //       text: "Logout successful.",
+  //       icon: "success",
+  //       confirmButtonText: "OK",
+  //       background: "rgba(255, 255, 255, 0.1)",
+  //       backdrop: "rgba(0, 0, 0, 0.4)",
+  //       customClass: {
+  //         popup: "glassmorphic-popup",
+  //         title: "glassmorphic-title",
+  //         htmlContainer: "glassmorphic-text",
+  //         confirmButton: "glassmorphic-button",
+  //       },
+  //     });
+  //     navigate("/");
+  //   } catch (error) {
+  //     console.error("Error logging out:", error);
+  //   }
+  // };
+
+  // logout handler
+const handleLogOut = async () => {
+  try {
+    const response = await axios.post("/api/users/logout/");
+    console.log("Logout successful:", response.data);
+
+    if (response.status === 200 || response.status === 201) {
+      localStorage.removeItem("user");
+      localStorage.removeItem("access");
+      localStorage.removeItem("refresh");
+      localStorage.removeItem("chat-session");
+      localStorage.removeItem("chatHistory");
+
+      // axios header clear করো
+      axiosInstance.defaults.headers.common["Authorization"] = "";
+
+      const modal = document.getElementById("Profile_Modal") as HTMLDialogElement | null;
+      if (modal) modal.close();
+
       Swal.fire({
         title: "Success!",
-        text: "Logout successful.",
+        text: "Logout  .",
         icon: "success",
         confirmButtonText: "OK",
         background: "rgba(255, 255, 255, 0.1)",
@@ -91,11 +143,17 @@ const Navigation = ({
           confirmButton: "glassmorphic-button",
         },
       });
-      navigate("/");
-    } catch (error) {
-      console.error("Error logging out:", error);
+
+      navigate("/"); // redirect to home
     }
-  };
+  } catch (error) {
+    console.error("Error logging out:", error);
+  }
+};
+
+  
+
+
 
   // const user = JSON.parse(localStorage.getItem("user") || "{}");
 

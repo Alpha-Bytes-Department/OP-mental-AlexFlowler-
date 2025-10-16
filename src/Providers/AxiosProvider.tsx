@@ -46,7 +46,7 @@ const processQueue = (error: any, token: string | null = null) => {
   failedQueue = [];
 };
 
-const axiosInstance = axios.create({
+ const axiosInstance = axios.create({
   baseURL: "https://optimalperformanceai.com/",
   timeout: 10000,
   headers: {

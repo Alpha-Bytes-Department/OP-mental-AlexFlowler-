@@ -45,7 +45,6 @@ const ChatHistory = () => {
     }
   };
 
-  console.log("chat history data:", datum);
 
   // Check permission from API
   const checkPermisssion = async () => {
@@ -152,20 +151,19 @@ const ChatHistory = () => {
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-[#b8a962] via-[#a69654] to-[#8b7c3f] px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex-shrink-0">
+      <div className=" px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex-shrink-0">
         <div className="mb-2">
-          <div className="flex items-center justify-center space-x-3">
+          <div className="flex items-center justify-center text-white space-x-3">
             {/* <MdHistory className="w-5 h-5 sm:w-6 sm:h-6 text-white flex-shrink-0" />  */}
-
             <div className="min-w-0 text-center">
-              <h1 className="text-xl sm:text-2xl font-bold text-black truncate">
+              <h1 className="text-xl sm:text-2xl font-bold  truncate">
                 Chat History
               </h1>
-              <h3 className="text-lg text-gray-700">
+              <h3 className="text-lg ">
                 {isPermitted ? "" : "Chat will apear for 24H only"}
               </h3>
-              <div className="flex justify-center items-center text-gray-700"></div>
-              <p className="text-gray-700 text-lg sm:text-sm">
+              <div className="flex justify-center items-center "></div>
+              <p className=" text-lg sm:text-sm">
                 Total: {filteredData.length}{" "}
                 {filteredData.length === 1 ? "conversation" : "conversations"}
               </p>
@@ -183,9 +181,8 @@ const ChatHistory = () => {
           />
         </div>
       </div>
-
       {/* Chat List - Scrollable Content */}
-      <div className="flex-1 overflow-y-auto bg-black/90">
+      <div className="flex-1 overflow-y-auto">
         {loading ? (
           <div className="flex items-center justify-center py-8 sm:py-12">
             <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-[#b8a962]"></div>

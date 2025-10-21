@@ -12,11 +12,11 @@ import { SiGoogletasks } from "react-icons/si";
 import { FaAngleDown, FaBookJournalWhills, FaBrain } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
 import { NavLink, useMatch, useNavigate } from "react-router-dom";
-import {  useState } from "react";
+import {  useEffect, useState } from "react";
 import axiosInstance, { useAxios } from "../Providers/AxiosProvider";
 import Swal from "sweetalert2";
 import { TbBrandMessenger } from "react-icons/tb";
-import { useStatus } from "../Providers/StatusProvider";
+// import { useStatus } from "../Providers/StatusProvider";
 import { useAuth } from "../Providers/AuthProvider";
 
 
@@ -39,117 +39,79 @@ const Navigation = ({
   toggleDesktopCollapse,
 }: NavigationProps) => {
   //hooks
-  const [isLogOutActive, setLogOutActive] = useState(false);
+   const [isLogOutActive, setLogOutActive] = useState(false);
   const navigate = useNavigate();
   const axios = useAxios();
-  const {chatGeneralHistory} = useStatus();
-  const {user} = useAuth();
-
-  // console.log("chat history", chatGeneralHistory);
-  // console.log("type of chat history", typeof(chatGeneralHistory));
+  const {user, refreshUser} = useAuth();
+  const [sessionId, setSessionId] = useState<string | null>(null);
   
-
-
-
-  //getting chat session from localstorage
-  const session_id = localStorage.getItem("chat-session");
-
-    
-  
-  
-
-  //matching active navigation for handle navigation style
-  const chatgeneral = useMatch("/chat/general/*");
+  const chatGeneralMatch = useMatch("/chat/general/*");
+  const chatSessionMatch = useMatch("/chat/:sessionId");
+  const chatInitMatch = useMatch("/chat/init");
+  const chatgeneral = chatGeneralMatch || chatSessionMatch || chatInitMatch;
   const journalLinkMatched = useMatch("/chat/journal/*");
   const mindsetLinkMatched = useMatch("/chat/mindsetChat/*");
   const internalChallengeMatch = useMatch("/chat/internalChat/*");
-  
 
-  
+useEffect(() => {
+    const updateSessionId = () => {
+      setSessionId(localStorage.getItem("chat-session"));
+    };
 
-  // logout handler
-  // const handleLogOut = async () => {
-    
-  // const {user} = useAuth();
-  // console.log("User information:", user)
+    updateSessionId(); // Initial check
 
-  
-  //   try {
-  //     const response = await axios.post("/api/users/logout/");
-  //     console.log("Logout successful:", response.data);
-  //     if (response.status === 200 || response.status === 201) {
-  //       localStorage.removeItem("user");
-  //       localStorage.removeItem("access");
-  //       localStorage.removeItem("refresh");
-  //       localStorage.removeItem("chat-session");
-  //       localStorage.removeItem("chatHistory");
-  //       axiosInstance.defaults.headers.common["Authorization"] = "";
-  //       refreshUser();
-  //       const modal = document.getElementById(
-  //         "Profile_Modal"
-  //       ) as HTMLDialogElement | null;
-  //       if (modal) modal.close();
-  //     }
-  //     Swal.fire({
-  //       title: "Success!",
-  //       text: "Logout successful.",
-  //       icon: "success",
-  //       confirmButtonText: "OK",
-  //       background: "rgba(255, 255, 255, 0.1)",
-  //       backdrop: "rgba(0, 0, 0, 0.4)",
-  //       customClass: {
-  //         popup: "glassmorphic-popup",
-  //         title: "glassmorphic-title",
-  //         htmlContainer: "glassmorphic-text",
-  //         confirmButton: "glassmorphic-button",
-  //       },
-  //     });
-  //     navigate("/");
-  //   } catch (error) {
-  //     console.error("Error logging out:", error);
-  //   }
-  // };
+    window.addEventListener("storage", updateSessionId);
 
-  // logout handler
-const handleLogOut = async () => {
-  try {
-    const response = await axios.post("/api/users/logout/");
-    console.log("Logout successful:", response.data);
+    return () => {
+      window.removeEventListener("storage", updateSessionId);
+    };
+  }, []);
 
-    if (response.status === 200 || response.status === 201) {
-      localStorage.removeItem("user");
-      localStorage.removeItem("access");
-      localStorage.removeItem("refresh");
-      localStorage.removeItem("chat-session");
-      localStorage.removeItem("chatHistory");
+  // Handler functions after hooks
+  const handleLogOut = async () => {
+    try {
+      const response = await axios.post("/api/users/logout/");
+      
+      if (response.status === 200 || response.status === 201) {
+        // Clear localStorage items
+        localStorage.removeItem("user");
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
+        localStorage.removeItem("chat-session");
+        localStorage.removeItem("chatHistory");
 
-      // axios header clear করো
-      axiosInstance.defaults.headers.common["Authorization"] = "";
+        // Clear axios header
+        axiosInstance.defaults.headers.common["Authorization"] = "";
 
-      const modal = document.getElementById("Profile_Modal") as HTMLDialogElement | null;
-      if (modal) modal.close();
+        // Close modal if open
+        const modal = document.getElementById("Profile_Modal") as HTMLDialogElement | null;
+        if (modal) modal.close();
 
-      Swal.fire({
-        title: "Success!",
-        text: "Logout  .",
-        icon: "success",
-        confirmButtonText: "OK",
-        background: "rgba(255, 255, 255, 0.1)",
-        backdrop: "rgba(0, 0, 0, 0.4)",
-        customClass: {
-          popup: "glassmorphic-popup",
-          title: "glassmorphic-title",
-          htmlContainer: "glassmorphic-text",
-          confirmButton: "glassmorphic-button",
-        },
-      });
-
-      navigate("/"); // redirect to home
+        // Show success message
+        await Swal.fire({
+          title: "Success!",
+          text: "Logout successful.",
+          icon: "success",
+          confirmButtonText: "OK",
+          background: "rgba(255, 255, 255, 0.1)",
+          backdrop: "rgba(0, 0, 0, 0.4)",
+          customClass: {
+            popup: "glassmorphic-popup",
+            title: "glassmorphic-title",
+            htmlContainer: "glassmorphic-text",
+            confirmButton: "glassmorphic-button",
+          },
+        });
+        
+        // Update auth state and navigate
+        refreshUser();
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Error logging out:", error);
     }
-  } catch (error) {
-    console.error("Error logging out:", error);
-  }
-};
+  };
+
 
   
 
@@ -231,7 +193,7 @@ const handleLogOut = async () => {
           {/* -----------------Top Section ------------------------ Start New Chat */}
           <div className="p-4 space-y-2">
             <NavLink
-              to="/chat/general"
+              to="/chat/init"
               end
               className={`
                 w-full flex items-center gap-3 p-3 rounded-lg
@@ -245,7 +207,7 @@ const handleLogOut = async () => {
                 <span className="text-lg font-montserrat ">Ai chat</span>
               )}
             </NavLink>
-            {chatGeneralHistory === "true" && user?.is_subscribed === true && <NavLink
+            {user?.is_subscribed === true && <NavLink
               to="/chat/general/history"
               end
               className={`
@@ -311,7 +273,7 @@ const handleLogOut = async () => {
               </NavLink>}
             </div>
             <NavLink
-              to={`/chat/internalChat/${session_id}`}
+              to={`/chat/internalChat/${sessionId}`}
               className={`
                     w-full flex items-center gap-3 p-3 rounded-lg
                     hover:bg-[#2D2A2B] transition-colors
@@ -328,7 +290,7 @@ const handleLogOut = async () => {
                 </span>
               )}
             </NavLink>
-            {session_id && (
+            {sessionId && (
               <NavLink
                 to="/chat/internalChat/Home"
                 className={`
@@ -368,7 +330,7 @@ const handleLogOut = async () => {
             {/* ---------bottom links------------- */}
             <div className="p-4 ">
               <NavLink
-                to="/chat/general"
+                to="/chat/init"
                 className={`
                 w-full flex items-center gap-3 p-3 rounded-lg
                 hover:bg-[#2D2A2B] transition-colors
@@ -415,8 +377,8 @@ const handleLogOut = async () => {
               </NavLink>
               <NavLink
                 to={
-                  session_id
-                    ? `/chat/internalChat/${session_id}`
+                  sessionId
+                    ? `/chat/internalChat/${sessionId}`
                     : "/chat/internalChat/home"
                 }
                 className={`

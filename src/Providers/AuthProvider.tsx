@@ -1,4 +1,4 @@
-import  { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { useAxios } from "./AxiosProvider";
 
@@ -11,7 +11,6 @@ interface User {
   is_subscribed: boolean;
 }
 
-
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
@@ -19,25 +18,18 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
-
-
-interface AuthContextType {
-  isLoading: boolean;
-  refreshUser: () => Promise<void>;
-  logout: () => Promise<void>; // 
-}
-
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const axios = useAxios();
 
-    const logout = async () => {
+  const logout = async () => {
     try {
-      await axios.post("/api/users/logout/"); 
+      await axios.post("/api/users/logout/");
     } catch {
     } finally {
       setUser(null);
@@ -46,7 +38,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       localStorage.removeItem("user");
     }
   };
-  
 
   const fetchUser = async () => {
     setIsLoading(true);
@@ -65,7 +56,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, refreshUser: fetchUser, logout }}>
+    <AuthContext.Provider
+      value={{ user, isLoading, refreshUser: fetchUser, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

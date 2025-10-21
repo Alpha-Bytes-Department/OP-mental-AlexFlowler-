@@ -32,7 +32,7 @@ export const GoogleBtnBackend = () => {
           // Set tokens in both localStorage and cookies
           setTokens(data.access, data.refresh);
           
-          window.location.href = "/chat/general";
+          window.location.href = "/chat/init";
         } else {
           console.error("Backend error:", data);
         }

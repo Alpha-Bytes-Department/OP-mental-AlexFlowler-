@@ -38,7 +38,6 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await axios.post("/api/users/login/", data);
-      refreshUser();
       if (response.status === 200 || response.status === 201) {
         Swal.fire({
           title: "Success!",
@@ -57,7 +56,8 @@ const Login = () => {
          localStorage.setItem("access", response.data.access);
          localStorage.setItem("refresh", response.data.refresh);
          localStorage.setItem("user", JSON.stringify(response.data.user));
-         navigate("/chat/general");
+         refreshUser();
+         navigate("/chat/init");
       }
     } catch (error) {
       let errorMessage = "An unknown error occurred";

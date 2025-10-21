@@ -116,7 +116,7 @@ const Header = () => {
               }}
             >
               <Link
-                to={"/chat/general"}
+                to={"/chat/init"}
                 className="btn rounded-full bg-gradient-to-r bg-cCard text-black
             border-none lg:py-4 lg:px-8 lg:w-88 lg:h-16 font-semibold text-sm lg:text-xl 
            shadow-md hover:scale-105 hover:shadow-[0_0_30px_rgba(99,102,241,0.8)] 

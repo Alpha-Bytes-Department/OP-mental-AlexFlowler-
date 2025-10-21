@@ -22,6 +22,7 @@ import JournalDetails from "../Pages/Journal/JournalDetails/JournalDetails";
 import UserVerify from "../Pages/MailVerifiy/UserVerify";
 import ChatHistory from "../Pages/Chat/ChatHistory/ChatHistory";
 import SingleChat from "../Pages/Chat/SingleChat/SingleChat";
+import ChatInit from "../Pages/Chat/ChatInit/ChatInit";
 
 const Router = createBrowserRouter([
   {
@@ -61,55 +62,59 @@ const Router = createBrowserRouter([
     errorElement: <Error />,
     children: [
       {
-        path: "/chat/general",
+        path: "init",
+        element: <ChatInit/>
+      },
+      {
+        path: ":sessionId",
         element: <ChatHome />,
       },
       {
-        path: "/chat/general/history",
+        path: "general/history",
         element: <ChatHistory />,
       },
       {
-        path: "/chat/general/history/:session_id",
+        path: "general/history/:session_id",
         element:<SingleChat/>
       },
       {
-        path: "/chat/general/test",
+        path: "general/test",
         element: <ChatSession />,
       },
       {
-        path: "/chat/settings",
+        path: "settings",
         element: <Settings />,
       },
       {
-        path: "/chat/journal/options",
+        path: "journal/options",
         element: <JournalOptions />,
       },
       {
-        path: "/chat/journal/journal-chat/:session_id",
+        path: "journal/journal-chat/:session_id",
         element: <JournalChat />,
       },
       {
-        path: "/chat/journal/list",
+        path: "journal/list",
         element: <JournalList />,
       },
       {
-        path: "/chat/journal/details/:session_id",
+        path: "journal/details/:session_id",
         element: <JournalDetails />,
       },
       {
-        path: "/chat/mindsetChat/home",
+        path: "mindsetChat/home",
         element: <MindsetHome />,
       },
       {
-        path: "/chat/mindsetChat/:mindset_session",
+        path: "mindsetChat/:mindset_session",
         element: <MindsetChat />,
       },
       {
-        path: "/chat/internalChat/Home",
+        path: "internalChat/Home",
         element: <InternalHome />,
       },
       {
-        path: "/chat/internalChat/:session_id",
+        path: "internalChat/:session_id",
         element: <InternalChat />,
       },
     ],

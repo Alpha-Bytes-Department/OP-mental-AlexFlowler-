@@ -157,7 +157,7 @@ const Pricing = () => {
         window.location.href = res.data.url;
       }
     } else {
-      navigate('/chat/general')
+      navigate('/chat/init')
     }
     }
    

@@ -103,7 +103,7 @@ const PaymentVerificationContent = () => {
           </button>
         ) : (
           <Link
-            to="/chat/general"
+            to="/chat/init"
             className="backdrop-blur-md bg-hCard py-3 px-6 rounded-xl font-medium text-white hover:bg-white/20 transition-all duration-300 text-center"
           >
             Go to dashboard

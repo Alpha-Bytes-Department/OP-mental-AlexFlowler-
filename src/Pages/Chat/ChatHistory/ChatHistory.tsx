@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAxios } from "../../../Providers/AxiosProvider";
-import { MdDelete, MdChat, MdHistory, MdSchedule } from "react-icons/md";
+import { MdDelete, MdChat, MdSchedule } from "react-icons/md";
 import Swal from "sweetalert2";
 import { Link } from "react-router-dom";
 
@@ -17,15 +17,21 @@ const ChatHistory = () => {
   const [datum, setDatum] = useState<ChatHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isPermitted, setIsPermitted] = useState(false);
+  // const [isOn, setIsOn] = useState(false);
 
+  // Fetch chat history from API
   const fetchChat = async () => {
     try {
       setLoading(true);
       const res = await axios.get("/api/chatbot/history/");
+      console.log("chat history response:", res.data);
       // Sort by updated_at descending (most recent first)
-      const sortedData = res?.data?.sort((a: ChatHistoryItem, b: ChatHistoryItem) => 
-        new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-      ) || [];
+      const sortedData =
+        res?.data?.sort(
+          (a: ChatHistoryItem, b: ChatHistoryItem) =>
+            new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        ) || [];
       setDatum(sortedData);
     } catch (error) {
       console.error("Failed to fetch chat history:", error);
@@ -39,7 +45,20 @@ const ChatHistory = () => {
     }
   };
 
+  console.log("chat history data:", datum);
+
+  // Check permission from API
+  const checkPermisssion = async () => {
+    try {
+      const res = await axios.get("/api/chatbot/settings/");
+      setIsPermitted(res.data.allow_chat_history);
+    } catch (error) {
+      console.error("Failed to check permission:", error);
+    }
+  };
+
   useEffect(() => {
+    checkPermisssion();
     fetchChat();
   }, []);
 
@@ -53,7 +72,7 @@ const ChatHistory = () => {
       confirmButtonColor: "#dc2626",
       cancelButtonColor: "#6b7280",
       confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "Cancel"
+      cancelButtonText: "Cancel",
     });
 
     if (result.isConfirmed) {
@@ -61,13 +80,13 @@ const ChatHistory = () => {
         const res = await axios.delete(`/api/chatbot/history/${id}/`);
         if (res.status === 204) {
           // Remove from local state immediately
-          setDatum(prev => prev.filter(item => item.id !== id));
+          setDatum((prev) => prev.filter((item) => item.id !== id));
           Swal.fire({
             title: "Deleted!",
             text: "Conversation has been deleted successfully.",
             icon: "success",
             timer: 2000,
-            showConfirmButton: false
+            showConfirmButton: false,
           });
         }
       } catch (error) {
@@ -83,58 +102,84 @@ const ChatHistory = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' ' + 
-           date.toLocaleDateString([], { month: 'short', day: 'numeric' }).toUpperCase();
+    return (
+      date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) +
+      " " +
+      date
+        .toLocaleDateString([], { month: "short", day: "numeric" })
+        .toUpperCase()
+    );
   };
 
   const getRelativeTime = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-    
+    const diffInMinutes = Math.floor(
+      (now.getTime() - date.getTime()) / (1000 * 60)
+    );
+
     if (diffInMinutes < 1) return "Just now";
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    
+
     const diffInHours = Math.floor(diffInMinutes / 60);
     if (diffInHours < 24) return `${diffInHours}h ago`;
-    
+
     const diffInDays = Math.floor(diffInHours / 24);
     if (diffInDays < 7) return `${diffInDays}d ago`;
-    
+
     return `${diffInDays}d ago`;
   };
 
   // Filter conversations based on search term
-  const filteredData = datum.filter(item =>
-    (item.title || "").toLowerCase().includes(searchTerm.toLowerCase())
-  );
+
+  const filteredData = datum.filter((item) => {
+    // First apply search term filter
+    const matchesSearch = (item.title || "")
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    // Then apply permission-based filtering
+    if (isPermitted) {
+      return matchesSearch && item.save_history;
+    } else {
+      // If user doesn't have permission, show only unsaved chats and chats from the last 24 hours
+      const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const isRecent = new Date(item.created_at) > twentyFourHoursAgo;
+      return matchesSearch && !item.save_history && isRecent;
+    }
+  });
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       {/* Header Section */}
       <div className="bg-gradient-to-r from-[#b8a962] via-[#a69654] to-[#8b7c3f] px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex-shrink-0">
-        <div className="mb-4 sm:mb-6">
-          <div className="flex items-center space-x-3">
-            <MdHistory className="w-5 h-5 sm:w-6 sm:h-6 text-white flex-shrink-0" />
-            <div className="min-w-0">
-              <h1 className="text-xl sm:text-2xl font-bold text-white truncate">
+        <div className="mb-2">
+          <div className="flex items-center justify-center space-x-3">
+            {/* <MdHistory className="w-5 h-5 sm:w-6 sm:h-6 text-white flex-shrink-0" />  */}
+
+            <div className="min-w-0 text-center">
+              <h1 className="text-xl sm:text-2xl font-bold text-black truncate">
                 Chat History
               </h1>
-              <p className="text-white/90 text-xs sm:text-sm">
-                {filteredData.length} {filteredData.length === 1 ? "conversation" : "conversations"}
+              <h3 className="text-lg text-gray-700">
+                {isPermitted ? "" : "Chat will apear for 24H only"}
+              </h3>
+              <div className="flex justify-center items-center text-gray-700"></div>
+              <p className="text-gray-700 text-lg sm:text-sm">
+                Total: {filteredData.length}{" "}
+                {filteredData.length === 1 ? "conversation" : "conversations"}
               </p>
             </div>
           </div>
         </div>
-
         {/* Search Bar */}
-        <div className="relative">
+        <div className="flex flex-col justify-center items-center">
           <input
             type="text"
             placeholder="Search conversations..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent text-sm"
+            className="w-full xl:w-4/12  px-3 sm:px-4 py-2.5 sm:py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent text-sm"
           />
         </div>
       </div>
@@ -144,7 +189,9 @@ const ChatHistory = () => {
         {loading ? (
           <div className="flex items-center justify-center py-8 sm:py-12">
             <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-[#b8a962]"></div>
-            <span className="ml-3 text-white text-sm sm:text-base">Loading conversations...</span>
+            <span className="ml-3 text-white text-sm sm:text-base">
+              Loading conversations...
+            </span>
           </div>
         ) : filteredData.length === 0 ? (
           <div className="px-4 sm:px-6 lg:px-8 py-12 sm:py-16 text-center">
@@ -153,10 +200,9 @@ const ChatHistory = () => {
               {searchTerm ? "No conversations found" : "No conversations yet"}
             </h3>
             <p className="text-gray-300 mb-6 text-sm sm:text-base px-4">
-              {searchTerm 
+              {searchTerm
                 ? `Try adjusting your search term "${searchTerm}"`
-                : "Start a new chat to see your conversation history here"
-              }
+                : "Start a new chat to see your conversation history here"}
             </p>
             {searchTerm && (
               <button

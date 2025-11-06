@@ -96,14 +96,14 @@ const Header = () => {
           at your fingertips.
         </p>
         <div className=" flex items-center flex-col sm:flex-row gap-4">
-          {user?.is_subscribed === false && (
+          {/* {user?.is_subscribed === false && (
             <button
               className="btn text-black bg-cCard lg:font-bold py-3 lg:px-5"
               onClick={scrollToPricing}
             >
               Start Subscription
             </button>
-          )}
+          )} */}
 
           <div className="flex justify-center">
             <motion.div

@@ -8,11 +8,11 @@ import {
   HiOutlineChevronLeft,
   // HiOutlineUser,
 } from "react-icons/hi2";
-import { SiGoogletasks } from "react-icons/si";
-import { FaAngleDown, FaBookJournalWhills, FaBrain } from "react-icons/fa6";
+// import { SiGoogletasks } from "react-icons/si";
+import { FaAngleDown, FaBookJournalWhills } from "react-icons/fa6";
 import { FaHome } from "react-icons/fa";
 import { NavLink, useMatch, useNavigate } from "react-router-dom";
-import {  useEffect, useState } from "react";
+import { useState } from "react";
 import axiosInstance, { useAxios } from "../Providers/AxiosProvider";
 import Swal from "sweetalert2";
 import { TbBrandMessenger } from "react-icons/tb";
@@ -43,29 +43,29 @@ const Navigation = ({
   const navigate = useNavigate();
   const axios = useAxios();
   const {user, refreshUser} = useAuth();
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  
+  // const [sessionId, setSessionId] = useState<string | null>(null);
+  console
   const chatGeneralMatch = useMatch("/chat/general/*");
   const chatSessionMatch = useMatch("/chat/:sessionId");
   const chatInitMatch = useMatch("/chat/init");
   const chatgeneral = chatGeneralMatch || chatSessionMatch || chatInitMatch;
   const journalLinkMatched = useMatch("/chat/journal/*");
-  const mindsetLinkMatched = useMatch("/chat/mindsetChat/*");
-  const internalChallengeMatch = useMatch("/chat/internalChat/*");
+  // const mindsetLinkMatched = useMatch("/chat/mindsetChat/*");
+  // const internalChallengeMatch = useMatch("/chat/internalChat/*");
 
-useEffect(() => {
-    const updateSessionId = () => {
-      setSessionId(localStorage.getItem("chat-session"));
-    };
+// useEffect(() => {
+//     const updateSessionId = () => {
+//       setSessionId(localStorage.getItem("chat-session"));
+//     };
 
-    updateSessionId(); // Initial check
+//     updateSessionId(); // Initial check
 
-    window.addEventListener("storage", updateSessionId);
+//     window.addEventListener("storage", updateSessionId);
 
-    return () => {
-      window.removeEventListener("storage", updateSessionId);
-    };
-  }, []);
+//     return () => {
+//       window.removeEventListener("storage", updateSessionId);
+//     };
+//   }, []);
 
   // Handler functions after hooks
   const handleLogOut = async () => {
@@ -222,7 +222,7 @@ useEffect(() => {
                 <span className="text-lg font-montserrat ">Ai chat History</span>
               )}
             </NavLink>}
-            <NavLink
+            {/* <NavLink
               to="/chat/mindsetChat/home"
               className={`
                     w-full flex items-center gap-3 p-3 rounded-lg
@@ -235,7 +235,7 @@ useEffect(() => {
               {!isDesktopCollapsed && (
                 <span className="text-lg font-montserrat ">Mindset Mantra</span>
               )}
-            </NavLink>
+            </NavLink> */}
             <div className="flex flex-col gap-3">
               <NavLink
                 to="/chat/journal/options"
@@ -272,7 +272,7 @@ useEffect(() => {
                 )}
               </NavLink>}
             </div>
-            <NavLink
+            {/* <NavLink
               to={`/chat/internalChat/${sessionId}`}
               className={`
                     w-full flex items-center gap-3 p-3 rounded-lg
@@ -289,8 +289,8 @@ useEffect(() => {
                   Internal Challenge
                 </span>
               )}
-            </NavLink>
-            {sessionId && (
+            </NavLink> */}
+            {/* {sessionId && (
               <NavLink
                 to="/chat/internalChat/Home"
                 className={`
@@ -308,7 +308,7 @@ useEffect(() => {
                   </span>
                 )}
               </NavLink>
-            )}
+            )} */}
             <NavLink
               to="/chat/settings"
               className={({ isActive }) => ` lg:hidden
@@ -343,7 +343,7 @@ useEffect(() => {
                   <span className="text-lg font-montserrat ">Ai chat</span>
                 )}
               </NavLink>
-              <NavLink
+              {/* <NavLink
                 to="/chat/mindsetChat/home"
                 className={`
                     w-full flex items-center gap-3 p-3 rounded-lg
@@ -358,7 +358,7 @@ useEffect(() => {
                     Mindset Mantra
                   </span>
                 )}
-              </NavLink>
+              </NavLink> */}
               <NavLink
                 to="/chat/journal/options"
                 className={({ isActive }) => `
@@ -375,7 +375,7 @@ useEffect(() => {
                   </span>
                 )}
               </NavLink>
-              <NavLink
+              {/* <NavLink
                 to={
                   sessionId
                     ? `/chat/internalChat/${sessionId}`
@@ -394,7 +394,7 @@ useEffect(() => {
                     Internal Challenge
                   </span>
                 )}
-              </NavLink>
+              </NavLink> */}
               <NavLink
                 to="/chat/settings"
                 className={({ isActive }) => ` lg:hidden

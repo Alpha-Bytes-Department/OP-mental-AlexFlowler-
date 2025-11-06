@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { useAxios } from "../../../Providers/AxiosProvider";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { useAuth } from "../../../Providers/AuthProvider";
+// import { set } from "react-hook-form";
 
 // interface Message {
 //   id: number | string;
@@ -27,8 +29,8 @@ const ChatInit = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const axios = useAxios();
   const navigate = useNavigate();
-  const [sessionId, setSessionId] = useState<string>("");
-
+  const [historyPermission, setHistoryPermission] = useState<boolean>(false);
+  const { user } = useAuth();
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(e.target.value);
@@ -70,26 +72,15 @@ const ChatInit = () => {
           },
         }).then(async (result) => {
           if (result.isConfirmed) {
-            const sessionRes = await axios.post("/api/chatbot/start/", {
-              save_history: true,
-              message: message,
-            });
-            setSessionId(sessionRes.data?.session_id);
+            setHistoryPermission(true);
           } else {
-            const sessionRes = await axios.post("/api/chatbot/start/", {
-              save_history: false,
-            });
-            setSessionId(sessionRes.data?.session_id);
+            setHistoryPermission(false);
           }
         });
       } else {
-        const sessionRes = await axios.post("/api/chatbot/start/", {
-          save_history: false,
-        });
-        setSessionId(sessionRes.data?.session_id);
+        setHistoryPermission(false);
       }
     } catch (error) {
-      console.error("Error starting chat session:", error);
       Swal.fire({
         title: "Error",
         text: "Could not start a new chat session. Please try again.",
@@ -107,29 +98,66 @@ const ChatInit = () => {
 
   //sending message to backend
   const handleSendMessage = async (e?: React.FormEvent<HTMLFormElement>) => {
-  if (e) e.preventDefault();
-  if (!message.trim() || isLoading) return;
-
-  setIsLoading(true);
-  
-  try {
-    if (sessionId) {
-      // If we have a sessionId, send the message
-      await axios.post("/api/chatbot/message/", {
-        session_id: sessionId,
+    if (e) e.preventDefault();
+    if (!message.trim() || isLoading) return;
+    setIsLoading(true);
+    if (user && user?.is_subscribed === true) {
+      const sessionRes = await axios.post("/api/chatbot/start/", {
+        save_history: historyPermission,
         message: message,
       });
-      // Navigate to the chat session
-      navigate(`/chat/${sessionId}`);
+
+      try {
+        if (sessionRes.data?.session_id) {
+          // If we have a sessionId, send the message
+          await axios.post("/api/chatbot/message/", {
+            session_id: sessionRes.data?.session_id,
+            message: message,
+          });
+          // Navigate to the chat session
+          navigate(`/chat/${sessionRes.data?.session_id}`);
+        }
+      } catch (error) {
+        console.error("Error sending message:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      user &&
+        Swal.fire({
+          title: "Subscribe to chat",
+          text: "To access this feature, please subscribe to one of our plans.",
+          icon: "info",
+          iconColor: "#DBD0A6",
+          confirmButtonText: "OK",
+          showCancelButton: true,
+          background: "rgba(255, 255, 255, 0.1)",
+          backdrop: "rgba(0, 0, 0, 0.4)",
+          customClass: {
+            popup: "glassmorphic-popup",
+            title: "glassmorphic-title",
+            htmlContainer: "glassmorphic-text",
+            confirmButton: "glassmorphic-button",
+          },
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate("/", { replace: false });
+            setTimeout(() => {
+              const pricingElement = document.getElementById("pricing");
+              if (pricingElement) {
+                pricingElement.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }
+            }, 500); // Adjust delay if needed
+          } else {
+            setIsLoading(false);
+            return;
+          }
+        });
     }
-  } catch (error) {
-    console.error("Error sending message:", error);
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {

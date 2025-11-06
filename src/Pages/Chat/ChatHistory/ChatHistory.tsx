@@ -160,7 +160,7 @@ const ChatHistory = () => {
                 Chat History
               </h1>
               <h3 className="text-lg ">
-                {isPermitted ? "" : "Chat will apear for 24H only"}
+                {isPermitted ? "" : "Chats will disappear after 24hrs"}
               </h3>
               <div className="flex justify-center items-center "></div>
               <p className=" text-lg sm:text-sm">
